@@ -6,9 +6,28 @@ from .forms import CustomUserCreationForm, CustomUserChangeForm
 from .models import CustomUser
 
 class CustomUserAdmin(UserAdmin):
-    add_form = CustomUserCreationForm
-    form = CustomUserChangeForm
     model = CustomUser
-    list_display = ['email', 'username',]
+    list_display = ('username', 'email', 'phone_number', 'address')
+    search_fields = ('Username', 'Email', 'Phone Number', 'Address')
+    ordering = ('username',)
+
+    # Customizing the fieldsets to include the phone number and address
+    fieldsets = UserAdmin.fieldsets + (
+        (None, {
+            'fields': ('phone_number', 'address'),
+        }),
+    )
+
+    # If you want to customize the add form as well in the flat page
+    add_fieldsets = UserAdmin.add_fieldsets + ( 
+        ('Personal info', {
+            'fields': ('first_name', 'last_name', 'email', 'phone_number', 'address'),
+        }),
+        ('Permissions', {
+            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+        }),
+    )
+
+
 
 admin.site.register(CustomUser, CustomUserAdmin)
