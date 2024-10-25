@@ -8,6 +8,3 @@ class HomePageView(TemplateView):
 class AboutPageView(TemplateView):
     template_name = "pages/about.html"
 
-def index(request):
-    print(request.headers)
-    return render(request, )
