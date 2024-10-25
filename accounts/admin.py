@@ -5,6 +5,9 @@ from django.contrib.auth.admin import UserAdmin
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from .models import CustomUser
 
+from allauth.account.models import EmailAddress
+
+
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
     list_display = ('username', 'email', 'phone_number', 'address')
@@ -31,3 +34,7 @@ class CustomUserAdmin(UserAdmin):
 
 
 admin.site.register(CustomUser, CustomUserAdmin)
+
+#print("Unregistering EmailAddress from admin.")
+#unshows the email address tab.
+admin.site.unregister(EmailAddress)
