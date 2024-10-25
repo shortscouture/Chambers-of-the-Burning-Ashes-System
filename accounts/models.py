@@ -11,3 +11,4 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username #can greet people in methods by calling this
+    
