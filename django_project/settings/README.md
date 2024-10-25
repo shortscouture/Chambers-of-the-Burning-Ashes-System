@@ -23,3 +23,8 @@ To generate SECRET_KEY:
 3. Copy generated key to local machine AND .env file.
 
 NOTE: Don't forget to put .env in your .gitignore file.
+
+
+If switching to production or local, simply change
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_project.settings.local")  to .local or .production
