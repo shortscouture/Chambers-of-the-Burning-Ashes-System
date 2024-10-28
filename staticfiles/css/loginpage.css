@@ -1,13 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap');
 
-body, html {
-  height: 100%;
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .vid_container {
   position: absolute;
   top: 0;
@@ -25,6 +17,8 @@ body, html {
   min-height: 100%;
   transform: translate(-50%, -50%);
 }
+
+
 
 .content-container {
   position: relative;
@@ -75,13 +69,4 @@ body, html {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.10); /* Stronger drop shadow on hover */
   color: rgb(255, 255, 255); /* Text color */
   font-weight: bold;
-}
-
-.content {
-  position: relative;
-  z-index: 1;
-  background: rgba(255, 255, 255, 0.8);
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }

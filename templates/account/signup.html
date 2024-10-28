@@ -13,11 +13,14 @@
       <source src="{% static 'images/logincloud.mp4' %}" type="video/mp4">
   </video>
   </div>
-<h2>Sign up</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form|crispy }}
-  <button class="btn btn-success" type="submit">Sign up</button>
+  
+<div class="content"><h2>Sign up</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button class="btn btn-success" type="submit">Sign up</button>
 </form>
+</div>
 </body>
+
 {% endblock content %}
