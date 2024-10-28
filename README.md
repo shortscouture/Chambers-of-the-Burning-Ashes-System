@@ -10,6 +10,6 @@ The project aims to automate the management of columbarium records, ensuring acc
 
 For production, the project will use Docker + Django and will utilize:
 
-Gunicorn (pure py http wsgi application)
-psycopg2-binary (PosgresSQL)
-The database server is subject to change.
+- Gunicorn (pure py http wsgi application)
+- psycopg2-binary (PosgresSQL)
+- The database server is subject to change.
