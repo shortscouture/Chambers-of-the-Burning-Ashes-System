@@ -10,7 +10,7 @@ INTERNAL_IPS = [ip[:-1] + "1" for ip in ips]
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Initialize env variables
+# Initialize env variablesparent
 env = environ.Env(
     DEBUG=(bool, False) #default value for DEBUG = False
 )
@@ -158,9 +158,8 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATIC_URL = "/static/"
 
 # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'django_project', 'static'),  # Ensure this path is correct
-]
+STATICFILES_DIRS =  [BASE_DIR / "static"]
+
 
 # https://whitenoise.readthedocs.io/en/latest/django.html
 STORAGES = {
