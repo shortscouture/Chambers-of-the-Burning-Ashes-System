@@ -8,12 +8,13 @@ hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
 INTERNAL_IPS = [ip[:-1] + "1" for ip in ips]
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent # always need lagyan tatlong parent kasi nasa base.py tayo
 
 # Initialize env variablesparent
 env = environ.Env(
     DEBUG=(bool, False) #default value for DEBUG = False
 )
+
 
 # Read env file
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
@@ -28,6 +29,7 @@ SECRET_KEY = env("SECRET_KEY")
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#debug
 # SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = env('DEBUG')
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
@@ -80,7 +82,7 @@ WSGI_APPLICATION = "django_project.wsgi.application"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],
+        "DIRS": [os.path.join(BASE_DIR / "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
