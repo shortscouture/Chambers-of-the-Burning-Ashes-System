@@ -8,7 +8,7 @@ hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
 INTERNAL_IPS = [ip[:-1] + "1" for ip in ips]
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent #.parent # always need lagyan tatlong parent kasi nasa base.py tayo
+BASE_DIR = Path(__file__).resolve().parent.parent # # always need lagyan tatlong parent kasi nasa base.py tayo
 
 # Initialize env variablesparent
 env = environ.Env(
