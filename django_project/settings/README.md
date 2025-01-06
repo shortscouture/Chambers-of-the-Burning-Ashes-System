@@ -28,3 +28,5 @@ NOTE: Don't forget to put .env in your .gitignore file.
 If switching to production or local, simply change
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_project.settings.local")  to .local or .production
+
+
