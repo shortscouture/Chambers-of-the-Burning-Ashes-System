@@ -178,11 +178,19 @@ body {
     margin-top: 100px;
     color:#012953;
     font-size: 20px;
-    margin-right: 50.5% ;
+    margin-right: 60% ;
+}
+.abt{
+    display: flex; /* Use Flexbox for horizontal alignment */
+    gap: 20px; /* Spacing between cards */
+    flex-wrap: wrap; /* Allow cards to wrap to the next row on small screens */
+    justify-content: center; /* Align cards to the center */
+    padding: 20px;
+    margin: 0 auto;
 }
 
 .card {
-    position: relative;
+    position: flex;
     margin: 20px;
     padding: 20px 40px;
     background-color: rgba(255, 255, 255, 0.1);
@@ -190,11 +198,13 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: space-between;
     gap: 10px;
     overflow: hidden;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     cursor: pointer;
     transition: transform 0.3s, background-color 0.3s;
+    flex-wrap: wrap;
 }
 .card:hover {
     background-color: rgba(255, 255, 255, 0.8);
@@ -228,13 +238,13 @@ body {
     transform: translateY(-10px);
 }
 .card-title {
-    font-size: 1.25rem;
+    font-size: 1.35rem;
     font-weight: bold;
     color: #e5e5e5;
     transition: color 0.3s;
 }
 .card:hover .card-title {
-    color: #4a4a4a;
+    color: #191919;
 }
 .card-subtitle {
     font-size: 0.75rem;
@@ -270,6 +280,7 @@ body {
     box-shadow: 10px 10px 150px #012953;
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
+    margin-left: 180px;
 }
 .order-button:hover {
     background-color: rgba(255, 255, 255, 0.1);

@@ -10,3 +10,15 @@
                 modal.style.display = 'none';
             }
         }
+        function openPopup(title, content) {
+            const popup = document.getElementById("popup");
+            document.getElementById("popup-title").innerText = title;
+            document.getElementById("popup-content").innerText = content;
+            popup.classList.add("active");
+        }
+        
+        function closePopup() {
+            const popup = document.getElementById("popup");
+            popup.classList.remove("active");
+        }
+        
