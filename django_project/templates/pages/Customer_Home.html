@@ -46,7 +46,7 @@
                 <p class="card-title">Our History</p>
                 <p class="card-subtitle">One of Kind & Unique Plants Collection Here at SMKY.</p>
                 <div class="card-footer">
-                    <p class="order-button">Explore Now</p>
+                    <p class="order-button" onclick="showPopup('Our History', 'This is a detailed description of our history.')">Explore Now</p>
                 </div>
             </div>
             <div class="card">
@@ -54,7 +54,7 @@
                 <p class="card-title">Our Services</p>
                 <p class="card-subtitle">One of Kind & Unique Plants Collection Here at SMKY.</p>
                 <div class="card-footer">
-                    <p class="order-button">Explore Now</p>
+                    <p class="order-button" onclick="showPopup('Our Services', 'This is a detailed description of our services.')">Explore Now</p>
                 </div>
             </div>
             <div class="card">
@@ -62,9 +62,16 @@
                 <p class="card-title">Who are We?</p>
                 <p class="card-subtitle">One of Kind & Unique Plants Collection Here at SMKY.</p>
                 <div class="card-footer">
-                    <p class="order-button">Explore Now</p>
+                    <p class="order-button"onclick="showPopup('Who Are We?', 'This is a detailed description about who we are.')">Explore Now</p>
                 </div>
             </div>
+        </div>
+    </div>
+    <div id="popup" class="popup hidden">
+        <div class="popup-content">
+            <span class="close-button" onclick="closePopup()">&times;</span>
+            <h2 id="popup-title"></h2>
+            <p id="popup-description"></p>
         </div>
     </div>
     

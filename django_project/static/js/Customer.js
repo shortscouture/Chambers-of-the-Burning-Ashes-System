@@ -10,15 +10,23 @@
                 modal.style.display = 'none';
             }
         }
-        function openPopup(title, content) {
-            const popup = document.getElementById("popup");
-            document.getElementById("popup-title").innerText = title;
-            document.getElementById("popup-content").innerText = content;
-            popup.classList.add("active");
+        function showPopup(title, description) {
+            // Get the popup elements
+            const popup = document.getElementById('popup');
+            const popupTitle = document.getElementById('popup-title');
+            const popupDescription = document.getElementById('popup-description');
+        
+            // Set the content
+            popupTitle.textContent = title;
+            popupDescription.textContent = description;
+        
+            // Show the popup
+            popup.classList.remove('hidden');
         }
         
         function closePopup() {
-            const popup = document.getElementById("popup");
-            popup.classList.remove("active");
+            // Hide the popup
+            const popup = document.getElementById('popup');
+            popup.classList.add('hidden');
         }
         
