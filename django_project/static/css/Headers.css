@@ -1,30 +1,25 @@
 
+
+ /* Header style for staff headers */
   #header{
     width: 100%;
     height: 100%;
     z-index:2 ;
   }
   
-  .container{
-    padding:10px 10%;
+  .container {
+    padding: 10px 10%;
     margin: -7px;
     margin-top: -30px;
     height: 130px;
-    border: 4cm;
-  }
+    border-bottom: 0.1cm solid white; /* Add a solid white border to the bottom */
+    background-color: rgba(21, 124, 215, 0.784);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Add a dark shadow */
+    border-radius: 1px; /* Optional: Add rounded corners for a smoother look */
+}
 
-  
-  .container:hover{
-    padding:10px 10%;
-    background-color: rgba(25, 76, 227, 0.719);
-    border-color:rgb(8, 123, 255);
-    border: 4cm;
-    overflow: hidden;
-    margin: -7px;
-    margin-top: -30px;
-    height: 130px;
-  }
-  
+ /* Ending Header style for staff headers */
+
   nav{
     display: flex;
     align-items: center;
@@ -43,14 +38,8 @@
     position: fixed;
     margin-left: 1250px;
   }
-  
-  .menu:hover{
-    background-color: rgba(255, 255, 255, 0.641);
-    border-radius: 100px;
-    transition: ease-in 0.25s;
-    cursor: pointer;
-  }
-  
+
+    
   .menu-box{
     width: 10%;
     height: 30%;
@@ -101,11 +90,17 @@
     align-items: center;
   }
   
-  .name{
-    width: 500px;
-    margin-left: -150px;
-    margin-top: -30px;
+  .logohead{
+    width: 350px;
+    margin-left: -50px;
+    margin-top: -60px;
     z-index: 2;
+  }
+
+  .headname{
+    margin-left: -90px;
+    margin-top: 40px;
+    z-index: 2; 
   }
   
   nav ul li{
@@ -154,24 +149,29 @@
     text-align: center;
   }
 
+
   /* Modal styles */
 
-  #logoutBtn{
-    background-color: rgb(39, 94, 246);
-    border-style: solid;
-    border: 10px;
-    border-color: rgb(184, 217, 255);
-    color: #f0ffff;
-    border-radius: 30px;
-    width: 80px;
-    height: 20px;
-    margin-top: -150px;
-    margin-right: -120px;
-    box-shadow: 5px 5px 7px rgba(0.5, 0.5, 0.5, 0.5);
+  #logoutBtn {
+    background-color: rgb(39, 94, 246); 
+    border-style: solid; 
+    border-width: 2px; /* Adjusted for clarity */
+    border-color: rgb(184, 217, 255); 
+    color: #f0ffff; 
+    border-radius: 30px; 
+    padding: 5px 15px; /* Use padding instead of fixed width/height */
+    margin-top: -150px; 
+    margin-right: -120px; 
+    box-shadow: 5px 5px 7px rgba(0.5, 0.5, 0.5, 0.5); 
+    font-size: 14px; /* Ensure font size fits */
+    text-align: center; /* Center-align text */
+    text-decoration: none; /* Remove underline */
   }
+
   #logoutBtn:hover{
     background-color: rgba(199, 5, 5, 0.874);
   }  
+  
 .modal {
   display: none;
   position: fixed;
