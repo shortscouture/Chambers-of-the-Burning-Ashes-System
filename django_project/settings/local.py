@@ -12,6 +12,5 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 # Local static and media file settings
 STATICFILES_DIRS = [BASE_DIR / 'static']
