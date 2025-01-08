@@ -5,17 +5,13 @@ DEBUG = False
 ALLOWED_HOSTS = ['127.0.0.1']
 
 # Production database settings
-DATABASES = {
+DATABASES = { #hosted somewhere else
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'testDB',
-        'USER': 'admin',
-        'PASSWORD': 'admin',
         'HOST': 'localhost',
-        'PORT': '',
         'OPTIONS': {
-            'unix_socket': '/var/run/mysqld/mysqld.sock',
-        },
+            "read_default_file": ".venv/my.cnf"  
+        }
     }
 }
 
