@@ -1,51 +1,18 @@
-{% extends '_base2.html' %}
-
-{% block title %}DMS Dashboard{% endblock title %}
+{% extends 'Staff_Headers.html' %}
+{% load static %}
 
 {% block content %}
-<div class="container">
-  <div class="row">
-    <div class="col-md-3">
-      <nav class="nav flex-column">
-        <a class="nav-link active" href="#">Dashboard</a>
-        <a class="nav-link" href="#">Documents</a>
-        <a class="nav-link" href="#">Upload</a>
-        <a class="nav-link" href="#">Settings</a>
-      </nav>
-    </div>
-    <div class="col-md-9">
-      <h1>Welcome to the DMS Dashboard</h1>
-      <p>Here you can manage your documents efficiently.</p>
-      <div class="card">
-        <div class="card-header">
-          Document List
-        </div>
-        <div class="card-body">
-          <table class="table">
-            <thead>
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">Document Name</th>
-                <th scope="col">Date Uploaded</th>
-                <th scope="col">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th scope="row">1</th>
-                <td>Document1.pdf</td>
-                <td>2024-10-27</td>
-                <td>
-                  <button class="btn btn-primary btn-sm">View</button>
-                  <button class="btn btn-danger btn-sm">Delete</button>
-                </td>
-              </tr>
-              <!-- More rows as needed -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+<style>
+    body {
+      background-image: url("{% static 'images/cloud.png' %}");
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-position: center;
+      margin: 0;
+      height: 100vh;
+      width: 100%;
+    }
+  </style>
+
 {% endblock content %}

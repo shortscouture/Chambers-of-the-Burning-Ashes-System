@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Page</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="../../static/css/Customer.css">
+</head>
+<body>
+    <img src="../../static/images/BGM.jpg" alt="Background" class="background">
+    <div id="header">
+        {% include '../Headers_Customers.html' %}
+    </div>
+    <div class="content">
+        <h1>Avail a Columbary now!</h1>
+        <button class="btn" onclick="openModal()">Avail Now!</button>
+    </div>
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <form>
+                <input type="text" placeholder="First Name" required id="fn">
+                <input type="text" placeholder="Last Name" required id="ln">
+                <input type="email" placeholder="Email Address" required>
+                <input type="tel" placeholder="Mobile Number" required>
+                <button type="submit">Send Letter of Intent</button>
+            </form>
+        </div>
+    </div>
+    <div class="tour">
+        <h1 id = 'txt'>Discover the splendor of the <br> Shrine and Columbarium.</br><span id = 'txt2'><br>Embark on a serene journey with our 
+            immersive <br>360° Virtual Tour of the Shrine and Columbarium.<br> Explore the sacred spaces and stunning architecture of<br> 
+            this revered site, all from the comfort of your device.</h1>
+        
+        <img src = "../../static/images/360.png" id = 'tour'>
+    </div>
+    <script src="../../static/js/Customer.js"></script>
+</body>
+</html>
