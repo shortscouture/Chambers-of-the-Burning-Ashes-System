@@ -10,7 +10,6 @@
 <body>
     <img src="../../static/images/BGM.jpg" alt="Background" class="background">
     <div id="header">
-        {% include '../Headers_Customers.html' %}
     </div>
     <div class="content">
         <h1>Avail a Columbary now!</h1>
@@ -28,12 +27,60 @@
         </div>
     </div>
     <div class="tour">
-        <h1 id = 'txt'>Discover the splendor of the <br> Shrine and Columbarium.</br><span id = 'txt2'><br>Embark on a serene journey with our 
-            immersive <br>360° Virtual Tour of the Shrine and Columbarium.<br> Explore the sacred spaces and stunning architecture of<br> 
-            this revered site, all from the comfort of your device.</h1>
-        
-        <img src = "../../static/images/360.png" id = 'tour'>
+        <h1 id="txt">
+            Discover the splendor of the <br> Shrine and Columbarium.
+            <span id="txt2">
+                <br>Embark on a serene journey with our immersive
+                <br>360° Virtual Tour of the Shrine and Columbarium.<br> Explore the sacred spaces and stunning architecture of<br>
+                this revered site, all from the comfort of your device.
+            </span>
+        </h1>
+        <img src="../../static/images/360.png" id="tour">
+        <div class="about">
+            <h1>Know More About Us!</h1>
+        </div>
+        <div class = "abt">
+            <div class="card">
+                <img src="../../static/images/history.png" id="History" alt="History Image">
+                <p class="card-title">Our History</p>
+                <p class="card-subtitle">Click the button to learn about our History</p>
+                <div class="card-footer">
+                <p class="order-button" onclick="showPopup(
+        'Our History',
+        'St. Alphonsus Mary de Liguori Parish, also known as the Magallanes Church, was established on June 7, 1967, following the initiative of the first residents of Magallanes Village and the endorsement of Msgr. Ferdinand Mempin. Built on a lot donated by Ayala y Compañía, the church\'s cornerstone was laid by Rufino Cardinal Santos on August 2, 1967. The original structure, designed by National Artist Leandro Locsin, was known for its modernist style. Over the years, the parish flourished under various pastors and became a hub of community activity, hosting events like concerts and fundraisers. A significant event in its history was the devastating fire on September 9, 2004, which destroyed much of the church but left a large wooden image of the crucified Christ intact. The community rallied to rebuild the church, with the new structure designed by Architect Dominic Galicia and completed by 2007. The parish faced another challenge in 2009 when Typhoon Ondoy caused flooding, but once again, the community came together to restore it. In 2017, the parish celebrated its 50th anniversary, marking a major milestone in its history. Throughout its journey, St. Alphonsus Mary de Liguori Parish has played a significant role in the spiritual and cultural life of its community, offering a range of spiritual services and participating in various social and charitable activities. The history of the parish is a testament to the faith, resilience, and unity of its community.',
+        '../../static/images/History.jpg'
+            )">Explore Now</p>
+
+                </div>
+            </div>
+            <div class="card">
+                <img src="../../static/images/Service.png" id="History" alt="Services Image">
+                <p class="card-title">Our Services</p>
+                <p class="card-subtitle">We offer a variety of services!</p>
+                <div class="card-footer">
+                    <p class="order-button" onclick="showPopup('Our Services', 'This is a detailed description of our services.')">Explore Now</p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="../../static/images/who.png" id="History" alt="Who Are We Image">
+                <p class="card-title">Who are We?</p>
+                <p class="card-subtitle">One of Kind & Unique Plants Collection Here at SMKY.</p>
+                <div class="card-footer">
+                    <p class="order-button"onclick="showPopup('Who Are We?', 'This is a detailed description about who we are.')">Explore Now</p>
+                </div>
+            </div>
+        </div>
     </div>
+    <div id="popup" class="popup hidden">
+        <div class="popup-content">
+            <span class="close-button" onclick="closePopup()">&times;</span>
+            <h2 id="popup-title"></h2>
+            <p id="popup-description"></p>
+        </div>
+    </div>
+    
+
+
     <script src="../../static/js/Customer.js"></script>
 </body>
 </html>
