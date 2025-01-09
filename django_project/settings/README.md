@@ -1,5 +1,5 @@
 MUST DO WHEN INITIALIZING IN A NEW LOCAL ENVIRONMENT:
-1. Install django-environ.
+1. Install django-environ. (usually included in requirements.txt when creating a new venv)
 2. Create .env file in your root folder (where manage.py resides)
 3. Paste this line to your .env file:
 SECRET_KEY= 'your_secret_key'
