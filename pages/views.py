@@ -11,3 +11,12 @@ class AboutPageView(TemplateView):
     
 class maindashview(TemplateView):
     template_name = "pages/maindash.html"
+    
+class customerhomeview(TemplateView):
+    template_name ='pages/Customer_Home.html'
+
+class columbaryrecordsview(TemplateView):
+    template_name = "pages/columbaryrecords.html"
+    
+class indexview(TemplateView):
+    template_name = "pages/index.html"
