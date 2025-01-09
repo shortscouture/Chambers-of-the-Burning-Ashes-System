@@ -10,23 +10,48 @@
                 modal.style.display = 'none';
             }
         }
-        function showPopup(title, description) {
-            // Get the popup elements
-            const popup = document.getElementById('popup');
-            const popupTitle = document.getElementById('popup-title');
-            const popupDescription = document.getElementById('popup-description');
+        function showPopup(title, description, imageUrl, displayStyle = 'block') {
+            let overlay = document.querySelector('.overlay');
+            let popup = document.querySelector('.popup');
         
-            // Set the content
-            popupTitle.textContent = title;
-            popupDescription.textContent = description;
+            // If popup and overlay exist, update their content and show them
+            if (popup && overlay) {
+                popup.querySelector('h2').textContent = title;
+                popup.querySelector('img').src = imageUrl;
+                popup.querySelector('img').alt = title;
+                popup.querySelector('p').textContent = description;
         
-            // Show the popup
-            popup.classList.remove('hidden');
+                overlay.style.display = 'block';
+                popup.style.display = displayStyle;
+                return;
+            }
+        
+            // Otherwise, create a new popup and overlay
+            overlay = document.createElement('div');
+            overlay.onclick = closePopup; // Attach close event to overlay
+        
+            popup = document.createElement('div');
+            popup.className = 'popup';
+            popup.style.display = displayStyle;
+            popup.innerHTML = `
+                <h2>${title}</h2>
+                <img src="${imageUrl}" alt="${title}">
+                <p>${description}</p>
+            `;
+        
+            const closeButton = document.createElement('button');
+            closeButton.textContent = 'Close';
+            closeButton.addEventListener('click', closePopup); // Attach close event to button
+            popup.appendChild(closeButton);
+        
+            document.body.appendChild(overlay);
+            document.body.appendChild(popup);
         }
         
         function closePopup() {
-            // Hide the popup
-            const popup = document.getElementById('popup');
-            popup.classList.add('hidden');
+            const popup = document.querySelector('.popup');
+            const overlay = document.querySelector('.overlay');
+            if (popup) popup.remove(); // Remove popup from DOM
+            if (overlay) overlay.remove(); // Remove overlay from DOM
         }
         

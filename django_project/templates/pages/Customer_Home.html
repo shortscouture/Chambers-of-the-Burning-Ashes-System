@@ -10,7 +10,6 @@
 <body>
     <img src="../../static/images/BGM.jpg" alt="Background" class="background">
     <div id="header">
-        {% include '../Headers_Customers.html' %}
     </div>
     <div class="content">
         <h1>Avail a Columbary now!</h1>
@@ -44,15 +43,20 @@
             <div class="card">
                 <img src="../../static/images/history.png" id="History" alt="History Image">
                 <p class="card-title">Our History</p>
-                <p class="card-subtitle">One of Kind & Unique Plants Collection Here at SMKY.</p>
+                <p class="card-subtitle">Click the button to learn about our History</p>
                 <div class="card-footer">
-                    <p class="order-button" onclick="showPopup('Our History', 'This is a detailed description of our history.')">Explore Now</p>
+                <p class="order-button" onclick="showPopup(
+        'Our History',
+        'St. Alphonsus Mary de Liguori Parish, also known as the Magallanes Church, was established on June 7, 1967, following the initiative of the first residents of Magallanes Village and the endorsement of Msgr. Ferdinand Mempin. Built on a lot donated by Ayala y Compañía, the church\'s cornerstone was laid by Rufino Cardinal Santos on August 2, 1967. The original structure, designed by National Artist Leandro Locsin, was known for its modernist style. Over the years, the parish flourished under various pastors and became a hub of community activity, hosting events like concerts and fundraisers. A significant event in its history was the devastating fire on September 9, 2004, which destroyed much of the church but left a large wooden image of the crucified Christ intact. The community rallied to rebuild the church, with the new structure designed by Architect Dominic Galicia and completed by 2007. The parish faced another challenge in 2009 when Typhoon Ondoy caused flooding, but once again, the community came together to restore it. In 2017, the parish celebrated its 50th anniversary, marking a major milestone in its history. Throughout its journey, St. Alphonsus Mary de Liguori Parish has played a significant role in the spiritual and cultural life of its community, offering a range of spiritual services and participating in various social and charitable activities. The history of the parish is a testament to the faith, resilience, and unity of its community.',
+        '../../static/images/History.jpg'
+            )">Explore Now</p>
+
                 </div>
             </div>
             <div class="card">
                 <img src="../../static/images/Service.png" id="History" alt="Services Image">
                 <p class="card-title">Our Services</p>
-                <p class="card-subtitle">One of Kind & Unique Plants Collection Here at SMKY.</p>
+                <p class="card-subtitle">We offer a variety of services!</p>
                 <div class="card-footer">
                     <p class="order-button" onclick="showPopup('Our Services', 'This is a detailed description of our services.')">Explore Now</p>
                 </div>
