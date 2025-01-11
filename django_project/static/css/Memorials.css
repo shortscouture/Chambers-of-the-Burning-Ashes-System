@@ -6,11 +6,14 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
+    background-image: url("../images/BGM.jpg");
   }
 
   .form-container {
     text-align: center;
     background-color: #ffffff;
+    width: 50%;
+    height: auto;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
