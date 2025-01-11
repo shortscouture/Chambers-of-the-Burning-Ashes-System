@@ -10,7 +10,7 @@
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Add a dark shadow */
     border-radius: 1px; /* Optional: Add rounded corners for a smoother look */
     position: fixed;
-    width: 85%;
+    width: 85%; 
     z-index: 2;
 }
 
