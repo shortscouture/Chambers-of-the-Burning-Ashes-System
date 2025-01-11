@@ -14,7 +14,7 @@ body {
     background-color: #ffffff;
     width: 50%;
     height: auto;
-    padding: 20px;
+    padding: 50px;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
@@ -27,12 +27,13 @@ body {
 
   .form-container input[type="email"] {
     width: 300px;
-    padding: 10px;
+    padding: 15px;
     border: 1px solid #cccccc;
-    border-radius: 5px;
+    border-radius: 30px;
     font-size: 14px;
     outline: none;
     margin-bottom: 15px;
+    width: 700px;
   }
 
   .form-container input[type="email"]:focus {
@@ -46,9 +47,11 @@ body {
     border: none;
     padding: 10px 20px;
     font-size: 14px;
-    border-radius: 5px;
+    border-radius: 30px;
+    width: 100px;
     cursor: pointer;
     transition: background-color 0.3s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
 
   .form-container button:hover {
