@@ -19,3 +19,6 @@ class customerhomeview(TemplateView):
 
 class columbaryrecordsview(TemplateView):
     template_name = "pages/columbaryrecords.html"
+
+class memorialview(TemplateView):
+    template_name = "pages/Memorials.html"
