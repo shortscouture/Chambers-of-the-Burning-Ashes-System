@@ -16,3 +16,5 @@ media
 venv
 # environment file
 .env
+.env.local
+.env.prod

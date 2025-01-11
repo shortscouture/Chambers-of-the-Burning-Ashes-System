@@ -5,11 +5,13 @@ DEBUG = True #determines if local (dev) mode.
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
-# Development database
-DATABASES = {
+DATABASES = { 
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': 'localhost',
+        'OPTIONS': {
+            "read_default_file": ".venv/my.cnf"  
+        }
     }
 }
 # Local static and media file settings
