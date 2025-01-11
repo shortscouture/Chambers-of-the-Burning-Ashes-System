@@ -133,15 +133,16 @@ body {
     padding: 10px;
     margin: 0 auto;
     flex-wrap: wrap; /* Makes it responsive */
+    z-index: 1;
 }
  #tour{
     margin-top: 50px;
     width: 600px; /* Set a size for the image */
     height: auto;
     animation: float 3s ease-in-out infinite;
-    position: flex;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     border-radius:50px;
+    z-index: 1;
 }
 @keyframes float {
     0%, 100% {
