@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+    <style>
+        .dashboard-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #ADD8E6; 
+        }
+    </style>
+</head>
+<body>
+    <iframe src='/staff-headers/' width="100%" height="100px" frameborder="0"></iframe>
+
+    <div class="dashboard-container">
+        <h1 style="text-align:center;">CBAS Dashboard</h1>
+        <div id="dashboard"></div>
+    </div>
+
+    <script>
+        fetch('/dashboard')
+            .then(response => response.json())
+            .then(chartSpec => {
+                // Assuming your chartSpec has a "vconcat" or "hconcat" for multiple charts
+                chartSpec.config = {
+                    legend: { orient: "right" } // Set default legend position
+                }; 
+                vegaEmbed('#dashboard', chartSpec, { renderer: "canvas" }).catch(console.error);
+            });
+    </script>
+</body>
+</html>
