@@ -12,7 +12,7 @@ def home():
 def dashboard():
 
     # Read the CSV file into a DataFrame
-    df = pd.read_csv(r'C:\Users\Cheewz\APC-2024-2025-T2-10-Chambers-of-the-Burning-Ashes-System-master\APC-2024-2025-T2-10-Chambers-of-the-Burning-Ashes-System-master\CBAS_col_rec_sample.csv') 
+    df = pd.read_csv(r'django_project/CBAS_col_rec_sample.csv') 
 
     # Convert `cr_date_of_issuance` to datetime
     df['cr_date_of_issuance'] = pd.to_datetime(df['cr_date_of_issuance'], errors='coerce', dayfirst=True)
