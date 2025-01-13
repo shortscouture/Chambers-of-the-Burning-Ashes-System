@@ -8,5 +8,5 @@ urlpatterns = [
     path("columbaryrecords/", columbaryrecordsview.as_view(), name="columbaryrecords"),
     path("Customer_Home/", customerhomeview.as_view(), name="Customer_Home"),
     path("Memorials/", memorialview.as_view(), name="Memorials"),
-    path('submit-intent/', register_customer, name='submit_intent'),
+    path('register/', register_customer, name='register_customer'),
 ]

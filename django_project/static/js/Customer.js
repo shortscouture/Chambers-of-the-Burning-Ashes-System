@@ -54,7 +54,7 @@
             if (popup) popup.remove(); // Remove popup from DOM
             if (overlay) overlay.remove(); // Remove overlay from DOM
         }
-        
+
         document.getElementById('customerForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -64,7 +64,7 @@
             // Validate form
             let isValid = true;
             const full_name = document.getElementById('full_name').value.trim();
-            const address = document.getElementById('address').value.trim();
+            const address = document.getElementById('permanent_address').value.trim();
             
             if (!full_name) {
                 document.getElementById('full_name_error').style.display = 'block';
@@ -86,8 +86,8 @@
                 const formData = {
                     full_name: full_name,
                     address: address,
-                    landline: document.getElementById('landline').value.trim(),
-                    mobile: document.getElementById('mobile').value.trim(),
+                    landline: document.getElementById('landline_number').value.trim(),
+                    mobile: document.getElementById('mobile_number').value.trim(),
                     email: email
                 };
                 
