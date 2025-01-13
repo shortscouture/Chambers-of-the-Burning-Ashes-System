@@ -55,3 +55,61 @@
             if (overlay) overlay.remove(); // Remove overlay from DOM
         }
         
+        document.getElementById('customerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Reset errors
+            document.querySelectorAll('.error').forEach(error => error.style.display = 'none');
+            
+            // Validate form
+            let isValid = true;
+            const full_name = document.getElementById('full_name').value.trim();
+            const address = document.getElementById('address').value.trim();
+            
+            if (!full_name) {
+                document.getElementById('full_name_error').style.display = 'block';
+                isValid = false;
+            }
+            
+            if (!address) {
+                document.getElementById('address_error').style.display = 'block';
+                isValid = false;
+            }
+            
+            const email = document.getElementById('email').value.trim();
+            if (email && !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                document.getElementById('email_error').style.display = 'block';
+                isValid = false;
+            }
+            
+            if (isValid) {
+                const formData = {
+                    full_name: full_name,
+                    address: address,
+                    landline: document.getElementById('landline').value.trim(),
+                    mobile: document.getElementById('mobile').value.trim(),
+                    email: email
+                };
+                
+                fetch('/register/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('Customer registered successfully!');
+                        document.getElementById('customerForm').reset();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while submitting the form');
+                });
+            }
+        });

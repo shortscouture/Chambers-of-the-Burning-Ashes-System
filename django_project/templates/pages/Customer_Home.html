@@ -18,13 +18,35 @@
     </div>
     <div class="modal" id="modal">
         <div class="modal-content">
-            <form>
-                <input type="text" placeholder="First Name" required id="fn">
-                <input type="text" placeholder="Last Name" required id="ln">
-                <input type="email" placeholder="Email Address" required>
-                <input type="tel" placeholder="Mobile Number" required>
-                <button type="submit">Send Letter of Intent</button>
+            <form method="post" id="customerForm" action="{% url 'submit_intent' %}"> <!-- Update the URL name if needed -->
+                {% csrf_token %} <!-- Include CSRF token for security in Django -->
+                
+                <label for="full_name">Full Name:</label>
+                <input type="text" name="Full_Name" placeholder="Full Name" required id="full_name">
+                
+                <label for="permanent_address">Permanent Address:</label>
+                <textarea name="Permanent_Address" placeholder="Permanent Address" required id="permanent_address"></textarea>
+                
+                <label for="landline_number">Landline Number (Optional):</label>
+                <input type="tel" name="Landline_Number" placeholder="Landline Number" id="landline_number">
+                
+                <label for="mobile_number">Mobile Number:</label>
+                <input type="tel" name="Mobile_Number" placeholder="Mobile Number" required id="mobile_number">
+                
+                <label for="email_address">Email Address:</label>
+                <input type="email" name="Email_Address" placeholder="Email Address" required id="email_address">
+                
+                <label for="vault_id">Vault ID:</label>
+                <select name="COLUMBARY_RECORDS_VaultID" required id="vault_id">
+                    <option value="" disabled selected>Select Vault ID</option>
+                    <!-- Populate options dynamically if needed -->
+                    <option value="Vault001">Vault001</option>
+                    <option value="Vault002">Vault002</option>
+                </select>
+        
+                <button type="submit">Submit Intent</button>
             </form>
+            
         </div>
     </div>
     <div class="tour">

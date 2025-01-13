@@ -11,10 +11,10 @@ DATABASES = {
         'NAME': 'columbary_db',  # Replace with your database name
         'USER': 'root',              # Replace with your MySQL username
         'PASSWORD': 'root',  # Replace with your MySQL password
-        'HOST': 'localhost',          # Use '127.0.0.1' or your database host
+        'HOST': '127.0.0.1',          # Use '127.0.0.1' or your database host
         'PORT': '3306',               # Default MySQL port
     }
 }
-
+    
 # Local static and media file settings
 STATICFILES_DIRS = [BASE_DIR / 'static']
