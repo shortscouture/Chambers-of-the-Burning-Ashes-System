@@ -8,5 +8,5 @@ urlpatterns = [
     path("columbaryrecords/", columbaryrecordsview.as_view(), name="columbaryrecords"),
     path("Customer_Home/", customerhomeview.as_view(), name="Customer_Home"),
     path("Memorials/", memorialview.as_view(), name="Memorials"),
-    path('letter/', send_letter_of_intent, name='letter'),
+    path('send_letter_of_intent/', send_letter_of_intent, name='send_letter_of_intent'),
 ]
