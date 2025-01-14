@@ -1,16 +1,74 @@
 {% include 'Staff_Headers.html' %}
 {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/columbaryrecords.css' %}">
+    <title>Columbary Records</title>
+    <style>
+        body {
+            background-image: url("{% static 'images/cloud.png' %}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="dashboard-container">
 
-<style>
-    body {
-        background-image: url("{% static 'images/cloud.png' %}");
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-        background-position: center;
-        margin: 0;
-        height: 100vh;
-        width: 100%;
-    }
-</style
+            <!-- Search Bar and Add New Button -->
+            <div class="search-bar-container">
+                <div class="search-bar">
+                    <input type="text" placeholder="Insert Name" id="search-name" aria-label="Search by Name">
+                    <input type="text" placeholder="Insert Crypt No." id="search-crypt" aria-label="Search by Crypt Number">
+                    <button id="search-button" aria-label="Search">Search</button>
+                    <button id="add-new-button" aria-label="Add New Record">Add New</button>
+                </div>
+            </div>
 
+            <!-- Table with Customers -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email Address</th>
+                            <th>Crypt #</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if customers %}
+                            {% for customer in customers %}
+                                <tr>
+                                    <td class="white-box">{{ customer.full_name }}</td>  <!-- Display full_name -->
+                                    <td class="white-box">{{ customer.email_address }}</td>  <!-- Display email_address -->
+                                    <td>--</td>  <!-- Replace "--" with Crypt # if available -->
+                                    <td>
+                                        <!-- Details Button for Each Row -->
+                                        <a<button class="details-button">Details</button>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="no-records">No Records Found</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>
