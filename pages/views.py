@@ -3,6 +3,8 @@ from django.shortcuts import render, redirect
 from django.views.generic import ListView  # Import ListView
 from django.views.decorators.csrf import csrf_exempt
 from .forms import CustomerForm
+from .models import Customer
+
 
 class HomePageView(TemplateView):
     template_name = "pages/home.html"
@@ -20,6 +22,11 @@ class customerhomeview(TemplateView):
 
 class columbaryrecordsview(TemplateView):
     template_name = "pages/columbaryrecords.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["customers"] = Customer.objects.all()  # Fetch all customers from the database
+        return context
 
 class memorialview(TemplateView):
     template_name = "pages/Memorials.html"
