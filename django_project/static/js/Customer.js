@@ -76,7 +76,7 @@
                 isValid = false;
             }
             
-            const email = document.getElementById('email').value.trim();
+            const email = document.getElementById('email_addrress').value.trim();
             if (email && !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
                 document.getElementById('email_error').style.display = 'block';
                 isValid = false;

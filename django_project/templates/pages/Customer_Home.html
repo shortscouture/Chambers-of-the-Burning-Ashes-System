@@ -18,33 +18,25 @@
     </div>
     <div class="modal" id="modal">
         <div class="modal-content">
-            <form method="post" id="customerForm" action="{% url 'submit_intent' %}"> <!-- Update the URL name if needed -->
-                {% csrf_token %} <!-- Include CSRF token for security in Django -->
+            <form method="post" action="{% url 'send_letter_of_intent' %}">
+                {% csrf_token %}
                 
-                <label for="full_name">Full Name:</label>
-                <input type="text" name="Full_Name" placeholder="Full Name" required id="full_name">
+                <!-- Full Name -->
+                <input type="text" name="full_name" placeholder="Full Name" required id="fn" class="form-control">
                 
-                <label for="permanent_address">Permanent Address:</label>
-                <textarea name="Permanent_Address" placeholder="Permanent Address" required id="permanent_address"></textarea>
+                <!-- Permanent Address -->
+                <textarea name="permanent_address" placeholder="Permanent Address" required class="form-control" rows="3"></textarea>
                 
-                <label for="landline_number">Landline Number (Optional):</label>
-                <input type="tel" name="Landline_Number" placeholder="Landline Number" id="landline_number">
+                <!-- Landline Number -->
+                <input type="tel" name="landline_number" placeholder="Landline Number" class="form-control">
                 
-                <label for="mobile_number">Mobile Number:</label>
-                <input type="tel" name="Mobile_Number" placeholder="Mobile Number" required id="mobile_number">
+                <!-- Mobile Number -->
+                <input type="tel" name="mobile_number" placeholder="Mobile Number" required class="form-control">
                 
-                <label for="email_address">Email Address:</label>
-                <input type="email" name="Email_Address" placeholder="Email Address" required id="email_address">
+                <!-- Email Address -->
+                <input type="email" name="email_address" placeholder="Email Address" required class="form-control">
                 
-                <label for="vault_id">Vault ID:</label>
-                <select name="COLUMBARY_RECORDS_VaultID" required id="vault_id">
-                    <option value="" disabled selected>Select Vault ID</option>
-                    <!-- Populate options dynamically if needed -->
-                    <option value="Vault001">Vault001</option>
-                    <option value="Vault002">Vault002</option>
-                </select>
-        
-                <button type="submit">Submit Intent</button>
+                <button type="submit" class="btn btn-primary">Send Letter of Intent</button>
             </form>
             
         </div>

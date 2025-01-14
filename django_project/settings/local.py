@@ -15,6 +15,11 @@ DATABASES = {
         'PORT': '3306',               # Default MySQL port
     }
 }
-    
+
 # Local static and media file settings
 STATICFILES_DIRS = [BASE_DIR / 'static']
+from django.apps import AppConfig
+
+
+class PagesConfig(AppConfig):
+    name = "pages"
