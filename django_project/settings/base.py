@@ -71,6 +71,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",  # django-allauth
+    "django_project.middleware.LimitSignupByIPMiddleware",  # Custom Middleware
 ]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#root-urlconf
@@ -128,6 +129,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Max sign up attempts per IP
+MAX_SIGNUP_ATTEMPTS = 5
+SIGNUP_ATTEMPTS_TIMEOUT = 300 #5 minutes
 
 # Internationalization
 # https://docs.djangoproject.com/en/dev/topics/i18n/
