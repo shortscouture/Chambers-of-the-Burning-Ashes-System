@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     # Local
     "accounts",
     "pages",
+    "captcha"
 ]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
