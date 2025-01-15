@@ -17,7 +17,6 @@ body {
     padding: 50px;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin-right: 100px;
   }
 
   .form-container h1 {
@@ -60,7 +59,7 @@ body {
   }
 
   .custom-button {
-    position: relative;
+    position: fixed;
     display: inline-block;
     width: 12rem;
     height: 3.5rem;
@@ -76,7 +75,7 @@ body {
     transition: background-color 0.3s;
     text-align: left;
     margin-top: -47%;
-    margin-left: -17%;
+    margin-left: -86%;
     width: 200px;
   }
   
