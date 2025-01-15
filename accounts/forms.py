@@ -20,4 +20,4 @@ class SignUpForm(UserCreationForm):
     
     class Meta:
         model = CustomUser
-        fields = ('username', 'email', 'password1', 'password2', 'captcha') #new and confirm password for password 1 and 2
+        fields = ('username', 'email', 'password1', 'password2') #new and confirm password for password 1 and 2
