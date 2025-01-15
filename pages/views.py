@@ -117,14 +117,6 @@ def decline_letter_of_intent(request, intent_id):
     )
 
 
-        form = CustomerForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('pages/Success.html')  # Replace with the actual success page or view name
-    else:
-        form = CustomerForm()
-
-    return render(request, 'pages/Customer_Home.html', {'form': form})
 
 class RecordsDetailsView(TemplateView):
     template_name = "pages/recordsdetails.html"
