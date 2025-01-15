@@ -27,12 +27,18 @@ class ParishStaff(models.Model):
 
 
 class Customer(models.Model):
-    customer_id = models.AutoField(primary_key=True)
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('declined', 'Declined'),
+    ]
     full_name = models.CharField(max_length=45)
-    permanent_address = models.TextField()
-    landline_number = models.IntegerField(blank=True, null=True)
-    mobile_number = models.IntegerField(blank=True, null=True)
-    email_address = models.EmailField(max_length=45, blank=True, null=True)
+    permanent_address = models.TextField(255)
+    landline_number = models.CharField(max_length=15, blank=True)
+    mobile_number = models.CharField(max_length=11)
+    email_address = models.EmailField(45)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.full_name

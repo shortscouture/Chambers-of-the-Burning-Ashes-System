@@ -1,3 +1,4 @@
+
 from django import forms
 from .models import Customer, ColumbaryRecord, Beneficiary 
 
@@ -47,5 +48,4 @@ class BeneficiaryForm(forms.ModelForm):
     class Meta:
         model = Beneficiary
         fields = ['first_beneficiary_name', 'second_beneficiary_name', 'third_beneficiary_name']
-
 
