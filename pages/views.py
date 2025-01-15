@@ -23,6 +23,11 @@ class customerhomeview(TemplateView):
 class columbaryrecordsview(TemplateView):
     template_name = "pages/columbaryrecords.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["customers"] = Customer.objects.all()  # Fetch all customers from the database
+        return context
+
 class memorialview(TemplateView):
     template_name = "pages/Memorials.html"
 

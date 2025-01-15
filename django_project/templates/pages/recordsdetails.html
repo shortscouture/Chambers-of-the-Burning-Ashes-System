@@ -1,0 +1,21 @@
+{% include 'Staff_Headers.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/columbaryrecords.css' %}">
+    <title>Columbary Records</title>
+    <style>
+        body {
+            background-image: url("{% static 'images/cloud.png' %}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
