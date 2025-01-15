@@ -2,10 +2,9 @@ from django.views.generic import TemplateView
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView  # Import ListView
 from django.views.decorators.csrf import csrf_exempt
-from .forms import CustomerForm
 from django.core.mail import send_mail
 from django.conf import settings
-
+from .models import Customer
 
 class HomePageView(TemplateView):
     template_name = "pages/home.html"
@@ -37,7 +36,7 @@ def send_letter_of_intent(request):
         email_address = request.POST['email_address']
 
         # Save the form data with a pending status
-        intent = CustomerForm.objects.create(
+        intent = Customer.objects.create(
             full_name=full_name,
             permanent_address=permanent_address,
             landline_number=landline_number,
@@ -63,18 +62,44 @@ def send_letter_of_intent(request):
             [settings.ADMIN_EMAIL],
         )
 
-        return redirect('pages/Success.html')  # Redirect after submission
+        return redirect('Customer_Home.html')  # Redirect after submission
 
     return render(request, 'pages/Customer_Home.html')
 
 def accept_letter_of_intent(request, intent_id):
-    intent = get_object_or_404(CustomerForm, id=intent_id)
+    intent = get_object_or_404(Customer, id=intent_id)
     intent.status = 'approved'
     intent.save()
-    return render(request, 'pages/accept_success.html')
+    
+    send_mail(
+        subject="Your Letter of Intent has been Accepted",
+        message=(
+            f"Dear {intent.full_name},\n\n"
+            "We are pleased to inform you that your letter of intent has been accepted.\n\n"
+            "Best regards,\nThe Team"
+        ),
+        from_email='stalphonsusmakati@gmail.com',
+        recipient_list=[intent.email_address],
+        fail_silently=False,
+    )
+
+    return render(request, 'pages/accept_success.html', {'intent': intent})
+
 
 def decline_letter_of_intent(request, intent_id):
-    intent = get_object_or_404(CustomerForm, id=intent_id)
+    intent = get_object_or_404(Customer, id=intent_id)
     intent.status = 'declined'
-    intent.save()
-    return render(request, 'pages/decline_success.html')
+    intent.delete()
+        
+    send_mail(
+        subject="Your Letter of Intent has been Declined",
+        message=(
+            f"Dear {intent.full_name},\n\n"
+            "We regret to inform you that your letter of intent has been declined.\n\n"
+            "Best regards,\nThe Team"
+        ),
+        from_email='stalphonsusmakati@gmail.com',
+        recipient_list=[intent.email_address],
+        fail_silently=False,
+    )
+
