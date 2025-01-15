@@ -1,5 +1,5 @@
 from django import forms
-from .models import Customer
+from .models import Customer, ColumbaryRecord, Beneficiary 
 
 
 class CustomerForm(forms.ModelForm):
@@ -36,3 +36,16 @@ class CustomerForm(forms.ModelForm):
                 'class': 'form-control'
             }),
         }
+
+
+class ColumbaryRecordForm(forms.ModelForm):
+    class Meta:
+        model = ColumbaryRecord
+        fields = ['vault_id', 'issuance_date', 'expiration_date', 'inurnment_date', 'issuing_parish_priest', 'urns_per_columbary']
+
+class BeneficiaryForm(forms.ModelForm):
+    class Meta:
+        model = Beneficiary
+        fields = ['first_beneficiary_name', 'second_beneficiary_name', 'third_beneficiary_name']
+
+
