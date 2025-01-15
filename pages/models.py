@@ -27,12 +27,18 @@ class ParishStaff(models.Model):
 
 
 class Customer(models.Model):
-    customer_id = models.AutoField(primary_key=True)
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('declined', 'Declined'),
+    ]
     full_name = models.CharField(max_length=45)
-    permanent_address = models.TextField()
-    landline_number = models.IntegerField(blank=True, null=True)
-    mobile_number = models.IntegerField(blank=True, null=True)
-    email_address = models.EmailField(max_length=45, blank=True, null=True)
+    permanent_address = models.TextField(255)
+    landline_number = models.CharField(max_length=15, blank=True)
+    mobile_number = models.CharField(max_length=11)
+    email_address = models.EmailField(45)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.full_name
@@ -82,12 +88,12 @@ class Payment(models.Model):
 
 
 class ColumbaryRecord(models.Model):
-    vault_id = models.AutoField(primary_key=True)
-    issuance_date = models.DateField()
-    expiration_date = models.DateField()
+    vault_id = models.CharField(primary_key=True, max_length=7)
+    issuance_date = models.DateField(null=True)
+    expiration_date = models.DateField(null=True)
     inurnment_date = models.DateField(blank=True, null=True)
     issuing_parish_priest = models.CharField(max_length=45, blank=True, null=True)
-    urns_per_columbary = models.CharField(max_length=1, choices=[('1', '1'), ('2', '2'), ('3', '3'), ('4', '4')])
+    urns_per_columbary = models.CharField(max_length=1, null=True, choices=[('1', '1'), ('2', '2'), ('3', '3'), ('4', '4')])
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
     parish_staff = models.ForeignKey(ParishStaff, on_delete=models.SET_NULL, null=True, blank=True)
     beneficiary = models.ForeignKey(Beneficiary, on_delete=models.SET_NULL, null=True, blank=True)
