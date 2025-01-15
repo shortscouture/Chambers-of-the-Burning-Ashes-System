@@ -16,6 +16,15 @@ DATABASES = {
     }
 }
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'your-smtp-host'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'christiangreymoba@gmail.com'
+EMAIL_HOST_PASSWORD = 'Kokiks100'
+DEFAULT_FROM_EMAIL = 'christiangreymoba@example.com'
+ADMIN_EMAIL = 'jamesnaldo376@gmail.com'
+
 # Local static and media file settings
 STATICFILES_DIRS = [BASE_DIR / 'static']
 from django.apps import AppConfig
