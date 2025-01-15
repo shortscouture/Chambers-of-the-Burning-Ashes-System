@@ -17,8 +17,9 @@
 <div class="content"><h2>Sign up</h2>
   <form method="post">
     {% csrf_token %}
-    {{ form|crispy }}
+    {{ form.as_p|crispy }}
     <button class="btn btn-success" type="submit">Sign up</button>
+
 </form>
 </div>
 </body>
