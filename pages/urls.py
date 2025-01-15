@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 
 
 from .views import HomePageView, AboutPageView, maindashview, columbaryrecordsview, customerhomeview, memorialview, send_letter_of_intent, accept_letter_of_intent, decline_letter_of_intent, RecordsDetailsView, CustomerEditView
@@ -18,5 +18,6 @@ urlpatterns = [
     path('recordsdetails/<int:customer_id>/', RecordsDetailsView.as_view(), name='recordsdetails'),
     path('edit_customer/<int:customer_id>/', CustomerEditView.as_view(), name='edit_customer'),
 
+    path('captcha/', include('captcha.urls')),
 
 ]

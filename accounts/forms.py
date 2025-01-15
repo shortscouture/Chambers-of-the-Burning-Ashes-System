@@ -13,7 +13,7 @@ class CustomUserChangeForm(UserChangeForm):
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'username',)
+        fields = ('email', 'username')
         
 class SignUpForm(UserCreationForm):
     c = CaptchaField()
