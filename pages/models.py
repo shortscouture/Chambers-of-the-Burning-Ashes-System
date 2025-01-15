@@ -1,4 +1,11 @@
 from django.db import models
+from django.contrib.auth.models import User
+import random
+from django.core.mail import send_mail
+from django.conf import settings
+from datetime import datetime, timedelta
+from django.utils import timezone
+
 
 
 class Account(models.Model):
@@ -28,11 +35,16 @@ class ParishStaff(models.Model):
 
 class Customer(models.Model):
     customer_id = models.AutoField(primary_key=True)
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('declined', 'Declined'),
+    ]
     full_name = models.CharField(max_length=45)
-    permanent_address = models.TextField()
-    landline_number = models.IntegerField(blank=True, null=True)
-    mobile_number = models.IntegerField(blank=True, null=True)
-    email_address = models.EmailField(max_length=45, blank=True, null=True)
+    permanent_address = models.TextField(max_length=255)
+    landline_number = models.CharField(max_length=15, blank=True)
+    mobile_number = models.CharField(max_length=11)
+    email_address = models.EmailField(max_length=45, default='no-email@example.com')
 
     def __str__(self):
         return self.full_name
@@ -96,3 +108,132 @@ class ColumbaryRecord(models.Model):
 
     def __str__(self):
         return f"Vault {self.vault_id}"
+    def get_record_data(self):
+        """Get formatted record data"""
+        data = {
+            'vault_info': {
+                'vault_id': self.vault_id,
+                'issuance_date': self.issuance_date,
+                'expiration_date': self.expiration_date,
+                'inurnment_date': self.inurnment_date,
+                'urns_per_columbary': self.urns_per_columbary,
+                'issuing_parish_priest': self.issuing_parish_priest,
+            }
+        }
+        
+        if self.customer:
+            data['customer_info'] = {
+                'full_name': self.customer.full_name,
+                'address': self.customer.permanent_address,
+                'mobile': self.customer.mobile_number,
+                'email': self.customer.email_address,
+            }
+        
+        if self.beneficiary:
+            data['beneficiary_info'] = {
+                'first_beneficiary': self.beneficiary.first_beneficiary_name,
+                'second_beneficiary': self.beneficiary.second_beneficiary_name,
+                'third_beneficiary': self.beneficiary.third_beneficiary_name,
+            }
+        
+        if self.payment:
+            data['payment_info'] = {
+                'full_contribution': self.payment.full_contribution,
+                'six_month_installment': self.payment.six_month_installment,
+                'official_receipt': self.payment.official_receipt,
+            }
+            
+        return data
+
+    def send_record_email(self):
+        """Send record details to customer's email"""
+        if not self.customer or not self.customer.email_address:
+            return False
+
+        data = self.get_record_data()
+        
+        message = f"Dear {self.customer.full_name},\n\nHere are your columbary record details:\n\n"
+        
+        # Add vault information
+        message += f"""
+VAULT INFORMATION
+----------------
+Vault ID: {data['vault_info']['vault_id']}
+Issuance Date: {data['vault_info']['issuance_date']}
+Expiration Date: {data['vault_info']['expiration_date']}
+Inurnment Date: {data['vault_info']['inurnment_date']}
+Urns Per Columbary: {data['vault_info']['urns_per_columbary']}
+Issuing Parish Priest: {data['vault_info']['issuing_parish_priest']}
+
+"""
+        # Add beneficiary information if available
+        if 'beneficiary_info' in data:
+            message += f"""
+BENEFICIARY INFORMATION
+----------------------
+First Beneficiary: {data['beneficiary_info']['first_beneficiary']}
+Second Beneficiary: {data['beneficiary_info']['second_beneficiary']}
+Third Beneficiary: {data['beneficiary_info']['third_beneficiary']}
+
+"""
+        # Add payment information if available
+        if 'payment_info' in data:
+            message += f"""
+PAYMENT INFORMATION
+------------------
+Full Contribution: {'Yes' if data['payment_info']['full_contribution'] else 'No'}
+Six Month Installment: {'Yes' if data['payment_info']['six_month_installment'] else 'No'}
+Official Receipt Number: {data['payment_info']['official_receipt']}
+"""
+
+        message += "\n\nBest regards,\nParish Administration"
+
+        subject = 'Your Columbary Record Details'
+        from_email = settings.EMAIL_HOST_USER
+        recipient_list = [self.customer.email_address]
+        
+        return send_mail(subject, message, from_email, recipient_list)
+
+class TwoFactorAuth(models.Model):
+    email = models.EmailField(max_length=45)
+    otp = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_verified = models.BooleanField(default=False)
+
+    def generate_otp(self):
+        self.otp = str(random.randint(100000, 999999))
+        self.save()
+        return self.otp
+
+    def send_otp_email(self, customer):
+        if not customer.email_address:
+            return False
+            
+        subject = 'Columbary System - Verification Code'
+        message = f'''
+        Dear {customer.full_name},
+        
+        Your verification code is: {self.otp}
+        
+        This code will expire in 15 minutes.
+        
+        Best regards,
+        Parish Administration
+        '''
+        from_email = settings.EMAIL_HOST_USER
+        recipient_list = [customer.email_address]
+        
+        try:
+            send_mail(subject, message, from_email, recipient_list)
+            return True
+        except Exception as e:
+            print(f"Email sending failed: {e}")
+            return False
+
+    def verify_otp(self, submitted_otp):
+        if self.otp == submitted_otp and not self.is_verified:
+            if self.created_at + timedelta(minutes=15) > timezone.now():
+                self.is_verified = True
+                self.save()
+                return True
+        return False

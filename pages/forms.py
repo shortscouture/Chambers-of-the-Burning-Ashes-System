@@ -36,3 +36,11 @@ class CustomerForm(forms.ModelForm):
                 'class': 'form-control'
             }),
         }
+
+class EmailVerificationForm(forms.Form):
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            'placeholder': 'Email Address',
+            'required': True
+        })
+    )
