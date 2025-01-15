@@ -37,8 +37,8 @@ def send_letter_of_intent(request):
         form = CustomerForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('pages/Success.html')  # Replace with the actual success page or view name
+            return redirect('successfull.html')  # Replace with the actual success page or view name
     else:
         form = CustomerForm()
 
-    return render(request, 'pages/Customer_Home.html', {'form': form})
+    return render(request, '500.html', {'form': form})
