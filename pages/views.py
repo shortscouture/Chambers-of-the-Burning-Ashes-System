@@ -147,12 +147,19 @@ class RecordsDetailsView(TemplateView):
         return context
 
 
+from django.shortcuts import get_object_or_404, HttpResponseRedirect
+from django.urls import reverse_lazy
+from django.views.generic.base import TemplateView
+from .models import Customer, ColumbaryRecord, Beneficiary
+from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm
+
+
 class CustomerEditView(TemplateView):
     template_name = "pages/edit_customer.html"
 
     def get(self, request, *args, **kwargs):
-        customer_id = self.kwargs.get('customer_id')
-        customer = get_object_or_404(Customer, id=customer_id)
+        customer_id = self.kwargs.get('customer_id')  # Retrieve customer_id from URL
+        customer = get_object_or_404(Customer, customer_id=customer_id)  # Use 'customer_id'
         columbary_record = ColumbaryRecord.objects.filter(customer=customer).first()
         beneficiary = Beneficiary.objects.filter(columbaryrecord__customer=customer).first()
 
@@ -168,8 +175,8 @@ class CustomerEditView(TemplateView):
         })
 
     def post(self, request, *args, **kwargs):
-        customer_id = self.kwargs.get('customer_id')
-        customer = get_object_or_404(Customer, id=customer_id)
+        customer_id = self.kwargs.get('customer_id')  # Retrieve customer_id from URL
+        customer = get_object_or_404(Customer, customer_id=customer_id)  # Use 'customer_id'
         columbary_record = ColumbaryRecord.objects.filter(customer=customer).first()
         beneficiary = Beneficiary.objects.filter(columbaryrecord__customer=customer).first()
 
@@ -182,6 +189,11 @@ class CustomerEditView(TemplateView):
             columbary_record_form.save()
             beneficiary_form.save()
             return HttpResponseRedirect(reverse_lazy('recordsdetails', kwargs={'customer_id': customer_id}))
+        else:
+            # Debugging: Print form errors
+            print("Customer form errors:", customer_form.errors)
+            print("Columbary record form errors:", columbary_record_form.errors)
+            print("Beneficiary form errors:", beneficiary_form.errors)
 
         return self.render_to_response({
             'customer_form': customer_form,
