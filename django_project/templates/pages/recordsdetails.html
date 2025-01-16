@@ -1,0 +1,122 @@
+{% include 'Staff_Headers.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        background-image: url("{% static 'images/cloud.png' %}");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center;
+        margin: 0;
+        padding: 0;
+    }</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/recordsdetails.css' %}">
+    <title>Customer Details</title>
+</head>
+<body>
+    <div class="page-container">
+        <div class="white-box">
+            <h1 class="header">Customer & Columbary Details</h1>
+
+            <!-- Details Section -->
+            <div class="details-section">
+                <div class="row">
+                    <span class="label">Full Name:</span>
+                    <span class="value">{{ customer.full_name }}</span>
+                </div>
+                <div class="row">
+                    <span class="label">Address:</span>
+                    <span class="value">{{ customer.permanent_address }}</span>
+                </div>
+                <div class="row">
+                    <span class="label">Landline:</span>
+                    <span class="value">{{ customer.landline_number }}</span>
+                </div>
+                <div class="row">
+                    <span class="label">Mobile:</span>
+                    <span class="value">{{ customer.mobile_number }}</span>
+                </div>
+                <div class="row">
+                    <span class="label">Email:</span>
+                    <span class="value">{{ customer.email_address }}</span>
+                </div>
+
+                {% if columbary_records %}
+                    {% for record in columbary_records %}
+                        <div class="row">
+                            <span class="label">Vault ID:</span>
+                            <span class="value">{{ record.vault_id }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">Issuance Date:</span>
+                            <span class="value">{{ record.issuance_date }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">Expiration Date:</span>
+                            <span class="value">{{ record.expiration_date }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">Inurnment Date:</span>
+                            <span class="value">{{ record.inurnment_date }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">Parish Priest:</span>
+                            <span class="value">{{ record.issuing_parish_priest }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">Urns/Columbary:</span>
+                            <span class="value">{{ record.urns_per_columbary }}</span>
+                        </div>
+                        <hr class="separator">
+                    {% endfor %}
+                {% else %}
+                    <p class="no-records">No Columbary Records found for this customer.</p>
+                {% endif %}
+            </div>
+            
+            <!-- Beneficiary Details -->
+            <div class="details-section">
+                <h3 class="sub-header">Beneficiary Details</h3>
+                {% if beneficiary %}
+                    <div class="row">
+                        <span class="label">First Beneficiary Name:</span>
+                        <span class="value">{{ beneficiary.first_beneficiary_name }}</span>
+                    </div>
+                    {% if beneficiary.second_beneficiary_name %}
+                        <div class="row">
+                            <span class="label">Second Beneficiary Name:</span>
+                            <span class="value">{{ beneficiary.second_beneficiary_name }}</span>
+                        </div>
+                    {% endif %}
+                    {% if beneficiary.third_beneficiary_name %}
+                        <div class="row">
+                            <span class="label">Third Beneficiary Name:</span>
+                            <span class="value">{{ beneficiary.third_beneficiary_name }}</span>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <p class="no-records">No Beneficiary Details found for this customer.</p>
+                {% endif %}
+            </div>
+
+            <div class="back-button">
+                <a href="{% url 'columbaryrecords' %}">
+                    <button>Back to Records</button>
+                </a>
+            </div>
+            <div class="edit-button">
+                <a href="{% url 'edit_customer' customer_id=customer.customer_id %}">
+                    <button>Edit Customer</button>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

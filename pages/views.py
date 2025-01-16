@@ -1,16 +1,17 @@
 from django.views.generic import TemplateView
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import ListView  # Import ListView
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail
 from django.conf import settings
-from .forms import CustomerForm, ColumbaryRecordForm, Beneficiary, EmailVerificationForm
-from .models import Customer, ColumbaryRecord, Beneficiary,TwoFactorAuth, Account
-from django.urls import reverse_lazy
-from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
+from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm
+from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth
+from django.urls import reverse_lazy
+from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
+
 
 class HomePageView(TemplateView):
     template_name = "pages/home.html"
@@ -19,22 +20,25 @@ class HomePageView(TemplateView):
 class AboutPageView(TemplateView):
     template_name = "pages/about.html"
 
-    
-class maindashview(TemplateView):
+
+class MainDashView(TemplateView):
     template_name = "pages/maindash.html"
 
-class customerhomeview(TemplateView):
+
+class CustomerHomeView(TemplateView):
     template_name = "pages/Customer_Home.html"
 
-class columbaryrecordsview(TemplateView):
+
+class ColumbaryRecordsView(TemplateView):
     template_name = "pages/columbaryrecords.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["customers"] = Customer.objects.all()  # Fetch all customers from the database
+        context["customers"] = Customer.objects.all()
         return context
 
-class memorialview(TemplateView):
+
+class MemorialView(TemplateView):
     template_name = "pages/Memorials.html"
 
 
@@ -46,7 +50,6 @@ def send_letter_of_intent(request):
         landline_number = request.POST.get('landline_number', '')
         mobile_number = request.POST['mobile_number']
         email_address = request.POST['email_address']
-        selected_vault = request.POST.get('vault_id')
         # Save the form data with a pending status
         intent = Customer.objects.create(
             full_name=full_name,
@@ -57,8 +60,8 @@ def send_letter_of_intent(request):
         )
         
         # Send email to admin
-        accept_url = request.build_absolute_uri(f'/accept/{intent.id}/')
-        decline_url = request.build_absolute_uri(f'/decline/{intent.id}/')
+        accept_url = request.build_absolute_uri(f'/accept/{intent.customer_id}/')
+        decline_url = request.build_absolute_uri(f'/decline/{intent.customer_id}/')
         email_body = f"""
 Dear Rev. Bobby
     
@@ -90,7 +93,7 @@ Best regards,
 
 
 def accept_letter_of_intent(request, intent_id):
-    intent = get_object_or_404(Customer, id=intent_id)
+    intent = get_object_or_404(Customer, customer_id=intent_id)
     intent.status = 'approved'
     intent.save()
     
@@ -110,7 +113,7 @@ def accept_letter_of_intent(request, intent_id):
 
 
 def decline_letter_of_intent(request, intent_id):
-    intent = get_object_or_404(Customer, id=intent_id)
+    intent = get_object_or_404(Customer, customer_id=intent_id)
     intent.status = 'declined'
     intent.delete()
         
@@ -132,22 +135,22 @@ class RecordsDetailsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        customer_id = self.kwargs.get('customer_id')  # Get the customer_id from the URL
-        customer = Customer.objects.get(customer_id=customer_id)  # Fetch the customer
+        customer_id = self.kwargs.get('customer_id')
+        
+        customer = get_object_or_404(Customer, customer_id=customer_id)
+        
         context['customer'] = customer
-        context['columbary_records'] = ColumbaryRecord.objects.filter(customer=customer)  # Fetch related columbary records
-        # Fetch beneficiary details
+        context['columbary_records'] = ColumbaryRecord.objects.filter(customer=customer)
         context['beneficiary'] = Beneficiary.objects.filter(columbaryrecord__customer=customer).first()
         return context
-    
+
+
 class CustomerEditView(TemplateView):
     template_name = "pages/edit_customer.html"
 
     def get(self, request, *args, **kwargs):
         customer_id = self.kwargs.get('customer_id')
-        customer = get_object_or_404(Customer, customer_id=customer_id)
-        
-        # Get related columbary record and beneficiary (if available)
+        customer = get_object_or_404(Customer, id=customer_id)
         columbary_record = ColumbaryRecord.objects.filter(customer=customer).first()
         beneficiary = Beneficiary.objects.filter(columbaryrecord__customer=customer).first()
 
@@ -164,9 +167,7 @@ class CustomerEditView(TemplateView):
 
     def post(self, request, *args, **kwargs):
         customer_id = self.kwargs.get('customer_id')
-        customer = get_object_or_404(Customer, customer_id=customer_id)
-        
-        # Get related columbary record and beneficiary (if available)
+        customer = get_object_or_404(Customer, id=customer_id)
         columbary_record = ColumbaryRecord.objects.filter(customer=customer).first()
         beneficiary = Beneficiary.objects.filter(columbaryrecord__customer=customer).first()
 
@@ -186,6 +187,8 @@ class CustomerEditView(TemplateView):
             'beneficiary_form': beneficiary_form,
             'customer': customer
         })
+
+
 def memorials_verification(request):
     form = EmailVerificationForm()
     if request.method == 'POST':
@@ -194,7 +197,6 @@ def memorials_verification(request):
             email = form.cleaned_data['email']
             try:
                 customer = Customer.objects.get(email_address=email)
-                
                 tfa = TwoFactorAuth.objects.create(email=email)
                 otp = tfa.generate_otp()
                 if tfa.send_otp_email(customer):
@@ -212,27 +214,28 @@ def memorials_verification(request):
     return render(request, 'pages/Memorials.html', {'form': form})
 
 
+@csrf_exempt
 def verify_otp(request):
     if 'verification_email' not in request.session:
         return redirect('Memorials')
-            
+
     if request.method == 'POST':
         submitted_otp = request.POST.get('otp')
         email = request.session['verification_email']
-        
+
         try:
             customer = Customer.objects.get(email_address=email)
             tfa = TwoFactorAuth.objects.get(
                 email=email,
                 is_verified=False,
-                created_at__gte=timezone.now() - timedelta(minutes=15)  # Correctly use timezone.now()
+                created_at__gte=timezone.now() - timedelta(minutes=15)
             )
-    
+
             if tfa.verify_otp(submitted_otp):
                 records = ColumbaryRecord.objects.filter(customer=customer)
                 for record in records:
                     record.send_record_email()
-                    
+
                 messages.success(request, "Verification successful! Your records have been sent to your email.")
                 del request.session['verification_email']
                 return redirect('Customer_Home')
@@ -241,8 +244,9 @@ def verify_otp(request):
         except (Customer.DoesNotExist, TwoFactorAuth.DoesNotExist):
             messages.error(request, "Something went wrong. Please try again.")
             return redirect('Memorials')
-        
+
     return render(request, 'pages/verify_otp.html')
+
 
 def success(request):
     return render(request, 'pages/success.html')
