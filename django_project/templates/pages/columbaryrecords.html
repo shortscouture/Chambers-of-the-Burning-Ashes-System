@@ -30,7 +30,7 @@
                     <input type="text" placeholder="Insert Name" id="search-name" aria-label="Search by Name">
                     <input type="text" placeholder="Insert Crypt No." id="search-crypt" aria-label="Search by Crypt Number">
                     <button id="search-button" aria-label="Search">Search</button>
-                    <button id="add-new-button" aria-label="Add New Record">Add New</button>
+                    <button id="search-button" aria-label="Add New Record">Add New</button>
                 </div>
             </div>
 
@@ -49,13 +49,14 @@
                         {% if customers %}
                             {% for customer in customers %}
                                 <tr>
-                                    <td class="white-box">{{ customer.full_name }}</td>  <!-- Display full_name -->
-                                    <td class="white-box">{{ customer.email_address }}</td>  <!-- Display email_address -->
-                                    <td>--</td>  <!-- Replace "--" with Crypt # if available -->
+                                    <td class="white-box">{{ customer.full_name }}</td>
+                                    <td class="white-box">{{ customer.email_address }}</td>
+                                    <td>--</td>
                                     <td>
-                                        <!-- Details Button for Each Row -->
-                                        <a<button class="details-button">Details</button>
+                                        <a href="{% url 'recordsdetails' customer.customer_id %}">
+                                            <button class="details-button">Details</button>
                                         </a>
+                                        <p>{{ customer.customer_id }}</p> <!-- Debugging: Print customer ID -->
                                     </td>
                                 </tr>
                             {% endfor %}

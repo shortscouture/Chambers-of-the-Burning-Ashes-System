@@ -1,0 +1,45 @@
+<!-- edit_customer.html -->
+{% include 'Staff_Headers.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/recordsdetails.css' %}">
+    <title>Edit Customer Details</title>
+</head>
+<body>
+    <div class="page-container">
+        <div class="white-box">
+            <h1 class="header">Edit Customer Details</h1>
+
+            <!-- Customer Edit Form -->
+            <form method="POST">
+                {% csrf_token %}
+                <h2>Edit Customer</h2>
+                {{ customer_form.as_p }}
+                <br>
+
+                <h2>Edit Columbary Record</h2>
+                {{ columbary_record_form.as_p }}
+                <br>
+
+                <h2>Edit Beneficiary</h2>
+                {{ beneficiary_form.as_p }}
+                <br>
+
+                <div class="back-button">
+                    <button type="submit">Save Changes</button>
+                </div>
+            </form>
+
+            <div class="back-button">
+                <a href="{% url 'recordsdetails' customer_id=customer.customer_id %}">
+                    <button>Back to Records</button>
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

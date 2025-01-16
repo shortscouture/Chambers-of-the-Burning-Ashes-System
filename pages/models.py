@@ -41,6 +41,7 @@ class Customer(models.Model):
         ('declined', 'Declined'),
     ]
     full_name = models.CharField(max_length=45)
+
     permanent_address = models.TextField(max_length=255)
     landline_number = models.CharField(max_length=15, blank=True)
     mobile_number = models.CharField(max_length=11)
