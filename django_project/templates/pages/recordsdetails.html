@@ -4,16 +4,17 @@
 <html lang="en">
 <head>
     <style>
-    body {
-        font-family: Arial, sans-serif;
-        background-image: url("{% static 'images/cloud.png' %}");
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-        background-position: center;
-        margin: 0;
-        padding: 0;
-    }</style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url("{% static 'images/cloud.png' %}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'css/recordsdetails.css' %}">
@@ -79,7 +80,7 @@
                     <p class="no-records">No Columbary Records found for this customer.</p>
                 {% endif %}
             </div>
-            
+
             <!-- Beneficiary Details -->
             <div class="details-section">
                 <h3 class="sub-header">Beneficiary Details</h3>
@@ -105,18 +106,27 @@
                 {% endif %}
             </div>
 
-            <div class="back-button">
-                <a href="{% url 'columbaryrecords' %}">
-                    <button>Back to Records</button>
-                </a>
-            </div>
-            <div class="edit-button">
-                <a href="{% url 'edit_customer' customer_id=customer.customer_id %}">
-                    <button>Edit Customer</button>
-                </a>
+            <!-- Buttons Section -->
+            <!-- Using back-button CSS design for both buttons -->
+            <div class="back-button" style="display: flex; justify-content: center; margin-top: 20px;">
+                <!-- Back to Records Button -->
+                {% if customer %}
+                    <!-- Back to Records Button -->
+                    <a href="{% url 'columbaryrecords' %}" style="margin-right: 10px;">
+                        <button>Back to Records</button> 
+                    </a>
+
+                    <!-- Edit Customer Button -->
+                    <a href="{% url 'edit_customer' customer_id=customer.customer_id %}">
+                        <button>Edit Customer</button> 
+                    </a> 
+                {% else %}
+                    <p>Error: Customer not found.</p> 
+                {% endif %}
             </div>
 
-        </div>
-    </div>
+        </div> <!-- End of white-box -->
+    </div> <!-- End of page-container -->
 </body>
 </html>
+

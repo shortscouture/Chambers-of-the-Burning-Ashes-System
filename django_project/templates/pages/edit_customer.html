@@ -65,23 +65,24 @@
                     {% endfor %}
                 </div>
 
-                <!-- Save Button -->
-                <div class="back-button">
-                    <button type="submit">Save Changes</button>
+                <!-- Buttons Section -->
+                <div class="back-button" style="display: flex; justify-content: center; align-items: center; margin-top: 20px;">
+                    <!-- Save Button -->
+                    <button type="submit" style="margin-right: 10px;">Save Changes</button>
+
+                    <!-- Back Button -->
+                    {% if customer %}
+                        <a href="{% url 'recordsdetails' customer_id=customer.customer_id %}">
+                            <button type="button">Back to Records</button>
+                        </a>
+                    {% else %}
+                        <p class="no-records">Error: Customer not found.</p>
+                    {% endif %}
                 </div>
             </form>
 
-            <!-- Back Button -->
-            <div class="back-button">
-                {% if customer %}
-                    <a href="{% url 'recordsdetails' customer_id=customer.customer_id %}">
-                        <button type="button">Back to Records</button>
-                    </a>
-                {% else %}
-                    <p class="no-records">Error: Customer not found.</p>
-                {% endif %}
-            </div>
-        </div>
-    </div>
+        </div> <!-- End of white-box -->
+    </div> <!-- End of page-container -->
 </body>
 </html>
+
