@@ -1,4 +1,8 @@
 from django.db import models
+import random
+from django.conf import settings
+from django.core.mail import send_mail
+from datetime import datetime, timedelta
 
 
 class Account(models.Model):
@@ -102,3 +106,47 @@ class ColumbaryRecord(models.Model):
 
     def __str__(self):
         return f"Vault {self.vault_id}"
+
+class TwoFactorAuth(models.Model):
+    email = models.EmailField(max_length=45)
+    otp = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_verified = models.BooleanField(default=False)
+
+    def generate_otp(self):
+        self.otp = str(random.randint(100000, 999999))
+        self.save()
+        return self.otp
+
+    def send_otp_email(self, customer):
+        if not customer.email_address:
+            return False
+            
+        subject = 'Columbary System - Verification Code'
+        message = f'''
+        Dear {customer.full_name},
+        
+        Your verification code is: {self.otp}
+        
+        This code will expire in 15 minutes.
+        
+        Best regards,
+        Parish Administration
+        '''
+        from_email = settings.EMAIL_HOST_USER
+        recipient_list = [customer.email_address]
+        
+        try:
+            send_mail(subject, message, from_email, recipient_list)
+            return True
+        except Exception as e:
+            print(f"Email sending failed: {e}")
+            return False
+
+    def verify_otp(self, submitted_otp):
+        if self.otp == submitted_otp and not self.is_verified:
+            if self.created_at + timedelta(minutes=15) > timezone.now():
+                self.is_verified = True
+                self.save()
+                return True
+        return False
