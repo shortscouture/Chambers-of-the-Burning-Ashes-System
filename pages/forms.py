@@ -1,6 +1,6 @@
 
 from django import forms
-from .models import Customer, ColumbaryRecord, Beneficiary 
+from .models import Customer
 
 
 class CustomerForm(forms.ModelForm):
@@ -37,6 +37,14 @@ class CustomerForm(forms.ModelForm):
                 'class': 'form-control'
             }),
         }
+
+class EmailVerificationForm(forms.Form):
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            'placeholder': 'Email Address',
+            'required': True
+        })
+    )
 
 
 class ColumbaryRecordForm(forms.ModelForm):
