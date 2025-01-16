@@ -46,7 +46,11 @@ class Customer(models.Model):
     landline_number = models.CharField(max_length=15, blank=True)
     mobile_number = models.CharField(max_length=11)
     email_address = models.EmailField(max_length=45, default='no-email@example.com')
-
+    status = models.CharField(
+        max_length=10, 
+        choices=STATUS_CHOICES, 
+        default='pending'
+    )  # Add this field for status
     def __str__(self):
         return self.full_name
 

@@ -12,6 +12,8 @@ from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 
+class SuccesView(TemplateView):
+    template_name = "success.html"
 
 class HomePageView(TemplateView):
     template_name = "pages/home.html"
@@ -89,8 +91,8 @@ Best regards,
             [settings.ADMIN_EMAIL],
         )
 
-        return redirect('Customer_Home.html')  # Redirect after submission
-
+        return render(request, 'Success.html', {'intent': intent})
+    
 
 def accept_letter_of_intent(request, intent_id):
     intent = get_object_or_404(Customer, customer_id=intent_id)

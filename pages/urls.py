@@ -1,7 +1,7 @@
 from django.urls import path
 
 
-from .views import HomePageView, AboutPageView, MainDashView, ColumbaryRecordsView, CustomerHomeView, MemorialView, send_letter_of_intent, verify_otp, memorials_verification,accept_letter_of_intent, decline_letter_of_intent, RecordsDetailsView, CustomerEditView
+from .views import HomePageView,AboutPageView, MainDashView, ColumbaryRecordsView, CustomerHomeView, MemorialView, send_letter_of_intent, verify_otp, memorials_verification,accept_letter_of_intent, decline_letter_of_intent, RecordsDetailsView, CustomerEditView, SuccesView
 
 
 urlpatterns = [
@@ -14,7 +14,7 @@ urlpatterns = [
     path('memorials_verification/', memorials_verification, name='memorials_verification'),
     path('verify-otp/', verify_otp, name='verify_otp'),
     path('send_letter_of_intent/', send_letter_of_intent, name='send_letter_of_intent'),
-
+    path("Success/", SuccesView.as_view(),name = "Success"),
     path('accept/<int:intent_id>/', accept_letter_of_intent, name='accept_letter_of_intent'),
     path('decline/<int:intent_id>/', decline_letter_of_intent, name='decline_letter_of_intent'),
 
