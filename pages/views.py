@@ -40,6 +40,7 @@ class memorialview(TemplateView):
 
 
 def send_letter_of_intent(request):
+    available_vaults = ColumbaryRecord.objects.filter(customer__isnull=True)
     if request.method == 'POST':
 
         full_name = request.POST['full_name']
@@ -47,7 +48,7 @@ def send_letter_of_intent(request):
         landline_number = request.POST.get('landline_number', '')
         mobile_number = request.POST['mobile_number']
         email_address = request.POST['email_address']
-
+        selected_vault = request.POST.get('vault_id')
         # Save the form data with a pending status
         intent = Customer.objects.create(
             full_name=full_name,
@@ -56,14 +57,27 @@ def send_letter_of_intent(request):
             mobile_number=mobile_number,
             email_address=email_address,
         )
-
+        
+        
         # Send email to admin
         accept_url = request.build_absolute_uri(f'/accept/{intent.id}/')
         decline_url = request.build_absolute_uri(f'/decline/{intent.id}/')
         email_body = f"""
-        A new letter of intent has been submitted:
-        Full Name: {full_name}
-        Address: {permanent_address}
+Dear Rev. Bobby
+    
+I hope this message finds you well. I am writing to formally submit my letter of intent for Acquiring a Columbary find my details below:
+
+Full Name: {full_name}
+Permanent Address: {permanent_address}
+Landline Number: {landline_number if landline_number else 'N/A'}
+Mobile Number: {mobile_number}
+Email Address: {email_address}
+
+I would appreciate your time and attention to this matter. Please feel free to reach out to me if any further information or clarification is needed.
+
+Thank you for considering my submission.
+
+Best regards,
 
         Accept: {accept_url}
         Decline: {decline_url}
@@ -77,7 +91,6 @@ def send_letter_of_intent(request):
 
         return redirect('Customer_Home.html')  # Redirect after submission
 
-    return render(request, 'pages/Customer_Home.html')
 
 def accept_letter_of_intent(request, intent_id):
     intent = get_object_or_404(Customer, id=intent_id)
