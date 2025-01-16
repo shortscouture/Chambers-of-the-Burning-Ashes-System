@@ -1,6 +1,6 @@
 
 from django import forms
-from .models import Customer
+from .models import Customer, ColumbaryRecord, Beneficiary
 
 
 class CustomerForm(forms.ModelForm):
