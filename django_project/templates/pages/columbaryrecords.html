@@ -51,12 +51,11 @@
                                 <tr>
                                     <td class="white-box">{{ customer.full_name }}</td>
                                     <td class="white-box">{{ customer.email_address }}</td>
-                                    <td>--</td>
+                                    <td class="white-box">{{ customer.customer_id }}</td>
                                     <td>
                                         <a href="{% url 'recordsdetails' customer.customer_id %}">
                                             <button class="details-button">Details</button>
                                         </a>
-                                        <p>{{ customer.customer_id }}</p> <!-- Debugging: Print customer ID -->
                                     </td>
                                 </tr>
                             {% endfor %}

@@ -145,12 +145,19 @@ class RecordsDetailsView(TemplateView):
         return context
 
 
+from django.shortcuts import get_object_or_404, HttpResponseRedirect
+from django.urls import reverse_lazy
+from django.views.generic.base import TemplateView
+from .models import Customer, ColumbaryRecord, Beneficiary
+from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm
+
+
 class CustomerEditView(TemplateView):
     template_name = "pages/edit_customer.html"
 
     def get(self, request, *args, **kwargs):
-        customer_id = self.kwargs.get('customer_id')
-        customer = get_object_or_404(Customer, id=customer_id)
+        customer_id = self.kwargs.get('customer_id')  # Retrieve customer_id from URL
+        customer = get_object_or_404(Customer, customer_id=customer_id)  # Use 'customer_id'
         columbary_record = ColumbaryRecord.objects.filter(customer=customer).first()
         beneficiary = Beneficiary.objects.filter(columbaryrecord__customer=customer).first()
 
@@ -166,8 +173,8 @@ class CustomerEditView(TemplateView):
         })
 
     def post(self, request, *args, **kwargs):
-        customer_id = self.kwargs.get('customer_id')
-        customer = get_object_or_404(Customer, id=customer_id)
+        customer_id = self.kwargs.get('customer_id')  # Retrieve customer_id from URL
+        customer = get_object_or_404(Customer, customer_id=customer_id)  # Use 'customer_id'
         columbary_record = ColumbaryRecord.objects.filter(customer=customer).first()
         beneficiary = Beneficiary.objects.filter(columbaryrecord__customer=customer).first()
 
