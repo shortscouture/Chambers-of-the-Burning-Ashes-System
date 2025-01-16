@@ -11,6 +11,11 @@ from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth
 from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, HttpResponseRedirect
+from django.urls import reverse_lazy
+from django.views.generic.base import TemplateView
+from .models import Customer, ColumbaryRecord, Beneficiary
+from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm
 
 class SuccesView(TemplateView):
     template_name = "success.html"
@@ -147,11 +152,6 @@ class RecordsDetailsView(TemplateView):
         return context
 
 
-from django.shortcuts import get_object_or_404, HttpResponseRedirect
-from django.urls import reverse_lazy
-from django.views.generic.base import TemplateView
-from .models import Customer, ColumbaryRecord, Beneficiary
-from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm
 
 
 class CustomerEditView(TemplateView):
