@@ -150,7 +150,7 @@ class CustomerEditView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         customer_id = self.kwargs.get('customer_id')
-        customer = get_object_or_404(Customer, id=customer_id)
+        customer = get_object_or_404(Customer, customer_id=customer_id)
         columbary_record = ColumbaryRecord.objects.filter(customer=customer).first()
         beneficiary = Beneficiary.objects.filter(columbaryrecord__customer=customer).first()
 
