@@ -18,13 +18,27 @@
     </div>
     <div class="modal" id="modal">
         <div class="modal-content">
-            <form>
-                <input type="text" placeholder="First Name" required id="fn">
-                <input type="text" placeholder="Last Name" required id="ln">
-                <input type="email" placeholder="Email Address" required>
-                <input type="tel" placeholder="Mobile Number" required>
-                <button type="submit">Send Letter of Intent</button>
+            <form method="post" action="{% url 'send_letter_of_intent' %}">
+                {% csrf_token %}
+                
+                <!-- Full Name -->
+                <input type="text" name="full_name" placeholder="Full Name" required id="fn" class="form-control">
+                
+                <!-- Permanent Address -->
+                <textarea name="permanent_address" placeholder="Permanent Address" required class="form-control" rows="3"></textarea>
+                
+                <!-- Landline Number -->
+                <input type="tel" name="landline_number" placeholder="Landline Number" class="form-control">
+                
+                <!-- Mobile Number -->
+                <input type="tel" name="mobile_number" placeholder="Mobile Number" required class="form-control">
+                
+                <!-- Email Address -->
+                <input type="email" name="email_address" placeholder="Email Address" required class="form-control">
+                
+                <button type="submit" class="btn btn-primary">Send Letter of Intent</button>
             </form>
+            
         </div>
     </div>
     <div class="tour">
@@ -36,15 +50,10 @@
                 this revered site, all from the comfort of your device.
             </span>
         </h1>
-<<<<<<< HEAD
         <a href= 'https://stalphonsusarcam.netlify.app/'>
         <img src="../../static/images/360.png" id="tour">
         </a>
         <div class="about">
-=======
-        <img src="../../static/images/360.png" id="tour" href='app-files/index.html'>
-        <div class="about" id = '2'>
->>>>>>> 1d557379ecf6bd5fe33dbdc8466a329a8e40070d
             <h1>Know More About Us!</h1>
         </div>
         <div class = "abt">

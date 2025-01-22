@@ -1,0 +1,88 @@
+{% include 'Staff_Headers.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url("{% static 'images/cloud.png' %}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/editcus.css' %}">
+    <title>Edit Customer Details</title>
+</head>
+<body>
+    <div class="page-container">
+        <div class="white-box">
+            <h1 class="header">Edit Customer & Columbary Details</h1>
+
+            <!-- Customer Edit Form -->
+            <form method="POST">
+                {% csrf_token %}
+                
+                <!-- Customer Section -->
+                <div class="details-section">
+                    <h2>Edit Customer</h2>
+                    {% for field in customer_form %}
+                        <div class="row">
+                            <span class="label">{{ field.label }}</span>
+                            <span class="value">{{ field }}</span>
+                        </div>
+                        <hr class="separator">
+                    {% endfor %}
+                </div>
+
+                <!-- Columbary Record Section -->
+                <div class="details-section">
+                    <h2>Edit Columbary Record</h2>
+                    {% for field in columbary_record_form %}
+                        <div class="row">
+                            <span class="label">{{ field.label }}</span>
+                            <span class="value">{{ field }}</span>
+                        </div>
+                        <hr class="separator">
+                    {% endfor %}
+                </div>
+
+                <!-- Beneficiary Section -->
+                <div class="details-section">
+                    <h2>Edit Beneficiary</h2>
+                    {% for field in beneficiary_form %}
+                        <div class="row">
+                            <span class="label">{{ field.label }}</span>
+                            <span class="value">{{ field }}</span>
+                        </div>
+                        <hr class="separator">
+                    {% endfor %}
+                </div>
+
+                <!-- Buttons Section -->
+                <div class="back-button" style="display: flex; justify-content: center; align-items: center; margin-top: 20px;">
+                    <!-- Save Button -->
+                    <button type="submit" style="margin-right: 10px;">Save Changes</button>
+
+                    <!-- Back Button -->
+                    {% if customer %}
+                        <a href="{% url 'recordsdetails' customer_id=customer.customer_id %}">
+                            <button type="button">Back to Records</button>
+                        </a>
+                    {% else %}
+                        <p class="no-records">Error: Customer not found.</p>
+                    {% endif %}
+                </div>
+            </form>
+
+        </div> <!-- End of white-box -->
+    </div> <!-- End of page-container -->
+</body>
+</html>
+
