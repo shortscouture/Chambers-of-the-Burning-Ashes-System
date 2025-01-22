@@ -1,0 +1,501 @@
+columbary_ID,cr_vault_number,cr_full_name,cr_permanent_residence,cr_mobile_number,cr_email_address,cr_date_of_issuance,cr_date_of_expiration,cr_issuing_party,first_beneficiary,second_beneficiary,third_beneficiary,fourth_beneficiary,pa_type_of_p,pa_amount,pa_ref_number
+4-A-North,240-B,Gloria Snyder,"25081 Brown Cliff Apt. 908, Williamston, LA 33307",(758)868-2388x3415,jessicaevans@hotmail.com,26/10/2021,06/08/2028,Taylor-Perry,Casey Aguirre,Joseph Davis MD,Brandon Collins,Kimberly Atkinson,FullContribution,62608,944488
+89-A-North,11-A,Victoria Brown,"80144 Harper Fields, Meganport, WI 24041",057-251-7901,williamspaula@lowe.com,16/11/2022,29/01/2029,"Smith, Pratt and Mitchell",Timothy Carter,Wayne Reynolds,Sonia Vance PhD,Jonathan Taylor,PartialContribution,221121,925469
+73-C-South,301-B,Holly Arnold,"30961 George Garden, Williamsland, ND 16398",927.797.6026,coxmichael@johnson.com,05/06/2024,28/05/2026,Wagner-Carter,Michael Miller,Samuel Cooper,Ashley James,Jason Hall,FullContribution,189663,976676
+21-D-North,233-A,Jeffrey Hubbard,"792 Dawn Drives Apt. 446, West Travisshire, NM 14403",001-872-862-6625x8331,lauriehill@gmail.com,07/08/2024,01/05/2029,"Myers, Mills and Young",Laura Wilson,Katherine Wright,Gerald Walker,Christopher Lamb,PartialContribution,290747,945830
+84-C-South,48-A,Joshua Walton,"335 Joyce Highway Apt. 068, Meltontown, CA 78434",+1-384-508-3720x03050,zschultz@schultz.com,13/08/2024,25/03/2027,"Ingram, Weiss and Avila",Joshua Martinez,James Marquez,Zachary Nelson II,Brian Thompson,PartialContribution,169678,913365
+4-C-North,256-B,Natalie Martin,"339 Hernandez Lock Suite 743, Meyermouth, DC 66196",+1-041-446-2248x000,fholmes@gmail.com,16/07/2023,16/12/2027,"Rodriguez, Goodwin and Gutierrez",Timothy Oliver,Robert Melendez,Pamela Blackwell,David Martinez,FullContribution,108240,945338
+58-A-North,453-A,Brian Reyes,"951 Justin Coves, Palmerton, NH 02412",379-731-5988,danielhensley@hotmail.com,20/05/2023,05/08/2028,Fletcher Ltd,Scott Porter,John Frank,Joshua Fields,Jeremy Powers,PartialContribution,147003,984123
+68-A-South,46-A,Michael Patel,"08376 Walton Park, Lake Stephentown, AK 36987",+1-951-540-6964x510,mollyhanson@martin.biz,17/09/2022,12/11/2028,Martin Ltd,Brandon Reynolds,Kimberly Jacobson,Larry Bowen,Carrie Rivera,FullContribution,247174,992610
+98-D-North,359-A,Jessica Warner,"06219 Baker Plaza, West Andrewville, MI 21865",001-285-734-3490,harold19@gmail.com,18/08/2024,15/09/2028,Reyes PLC,Dr. Joseph Wilson MD,Carolyn Matthews,John Diaz,Tyler Roberts,PartialContribution,117200,965542
+92-A-North,367-B,Cheryl Nelson,"7575 Young Ford, West Michael, KY 71365",(220)572-9643,jasmineellison@mccarty.info,21/09/2023,25/03/2029,"Wolfe, Lawson and Reed",Cody Smith,Timothy Fletcher,Cheyenne Brown,Charles Cox,FullContribution,52863,979639
+50-A-South,207-A,Chase Le,"7051 Fitzgerald Pike Apt. 205, Williamsfort, OR 40427",(700)501-8032x5346,josephjenkins@hotmail.com,12/07/2020,27/11/2027,"Proctor, Turner and Clark",Anthony Butler,Lauren Miller,Daniel Nguyen,Ronald Martinez,FullContribution,158695,978379
+46-D-North,41-B,Melissa Brown,"64826 Don Freeway, Mercadobury, DE 23195",378.542.7154,danielburke@weber-hoover.org,10/07/2024,13/03/2026,Bailey Ltd,Isabel Larson,Lisa Robinson,Kaitlin Hamilton,Amy Rosales,PartialContribution,180027,977397
+8-B-North,391-A,Timothy Moore,"139 Chambers Points, North Toddmouth, ME 12131",145-095-9421x1458,robert93@brown.com,23/10/2020,03/03/2028,Rodriguez-Page,Michael Finley,Teresa Ortiz,Tim Ross,Mrs. Amber Hughes,FullContribution,217788,995754
+93-B-North,39-A,Ian Robertson,"237 Burton Plaza, Donaldside, SD 76560",(889)387-6402,justin12@mcgee.com,05/01/2024,03/03/2029,"Olsen, Ramirez and Nelson",Jake Scott DDS,Mr. Jesus Lane,Jennifer Summers,Kelly Hall,FullContribution,198140,921448
+89-C-North,135-B,Janet Hart,"0456 Mark Flats Apt. 171, East Joeville, AK 30214",001-037-586-0604x5805,james12@chan.com,28/09/2024,12/01/2027,Jenkins-Smith,Patricia Jacobson,Eduardo Rogers,Lisa Braun,Adam Hudson,PartialContribution,154425,936098
+94-C-North,321-B,William Vaughan,"6624 Osborn Views, West Donna, AK 23975",(647)521-5349,cpetty@hotmail.com,15/01/2021,12/02/2027,"Brooks, Ellis and Cruz",Phillip Casey,Barbara Henderson,Rachel Mueller,Amy Mcfarland,PartialContribution,282234,915272
+85-C-North,418-B,Jesus Munoz,"3216 Andrew Land Suite 037, Shawnhaven, IL 40925",+1-585-114-9969x386,jamesmason@gmail.com,18/05/2023,02/07/2026,Harris-Nguyen,John Dorsey,Christopher Caldwell,Justin Ford,Jerry Bishop,FullContribution,156226,918424
+36-B-North,356-A,Alicia Joseph,"66211 Scott Spur, Port Matthew, CT 91742",778-905-8593x73081,tammybishop@melendez-johnson.com,13/08/2023,28/12/2028,Rodriguez-Phillips,Christine Brooks,Kevin Haney,Amy Williams,Alexander Norris,FullContribution,170979,951451
+21-C-South,306-A,Maria Kelly,"06255 Kirk Path, West Mary, WI 50727",258-730-9562,diazbrian@hotmail.com,19/08/2022,20/06/2026,"Rodgers, Sharp and Hobbs",Dr. Tina Bradford,Jesse Stephens,Christina Montoya,Scott Woods,PartialContribution,126099,991804
+80-B-South,331-B,Carlos Herrera,"96881 Reyes Knoll, Baldwinberg, SD 01184",433-131-6030,vross@gmail.com,15/06/2021,26/02/2029,"Melton, Miranda and Pruitt",John Espinoza,Grace Brown,Rachel Williams,Susan Burke,FullContribution,269652,941597
+23-A-South,458-B,Elizabeth Clark,"3410 Heath Field Suite 131, Nicoleview, LA 61548",+1-721-331-6307x267,erinhenderson@yahoo.com,03/09/2024,01/11/2028,"Patel, Anderson and Mckee",Annette Chandler,Danielle Ramos,Travis Ward,Ashley Bell,FullContribution,188648,958759
+64-D-North,174-B,Vanessa Meyers,"Unit 0795 Box 8732, DPO AP 92458",8910154066,jessicamullen@heath.biz,09/05/2024,01/09/2028,"Anderson, Kim and Parker",Todd Patel,Michelle Christensen,Aimee Evans,Darrell Burke,PartialContribution,66563,934935
+21-C-South,230-A,Daniel Cain,"7781 Terri Mountain, Benjaminville, CO 95715",256.220.6009,april96@gmail.com,16/11/2023,25/05/2026,Stewart PLC,Jennifer Lara,Scott Morgan,Mary Arnold,Emily Robbins,PartialContribution,213927,998572
+36-D-North,281-A,Robert Krause,"USNV Lee, FPO AA 10304",001-202-924-9755x018,nhernandez@kerr-davies.com,30/10/2021,07/09/2029,Stewart PLC,Joseph Hanson,Michael Garcia,Erika Crawford,Bradley Anderson,PartialContribution,174864,930293
+58-D-South,333-A,Veronica Schultz,"639 Aaron Fords, Littlemouth, MI 16804",(397)874-2601x114,pkrause@castillo.info,15/05/2022,23/06/2029,"Davis, Torres and Hunt",Francisco Weber,Susan Trevino,Barbara Long,Brenda Williams,PartialContribution,243686,964168
+6-C-North,471-B,Andrew Meyer,"Unit 2791 Box 1385, DPO AA 01046",001-123-181-0556x41297,webbcorey@bennett-ruiz.biz,08/03/2020,06/05/2026,West-Rivas,Justin Davis,Morgan Webb,Stephanie Barnett,Christy Walsh,FullContribution,227587,928521
+59-D-South,52-A,Laura Smith,"1157 Kelly Meadows, Lake Elizabeth, AL 31252",001-873-984-7942x8645,ekim@johnson-brooks.info,01/05/2021,23/11/2029,"Jackson, Miller and Bryan",Scott Wells,Luke Rodriguez,Ashley Williams,Emily Ruiz,FullContribution,238118,943332
+36-D-North,323-B,William Schultz,"582 Kathryn Throughway, Lake Kelly, GA 15491",287-710-8410x8149,frobinson@hotmail.com,08/09/2022,22/03/2028,"Sanders, Burns and Garcia",Danny Fitzgerald,Nicholas Brooks,Juan Richardson,Alex Ellison,PartialContribution,272551,916221
+63-A-South,91-B,Adrienne Mckee,"344 Deborah Parkways, Nathanland, WV 48833",+1-077-885-6484x3002,james93@stewart.org,03/09/2022,17/08/2028,Giles-Jones,Haley Martin,Michael Cochran,Sarah Perez,Richard Cervantes,FullContribution,83177,962552
+5-D-South,386-B,Tonya Young,"5997 Perez Trail Apt. 279, East Katherine, SC 06397",+1-642-228-5577x7537,jonathanrodriguez@gmail.com,12/11/2024,30/10/2028,"Levy, Anderson and Martin",Renee Sanchez,Mitchell Patton,Dr. Jacqueline Smith MD,Sandra Roberts,FullContribution,217107,992774
+13-D-South,187-A,Andrew Wells,"9195 Kathy Court, East Nathaniel, WV 36737",(472)986-1869x713,dfleming@phillips.biz,04/09/2021,15/08/2028,Taylor and Sons,Christopher Casey,Susan Page,Jacob Taylor,Allen Kemp,FullContribution,112615,959351
+63-C-South,198-B,Jennifer Cross,"8906 Brock Loop, Bushton, MA 12186",001-160-669-9389,michaelgraham@ortiz.com,19/09/2024,16/07/2028,Ramirez PLC,Kendra Mason,Logan Sawyer,Lindsey Taylor,Kenneth Miller,PartialContribution,233437,932316
+60-B-North,448-B,Ashley Diaz,"932 Davis Groves, Murphymouth, TX 54181",967-826-5743x586,robert10@cross.biz,26/01/2024,06/04/2028,Patterson-Mathis,Kimberly Sims,Christopher Johnson,Jacqueline Daniel,Caroline Silva,FullContribution,247705,976537
+11-D-North,422-B,Carlos Nguyen,"910 Ashley Summit, Port Thomas, RI 94033",570.206.0917x232,krausesheila@yahoo.com,21/11/2024,25/09/2027,Nelson PLC,Ryan Kirk,Linda Floyd,Aaron Nelson,Mary Williams,FullContribution,295893,954264
+40-C-South,46-B,Gregory Williams,"USS Donaldson, FPO AA 74159",001-201-014-3051x096,shellyberg@sanchez-benton.com,25/01/2024,15/09/2028,"Ferguson, Daniel and Elliott",Erica Cummings,Sierra Clark,Michael Green,Sarah Mccarthy,FullContribution,205895,957361
+25-C-North,454-B,Michael Washington,"5534 Williams Street, West Victor, AR 09236",(189)870-0208x7583,nterry@hotmail.com,25/03/2020,08/03/2029,Shaffer-Henson,John Rose,Linda Cook,Stephanie Miranda,Keith Johnson,PartialContribution,262514,952013
+17-D-North,499-A,Taylor Thompson,"6625 Kristy Throughway Apt. 415, Lake Janet, SD 70636",+1-988-689-7724x84891,garciastephanie@yahoo.com,07/03/2023,18/03/2026,"Stevens, Fisher and Henderson",Alyssa Le,Kathryn Rodriguez,Julie Osborne,Logan Douglas,PartialContribution,269757,955010
+82-A-South,283-B,Katherine Burton,"4572 Brian Squares Apt. 551, East Stacey, TX 26463",950-273-8301x8063,michellemiller@yahoo.com,10/08/2022,11/07/2026,Mcgrath and Sons,April Mitchell,Amber Jackson,Jodi Garcia,Barbara Gardner,FullContribution,214443,995911
+43-B-North,233-B,Alexis Murillo,"0354 Zimmerman Points Apt. 204, South Patricia, PA 75604",375.252.5269,hernandezmichelle@gmail.com,06/02/2021,20/06/2028,Jones-Cruz,John Ford,Vincent Choi,Jason Smith,Sean Jones,FullContribution,255259,979143
+20-D-South,443-A,Krista Grant,"0963 Gould Shores Suite 730, Hallton, WA 49110",001-845-598-4717x434,zbolton@yahoo.com,23/12/2022,11/02/2028,Espinoza-Allen,Anna Parker,Christopher Price,Dawn Butler,Sean Smith,FullContribution,129226,945314
+21-A-North,81-B,Matthew Haynes,"PSC 8147, Box 3139, APO AE 99454",001-123-895-5033x6846,gerald84@yates.com,06/02/2020,15/05/2028,Chavez Inc,Steven Payne,Chris Fowler,Sarah Walker,Paige Campos,FullContribution,148710,996129
+47-D-North,357-A,Sean Todd,"61824 Wells Keys, West Christina, OK 38989",(672)741-1620,davidsarah@smith.com,13/02/2021,06/05/2029,"Foster, Wallace and Benson",Jason Macias,Christopher Thomas,Jeanette Jackson,Jessica Vega,PartialContribution,196435,945777
+71-B-South,82-B,Seth Reid,"7154 Michelle Ranch Apt. 405, Tonymouth, VT 80882",965.475.1328,andersongloria@hotmail.com,18/10/2021,28/06/2028,"Fox, Brock and Peters",Sharon Hudson,Gabriela Young,Jade Johnson,Max Jordan,FullContribution,150275,940812
+96-A-North,187-B,Jose Roberts,"5765 Joseph Flat, Alyssafort, OR 83208",855.446.0837x769,bmejia@gallegos.com,10/11/2023,23/02/2029,"Garcia, Smith and Bennett",Jamie Rios,Daniel Rodriguez,Jessica Little,Yolanda Swanson,PartialContribution,51252,997094
+97-A-South,242-A,Sarah Daniel,"6660 Alexander Mountain Suite 510, Lucasberg, WA 38590",(462)040-9771x556,jibarra@payne.org,10/02/2023,24/01/2026,Bridges LLC,Daniel Acosta,Donald King,Stephanie Young,John Brown,PartialContribution,247950,967811
+5-A-North,460-A,Robin Henson,"985 Margaret Port Suite 220, Allisonfort, ME 80207",001-830-399-2975,hillsandra@gmail.com,23/02/2022,05/09/2029,Duffy Ltd,Mary Johnston,Ann Keller,Alvin Franklin,Joshua Villegas,PartialContribution,141323,999981
+79-B-North,22-B,Amanda Dennis,"USCGC Simmons, FPO AP 34064",(273)544-8899x552,gina66@smith.com,02/04/2024,29/10/2029,"Perez, Gregory and Edwards",Scott Garcia,Haley Hall,Derrick Jordan,Anthony Ellis,FullContribution,129350,928890
+96-B-North,268-A,Michelle Patel,"0383 Stephanie Terrace, Rebeccaport, VT 05556",9808666911,grantsamantha@lambert.com,11/03/2023,14/11/2026,Herrera Ltd,Benjamin Leach,Jane Fisher,Mark Stone,Jason Davidson,FullContribution,174622,954887
+86-C-South,254-A,Eric Jackson,"0770 Brenda Drive, Dominguezport, NV 11117",398.720.7754x578,kimberlymaddox@yahoo.com,19/04/2021,19/02/2027,Lee and Sons,Samuel Bell,April Diaz,Nicole Foster,Robert Moody MD,FullContribution,195780,983072
+97-D-North,194-B,Michael Davis,"643 Elizabeth Plains, North Cynthia, UT 95931",124.239.9857x2024,amanning@gmail.com,30/04/2024,08/03/2029,Buchanan PLC,Lisa Bailey,Kevin Diaz,Maria Moore,Steven Anderson,FullContribution,199520,957271
+100-B-North,408-B,Dr. Michele Pruitt DVM,"90896 Fernandez Springs, South Davidmouth, MA 07717",274-761-6065,yadams@myers.com,05/01/2025,06/09/2029,Jordan and Sons,Sara Norris DDS,Richard Brown,Lisa Ford,Mr. Joshua Harrington,FullContribution,58940,949328
+8-A-North,245-A,Alexandra French,"Unit 3415 Box 0141, DPO AE 63830",-9032,gcallahan@hotmail.com,07/06/2024,25/12/2029,Harper-Valdez,Angela Lin,Jennifer Banks,Colin Jones,Christine Smith,FullContribution,99227,980653
+72-A-South,56-B,Alicia Baker,"30727 Mcdonald Rest Apt. 742, Port Dylan, NC 79778",+1-405-982-3791x73165,donovandeborah@hotmail.com,08/09/2023,04/12/2029,"Walsh, Brooks and Meadows",Dawn Brooks,Kevin Taylor,Darren Gregory,Eric Bolton,PartialContribution,256904,928802
+17-A-North,187-A,Michael Bradley,"423 Barker Stravenue, Warrenbury, MS 74695",362-628-0373x7635,fieldspeter@yahoo.com,25/08/2020,09/08/2026,Parks-Hernandez,Andrea Estrada,Melissa Jones,Terry Alvarado,David Robinson,PartialContribution,206590,939645
+18-C-North,359-B,Julie Hartman,"5712 Stacy Square Apt. 382, Heatherland, AZ 29312",(461)559-2726x084,stacyhernandez@hotmail.com,10/07/2024,13/08/2029,Cisneros-Thompson,Belinda Gibson,Ashley Mckay,Kaitlyn Smith,Alexa Lynch,PartialContribution,250649,915469
+69-D-North,135-A,Bianca Powell,"60696 Gina River Suite 658, Phillipsport, DE 27960",491-941-7090x902,ywilliams@randolph.com,14/12/2022,09/04/2028,"Anderson, Henry and Higgins",Jonathan Holloway,Paige Fisher,Sherry Wilson,Kimberly Villa,FullContribution,75718,933327
+24-B-South,110-A,Fernando Trujillo,"721 Kevin Haven Suite 269, Jennifermouth, MO 57631",009-700-4000,stephanie03@yahoo.com,02/03/2022,20/08/2029,Owens-Le,Stephanie Lewis,Kelly Ortega,Derek Norton,Craig Waters,FullContribution,189840,974141
+42-A-South,459-A,Brandon Owens,"659 William Points Apt. 201, North Richard, AK 76591",(157)982-1653x160,ryanthomas@williams.com,07/12/2021,27/05/2026,Khan Inc,Melissa Mills,Joshua Buck,Jose Whitehead,Amy Nelson,PartialContribution,150730,958834
+97-D-North,224-A,Eric Mckinney,"16420 Montoya Ranch Apt. 235, Amyshire, CO 22435",-10369,brownamanda@todd.info,20/08/2023,05/04/2029,White and Sons,Jared Ho,Michelle Rivers,Megan Wilson,Marie Williams,FullContribution,66508,953821
+50-D-North,133-B,Nicole Roberts,"4453 Jackson Neck Apt. 688, Sotoview, OR 55565",9897372634,sheilarobertson@reese.net,31/07/2024,15/06/2028,Wilson Ltd,Joshua Navarro,Sherry Solis,Larry Barker,Corey Jackson,FullContribution,182403,962097
+38-D-South,215-B,Brandy Haynes,"960 Russell Turnpike, Lake Tinatown, MI 88155",754-364-3832x3620,fking@hotmail.com,25/07/2020,26/06/2029,"Humphrey, Blair and Munoz",Elizabeth Williams,Lauren Thompson,Christy Ortiz,Kyle Lee,PartialContribution,213074,976366
+96-C-South,193-B,Benjamin Barber,"49144 Mills Crest, Lake Elizabethside, SC 79380",+1-241-653-6527x5141,manueltrujillo@morgan.org,10/12/2021,09/09/2027,Fox LLC,Deborah Garcia,Brittany Hobbs,Lisa Koch,Valerie Mayer,FullContribution,66588,924876
+34-A-North,190-A,Stephanie Brown,"6438 Coffey Extensions, Martinezhaven, OK 42079",(240)619-7218x69069,teresabass@allen.com,18/12/2020,28/03/2029,Oconnor-Garcia,Melinda Byrd,Alicia Nash,Angela Carter,James Davidson,FullContribution,131779,997499
+95-D-North,51-A,Amanda Lopez,"30115 Foster Inlet Apt. 821, Ramosstad, OH 03027",796-196-5725x0845,christinejohnson@bell.com,20/12/2021,10/05/2029,Williams and Sons,Natasha Riley,Andrew Wood,Brenda Clark,Jennifer Jones,FullContribution,180981,952715
+81-D-North,449-A,Ashley Haley,"43295 Drake Ridge, Millsborough, TN 65231",+1-801-110-5876x5106,erinshaw@fowler.org,15/02/2022,13/08/2028,"Long, Colon and Gonzalez",Tyler Mcguire,Jane Smith MD,Brendan Hill,Lisa Benjamin,FullContribution,240607,991143
+64-A-South,128-A,Kimberly Todd,"6472 Miller Club, Williamsfort, MD 24090",626.861.8761,wardevelyn@herring.com,03/01/2024,29/11/2029,"Barnett, Johnston and Thompson",Glenn Kerr,Brandon Coffey,Jon Herrera,Christina Romero,FullContribution,155551,926289
+92-D-North,373-A,Megan Vaughn,"75057 Amanda Rapids Suite 439, West Angela, VA 03633",(318)933-6019x6390,alexander69@hotmail.com,14/04/2020,04/03/2028,Davenport-Navarro,Peter Williams,Maria Quinn,Robert Black,Christopher Hobbs,PartialContribution,199096,966901
+11-A-North,498-A,Michelle Carr,"63753 Daniel Run Apt. 391, Nicholaschester, ID 58006",001-875-397-4654,ericrobinson@leonard-tate.net,12/02/2023,14/11/2029,Webb-Powell,Dylan Lopez,Gabriel Craig,Nicholas Collins,William Hill,PartialContribution,151018,911221
+34-C-North,243-A,Mr. Gary Jackson,"27629 Nicole Streets, South Sarah, IL 88596",001-600-188-2361x7569,griffinstephanie@yahoo.com,19/08/2020,01/02/2029,Murphy-Acosta,Christine Peterson MD,Christine Burns,Brian Smith,Mary Jennings,PartialContribution,59196,945276
+50-C-South,336-B,David Stewart,"636 Allen Grove Suite 501, Lake April, LA 13134",+1-276-072-2746x198,xwilliams@wade.info,20/02/2020,09/12/2026,Cook-Estrada,Michelle Gay,Ryan Adams,Peter Reyes,Seth Berger,FullContribution,284543,958654
+19-C-South,302-B,Juan Lewis,"613 Rhonda Port, Lake Jessica, MA 39732",3891182328,morrischarles@jacobs.com,21/01/2021,03/01/2027,Rogers Ltd,Heidi Walker,Denise Hernandez,Eric Blackwell,Gina Roy,FullContribution,222155,972652
+42-A-South,365-B,James Young,"2921 Joseph Skyway, South Johnmouth, MA 94889",+1-513-662-8134x27906,marshmelanie@sherman.net,03/01/2020,02/06/2027,"Robertson, Kim and Brennan",Dr. Kristi Henderson,James Johnson,Steven Price,Darryl Gregory,PartialContribution,146746,988521
+87-C-South,241-A,Kristen Smith,"72632 Antonio Rue Apt. 962, South Kathleen, NH 48629",001-020-149-1382x227,amberjennings@hotmail.com,31/05/2024,30/03/2026,"Gibbs, Lopez and Roberts",Don Park,Casey Graves,Danielle Fitzgerald,Joshua Adams,PartialContribution,99035,984798
+48-C-North,240-A,Amanda Smith,"296 Bates Pike Apt. 568, Coreymouth, DE 15222",(073)771-1964x92341,robertblackburn@gmail.com,12/06/2023,01/10/2026,"Payne, Rhodes and Mcgrath",Kimberly Morales,Renee Lee,Kathryn Hill,Ryan White MD,FullContribution,280346,989255
+77-A-South,339-A,Roger Riley,"317 Dougherty Inlet Suite 718, West Mary, RI 52615",001-320-675-9277x4633,joseph69@sherman.com,19/10/2022,27/01/2026,Roberts Ltd,Kimberly Webb,Dawn Fischer,Ryan Acevedo,James Mitchell DDS,PartialContribution,128728,958355
+88-D-South,481-B,Mark Lopez,"01644 Hill Vista, Port Chelsea, TX 88697",001-470-034-8601x0383,elizabeth68@robinson.net,29/11/2020,02/11/2027,Pacheco Group,John Hernandez,Teresa Becker,Michaela Miller,Lauren Holmes,PartialContribution,275439,996701
+39-B-North,382-A,Robin Eaton,"5789 Jennifer Station, Lake Markbury, WA 69363",(205)705-4506x2640,pearsonmiguel@smith-hunter.org,11/03/2021,31/05/2026,"Bennett, Hobbs and Burns",Brian Woodard,James Fisher,Dave Hunter,Sherry Miller,PartialContribution,132096,938634
+41-B-South,330-A,Kimberly Vance,"292 Robinson Well, Mortonland, ME 05488",(879)892-6782,lisa88@mckinney.com,15/08/2021,25/06/2027,Espinoza LLC,Rachel Williams,Deanna Wang,Jamie Young,Michael Fleming,PartialContribution,281730,955821
+61-A-North,470-A,Robert Castillo,"933 Carpenter Ranch Suite 209, Kyleton, ME 60414",132-740-9795,jamestownsend@smith.com,09/05/2023,31/10/2026,Campbell Ltd,John Thompson,George Fleming,Ellen English DDS,Lindsay Gibson,PartialContribution,159275,945025
+77-C-South,292-A,Michelle York,"456 Christopher Neck, New Courtneyfort, IA 98488",293.380.3811x6992,lee14@hart.com,28/01/2022,07/12/2029,Martin-Carter,Patricia Evans DDS,Michael Bender,Steven Lopez,Kristen Brooks,PartialContribution,125346,952514
+42-B-North,457-A,Debbie Lewis,"649 Todd Avenue Apt. 147, West Thomasstad, KY 26822",826-418-6834x2250,lindsaystuart@gmail.com,28/05/2022,25/04/2028,Williams-Copeland,Nicholas Haney,Heather Brown,Mr. Raymond Hoover,Jordan Griffin,FullContribution,112820,987445
+29-D-North,474-A,Ashley Irwin,"29253 Johnson Row Apt. 532, Joneston, CA 75126",(861)563-2072,alanreid@yahoo.com,26/08/2021,23/04/2028,Daniel Ltd,Cameron Cook,John Schneider,Katherine Bruce,Derek Sheppard,PartialContribution,188911,936169
+88-C-North,455-A,Caleb Wolf,"261 Brent Lock Suite 178, North Judith, SC 43809",114-155-9171x6685,shernandez@daniel.net,06/05/2021,28/02/2029,Wilkerson and Sons,Martha Perez,Andrew Wood,Lance Bryant,James Hoffman,FullContribution,275905,985665
+83-D-South,342-B,Jeffrey Bass,"4441 Angela Harbors Suite 776, West Derekside, SD 08402",886109609,carl63@gmail.com,19/06/2020,29/01/2027,Doyle-Cole,Steven Willis,Joshua Morales,Ryan Simpson,Megan Ayala,FullContribution,241048,955444
+30-A-North,268-B,Sara Berry,"7770 Elizabeth Station, Josephchester, CA 92108",7098689339,allenabigail@black-zimmerman.com,03/01/2020,25/07/2029,West Ltd,Eileen Garner,Aaron Jones MD,Michelle Brooks,Tammy Young,FullContribution,232454,955858
+22-B-South,444-A,Jennifer Ryan,"94284 Williams Turnpike, North Jamesville, NH 62835",723.487.3183x826,josephanderson@vazquez.biz,09/02/2021,16/04/2027,"Welch, Maddox and Perez",Jessica Davis,Barbara Fuentes,Emily Patterson,Jason Rogers,FullContribution,228415,944329
+21-A-North,165-A,Melinda Gallagher,"396 Melissa Run Apt. 174, Lake Maria, ND 48786",+1-873-692-5984x151,bcook@hotmail.com,02/01/2025,10/02/2029,"Stewart, Bryant and Dalton",Jessica Mosley,Barbara Cook,Jonathan Boyd,Michelle Sanchez,PartialContribution,75016,985693
+50-C-North,145-B,William Dunn,"725 Morgan Alley, New Timothy, CT 90398",+1-865-597-7396x8736,cassandra24@williamson.info,27/06/2020,16/12/2026,Padilla PLC,William Valentine,Kimberly Spencer,Marcia Gonzalez,Kimberly Rhodes,PartialContribution,268617,935175
+45-A-South,230-B,Anthony Weaver,"4210 Barton Walk, Reyesmouth, AK 04883",4181621735,yevans@hotmail.com,05/04/2020,06/12/2029,Alexander Group,Brian Smith,Kenneth Smith,Maureen Austin,Samantha Johnson,PartialContribution,259312,951223
+20-C-North,78-B,Brandi Phillips,"771 Holden Terrace, Miguelbury, WA 94173",095-727-7492x1043,rtyler@gmail.com,19/07/2022,06/04/2028,Smith and Sons,Travis White,Scott Brooks,Robert Jackson,Robert Garcia,PartialContribution,179364,956505
+39-C-South,255-B,Troy Reynolds,"3209 Fernando Landing Suite 939, South Heatherside, WV 50318",9167827068,amanda39@hotmail.com,02/02/2020,14/12/2029,Willis Inc,Douglas Boyd,Jessica Turner,Megan Johnson,Michael Sanchez,PartialContribution,141464,931807
+38-B-North,448-A,David Baker,"6308 Cody Rue, North Jerry, RI 02369",(431)103-2658,hayden01@hotmail.com,09/05/2021,07/02/2027,"Dawson, Arias and Mcdonald",Daniel Johnson,Misty Estrada,Derek Jones,Andrea Arroyo,FullContribution,263997,995176
+56-A-North,439-B,Jane Wilson,"553 Garrison Prairie Apt. 365, North Heather, IN 83536",(925)008-6500x1622,courtney17@estes.com,12/11/2023,23/03/2026,Hawkins-Woods,Steven Ross,Scott Reed,Maria Jenkins,Mary Allen,FullContribution,177778,911156
+30-B-North,56-B,Jeffrey Phillips MD,"23829 Renee Mills Apt. 015, Christyton, CT 17814",-8920,amandafischer@yahoo.com,15/11/2021,17/10/2028,"Maldonado, Jacobs and Cochran",Robert Jones,Eric Stewart,Shawn Gonzalez,Amanda Gould,PartialContribution,207063,949666
+26-C-South,52-A,Christine Jones,"9812 Toni Roads Suite 068, New Jason, AR 03388",001-025-841-3743x143,uward@adams.com,21/01/2024,21/10/2027,"Weaver, Garcia and Riley",Gregory Romero,Isabel Johnson,Mary Arellano,Leah Moore,PartialContribution,257178,970292
+77-A-South,488-B,Christopher Sims,"51306 Ferguson Vista Apt. 338, Lake Michaelmouth, AZ 06670",+1-918-441-2094x429,morriskayla@smith-ford.com,25/03/2023,22/01/2027,"Copeland, Mcclain and Collins",Christina Coleman,Megan Harrison,Peter Morris,Ruben Spencer,PartialContribution,241382,948830
+54-A-South,202-A,Chelsea Singleton,"0897 Gilmore Walk, East Jennifershire, MI 30273",384.917.8007,freemantracy@riley.com,21/03/2024,27/12/2027,Kelly-Smith,Jordan Caldwell,Danielle Obrien,Margaret Lopez,Jared Sampson,FullContribution,128671,923805
+81-B-North,467-A,Michael Ryan,"9616 Dana Trace Apt. 037, Millerfurt, AL 70054",(380)102-6972x71179,kellytiffany@yahoo.com,31/05/2022,06/04/2028,Green Inc,Carlos Harris,Kara Marshall,Jonathan Miller,Daniel Guzman,PartialContribution,128192,993201
+18-D-South,328-B,Brian Rivera,"7223 Anthony Inlet, Edwardland, WA 56827",(393)594-9736x239,vincent36@gmail.com,24/04/2023,01/07/2027,Howell-Figueroa,Michael Fernandez,Dylan Smith,Michelle Silva,Lisa Dean,PartialContribution,116508,941430
+66-C-South,64-B,Gerald Torres,"6895 Black Turnpike, Woodsside, WV 13301",+1-060-297-6002x6734,goldenbryan@khan.com,18/02/2021,20/02/2029,Turner Ltd,Sierra Thomas,Daniel Bowman,Kristina Gonzales,Patricia Clayton,FullContribution,136370,996199
+81-A-North,229-B,Scott Shaw,"68208 Thomas Lock Suite 724, East Jenny, KS 17307",+1-806-270-6680x6006,jacksonzachary@griffin.com,03/07/2021,05/02/2027,"Garcia, Garcia and Norris",Debra Davis,Gina Hess,Brian Sutton,Tyler Williamson,PartialContribution,245265,931408
+45-D-North,388-A,Ryan Miller,"USCGC Mendez, FPO AE 36719",227.198.6542,lawsonmichelle@gmail.com,08/04/2023,20/02/2028,Hancock LLC,Christopher Howard,Shaun Morris III,Michael Allen,William Rivera,PartialContribution,226487,990581
+68-D-South,296-B,Angela Hunter,"1442 Alvarado Neck Suite 379, Alyssaton, MD 79364",001-537-601-0844x9674,mckinneymatthew@hotmail.com,21/05/2021,29/09/2026,"Aguilar, White and Maynard",Eric Wu PhD,Brandon Martinez,Steven Ramos,Alexis Vazquez,FullContribution,94101,959565
+36-A-North,262-B,Kaitlyn Miller,"Unit 2259 Box 6285, DPO AE 08264",706.264.6015x92828,mitchellkimberly@yahoo.com,29/02/2024,08/11/2027,"Stone, White and Rogers",Brian Glover,Clarence Lambert,Jacob Martin,Morgan Baker,FullContribution,194668,976642
+70-A-North,112-A,Anthony Hall,"833 Justin Groves, New Deanna, RI 64488",+1-223-518-1354x110,mcfarlandcharles@johnson-wilson.info,14/12/2021,20/03/2029,Chan-Allen,Billy Huerta,Denise Robertson,Meghan Medina,Brian Young,FullContribution,64102,961201
+16-B-South,58-B,Christopher Johnson,"3290 James View Suite 074, West Rogerport, MS 97561",944-064-2697,vgeorge@perkins.com,05/08/2023,25/05/2027,Bradley-Cobb,Mr. Douglas Wiley,Jonathan Valdez,Tyler Garcia,Shawn Brown,PartialContribution,218274,984920
+38-A-South,181-B,Amy Boyle,"5761 Pamela Center, North Caleb, MT 20351",112-066-7384,stanleypaul@thompson.com,12/02/2024,26/11/2026,Livingston Inc,Christopher Deleon,Amy Gonzalez,Brittany Peterson,Melissa Kemp,PartialContribution,270002,937494
+43-C-North,240-B,Stephanie Montes,"314 Taylor Spur Suite 923, Port Gregory, ID 66652",-3697,millerjason@butler-sandoval.com,12/01/2022,06/11/2027,King and Sons,Crystal King,Eric Reeves,Kathleen Wilson,Mark Owens,FullContribution,125159,991067
+72-C-North,309-B,Steve Richardson,"79297 Wolfe Lane, Lake Jaimehaven, WV 99327",001-540-436-4008x64079,carolwright@gmail.com,07/09/2024,02/09/2028,"Stephens, Pena and Cervantes",Bernard Holland,Danny Rodriguez,Samantha Price,Olivia Bowen,PartialContribution,255172,965015
+57-D-North,178-B,Matthew Blackwell,"506 Juan Roads, New John, FL 83796",001-949-711-7564x58319,catherine45@hotmail.com,30/10/2021,25/10/2027,Sanchez-Holmes,Laura Rogers,Gerald Hart,Caleb Lee,Mark Morton,FullContribution,165815,956782
+53-C-South,43-A,Gregory Mays,"11946 Russell Walk Suite 985, West Kayla, MI 98784",981-972-4771,ojames@gmail.com,18/03/2023,09/07/2026,Love-Mcguire,Mark Boyd,Robert Robinson,Douglas Owens,Caroline Burch,PartialContribution,64426,941375
+86-B-North,56-B,Gwendolyn Brown,"4806 Wallace Mission Apt. 015, Hilltown, GA 48106",001-525-210-8130x82383,christopher26@yahoo.com,12/09/2022,19/11/2027,"Gould, Hall and Lopez",Bobby Glass,Kelly Buchanan,Valerie Frost,Keith Brown MD,PartialContribution,201069,933742
+19-D-South,240-B,Sandra Thompson,"1848 Perkins Crescent, Jillianhaven, ND 08429",+1-175-092-0685x143,george96@yahoo.com,10/10/2022,09/04/2026,Foley and Sons,Michelle Hernandez,Karen Lopez,Ashley Lee,Rebecca Taylor,PartialContribution,102997,965726
+69-C-North,248-A,Christina Garrett,"49291 Steven Turnpike, New Kristinamouth, RI 89063",022-505-6021,josechavez@hotmail.com,23/07/2020,28/11/2028,Black Group,Pamela Odonnell,Jeremy Smith,Kevin Moses,Mary Garner,FullContribution,103954,915186
+99-C-South,50-A,Amanda Hodge,"690 Garner Expressway Suite 556, Kingside, MT 26690",3863666550,vazquezjanice@gmail.com,16/01/2021,15/02/2026,Macdonald-Green,James Garcia,Michael Reed,Stephanie Ryan,Randall Castillo Jr.,PartialContribution,273181,996598
+35-D-North,355-A,Jerry Hernandez,"6321 Brooks Place, New Michaelberg, TN 60815",-5923,tneal@williams.com,26/02/2021,30/09/2028,"Hoffman, Salas and Gonzales",Cassandra Parker,Shane Lewis,Stephanie Jordan,Cassandra Martin,PartialContribution,162424,981577
+18-C-North,275-B,Christopher Peterson,"552 Montoya Lodge, Brewerland, MO 30395",(279)117-3015,erinrandolph@gmail.com,05/07/2022,09/05/2029,"Simon, Richards and Howard",Rhonda Delgado,Daniel Williams,Jeremy Smith,Kaitlin Williams,PartialContribution,131129,921416
+55-B-North,34-B,Katie Cabrera,"852 Alexander Loaf, West Jodi, SC 73455",977-223-6698x8784,dennisthompson@lopez.com,24/09/2023,17/10/2026,"Jackson, Barnes and Miller",James Wilson,David Miller,David Bell,Tiffany Carpenter,FullContribution,102453,975789
+58-B-North,412-B,Paul Underwood,"691 Joseph Mountains Suite 923, East Jessica, VA 52473",323.318.2694,nlawson@martin.com,30/09/2021,05/06/2026,"Espinoza, Herrera and Stokes",Christopher Webster,Holly Jones,Rachel Lopez,Daniel Cross,FullContribution,81564,992022
+32-B-South,372-A,Thomas Lopez,"PSC 2701, Box 6442, APO AP 48540",-2014,daniel84@francis.org,19/02/2022,03/04/2028,Tucker Group,Harold Hernandez,Franklin Ortega,James Bryant,Ryan Miller,PartialContribution,292094,975289
+90-D-North,392-A,Jay Stephens,"653 Galvan Plain, Brianshire, WI 59026",468-556-6590x1092,tyroneanderson@watts-fernandez.com,16/03/2023,07/03/2026,Howe Ltd,Duane Shannon,Michelle Nielsen,Deborah Anderson,Cynthia Smith,PartialContribution,276459,932676
+55-D-North,250-A,Jacqueline Yates,"349 Walls Divide, Moonfort, MD 23749",+1-266-960-2195x104,kevin31@ramos-valdez.biz,06/08/2023,31/07/2027,Russell PLC,Keith Castillo,Jason Hoffman,Stephen Cook,Nicole Nunez,FullContribution,256695,993206
+4-D-North,178-B,Shannon Simmons,"8440 Alexander Light, Abigailborough, OK 05829",493-514-4286x40809,carol53@yahoo.com,12/06/2020,23/04/2029,"Parrish, Ramos and Payne",Darin Kelley,Luis Lin,Chelsea Bowers,Tamara Khan,PartialContribution,71356,931286
+34-A-South,452-B,Rachel Johnson,"PSC 8594, Box 2645, APO AA 30569",6315909572,marshallcindy@hotmail.com,11/12/2022,12/10/2029,Carr-Wells,Kevin Gonzalez,Catherine Salazar,Brittney Grant,Melanie Lowe,FullContribution,89721,923232
+6-A-South,53-B,Yesenia Tucker,"38647 Arroyo Path Apt. 588, North Lawrence, PA 32715",970.663.4595,heatherbarnett@thomas.com,03/10/2022,30/07/2026,Hammond-Ross,Tony Baker,Michael Clark,Jennifer King,David Wood,FullContribution,212578,980694
+86-D-South,454-B,Sean Byrd MD,"571 Thomas Throughway Apt. 516, Lopezberg, AK 06152",8172535283,petersondouglas@yahoo.com,28/02/2020,20/02/2026,Vincent-Wolf,Colin Adams,John Anderson,Heather Perez,Crystal Good,FullContribution,250294,945184
+76-D-North,206-A,Valerie Diaz,"2807 Perry Crossroad Suite 986, Port Ryan, UT 00747",3284396632,prestonalvarado@hotmail.com,27/11/2020,31/07/2029,"Larson, Mcbride and Morris",Shane Friedman,Angelica Reeves,Jared Fernandez,Daniel Franco,FullContribution,54213,951425
+31-D-South,207-B,Stephanie Smith,"1806 Maldonado Keys Suite 072, North Rachelfort, IN 63175",001-612-098-6358x34885,rebeccaholder@gmail.com,05/09/2023,18/09/2028,Webb-Davis,Steven Kelly,Donald Luna,Leslie Phillips,Jeffrey White,PartialContribution,197358,970326
+54-C-South,310-B,Marcus Fuentes,"0257 Welch Courts Apt. 836, Robertsstad, MN 68777",(384)999-1809x565,scott41@lewis.com,24/10/2024,07/07/2028,"Baker, Lloyd and Hall",Matthew Evans,Eugene Carson,Maureen Berg,Maria Bradford,PartialContribution,97394,931210
+7-D-South,144-B,Timothy Gibson,"PSC 0195, Box 0755, APO AP 54883",901-396-3510x119,adrian91@yahoo.com,14/03/2024,11/03/2028,Moore-Tran,Christina Mcbride,Dylan Kelly,Aaron Roberts,Daniel Haynes,PartialContribution,105286,985942
+60-D-North,359-B,Ms. Shelly Murphy,"20499 Higgins Isle Suite 625, Hernandezbury, FL 12094",+1-468-340-1555x065,david23@blevins.info,05/12/2020,30/11/2028,Marsh-Green,Christopher Spencer,Colin Shannon,William Woods,Julie Barnett,PartialContribution,250976,924038
+88-C-South,282-A,Nicholas Peters,"923 Hester Expressway Suite 400, Lake Mark, AK 40200",001-662-154-2952,schmittamanda@gmail.com,01/09/2023,05/06/2027,Brown PLC,Laura Brooks,Michael Wilson,Dawn Miller,William Garcia,FullContribution,73077,955407
+26-A-South,465-B,Matthew Thompson MD,"52716 Eric Common, East Elizabethshire, ND 22761",932-871-6981,rkeith@barnes.com,20/10/2024,23/03/2029,Osborne Inc,Laura Santos,Dr. Douglas Young,Kristy Rios,Stacey Rivas,FullContribution,299062,986710
+34-B-South,119-B,Nicole Contreras,"42555 Elizabeth Divide, South Jason, SC 85953",(688)258-6757x23286,andrewbrooks@yahoo.com,07/07/2023,06/08/2028,Yates Ltd,Destiny Shaw,Joseph Scott,Michelle Lopez,Kelly Perez,PartialContribution,209048,911538
+98-B-North,481-A,Paula Roman,"212 Daniel Valley, Port Kathryn, WV 53277",074.935.2821x26017,uodom@ruiz.com,03/08/2021,22/04/2029,"Jones, Barnett and Arnold",Omar King,Catherine Webb,Kenneth Franklin,Richard Nguyen,PartialContribution,66878,929700
+56-A-North,436-B,Toni Graham,"838 Melissa Springs, North Lydia, NH 81797",(416)749-6155,joy97@yahoo.com,04/06/2023,16/01/2029,Medina and Sons,Robert Ford,Lauren Rivera,Matthew Harris,Michael Coleman,PartialContribution,174661,984481
+57-B-South,59-A,Wesley Parker,"8752 Brenda Mission Apt. 342, South Stephenmouth, VA 86805",232.845.5107,stephenjimenez@hernandez-lewis.net,13/10/2020,01/01/2027,"Hurst, Mcdowell and Stewart",Ashley Gonzalez,Ryan Hughes,Roberto Francis,Jeffrey Rodriguez,PartialContribution,173966,989181
+89-A-South,203-A,Elizabeth Clark,"967 Hardy Curve Apt. 625, Port Jennifer, AZ 24510",410-332-2280x1854,katherine34@gillespie.org,19/05/2021,03/01/2027,"Reyes, Caldwell and Trevino",Trevor Mclean,Jennifer Ochoa,Cynthia Vaughan,Vincent Phillips,PartialContribution,265268,913531
+60-C-South,368-B,Amber Hunter,"23809 Ashley Burgs Suite 182, Port Laura, RI 40708",013-611-1110,nelsonbarry@yahoo.com,30/07/2021,25/01/2027,Hammond-Johnson,Janet Collins,Karen Johnson,Shelby Figueroa,Javier Clark,PartialContribution,111849,980056
+1-C-South,413-A,Alexis Phillips,"14380 William Unions, Strongshire, LA 41252",(732)739-8589x24659,haynesheather@hughes.com,31/03/2024,15/04/2027,"Ferguson, Adkins and Frazier",Ricky Richards,Suzanne Lopez,Gabrielle Chapman,Mary Ford,PartialContribution,140679,964872
+67-C-South,435-B,Thomas Hall,"PSC 7500, Box 9016, APO AE 16178",787141782,padilladennis@yahoo.com,12/05/2023,27/09/2029,Smith Inc,Erin Whitehead,Samuel Kelly,Derrick Garcia,Rebecca Scott,FullContribution,95414,970575
+67-C-North,256-A,Mr. Gregory Chandler,"2536 Dixon Club, Bakerborough, AL 60949",(209)592-9778x226,francisco35@gmail.com,30/12/2021,11/02/2028,"Garcia, White and Ramos",Joseph Kent,Danielle Shelton,Hannah Stevenson,Elizabeth Cox,FullContribution,122712,932365
+92-C-South,37-A,Jillian Pearson,"81861 Donna Manors, Joshuabury, AR 96250",3498676962,zlucero@santos-gonzalez.com,01/06/2023,21/05/2027,"Stanley, Rojas and Smith",Alexis Carson,Garrett Wright,Andrew Johnson,Amanda White,PartialContribution,210275,949185
+47-B-South,327-B,Danielle Valdez,"92991 Alexander Valley Suite 136, Lake Calvinview, FL 21549",001-652-682-6624x040,sjohnson@soto.com,19/02/2020,11/12/2026,"Blake, Cox and Koch",Traci Robertson,Kenneth White,Chelsea Silva,Dylan Galloway,PartialContribution,178229,992899
+59-B-South,157-A,Maria Rosario,"6498 James Glens Suite 857, Ochoaport, NV 26645",001-755-914-4630x2424,lauramartinez@harper.com,04/01/2022,12/07/2026,Rhodes and Sons,Nicole Elliott,Kelsey Roth,Manuel Swanson,Jessica Miller,PartialContribution,257480,916874
+13-A-South,199-A,Erica Taylor,"USS Johnson, FPO AE 21648",032.541.5591x4299,jennifer84@yahoo.com,30/10/2022,22/10/2026,Williams-Mccoy,Joseph Allen,Chelsea Kelley,Charles Mejia,Brenda Gardner,PartialContribution,254664,952437
+50-A-South,465-A,Peter Woods,"0645 Jonathan Stravenue, West Wendytown, DC 25425",001-423-465-8154,chavezmisty@hotmail.com,20/10/2023,06/05/2029,Farrell LLC,Debra Stevenson,Margaret Davis,Anthony Guzman,Shawn Douglas,FullContribution,208035,999529
+4-B-North,234-B,Janet Huffman DDS,"3797 Shaw Springs, Deniseview, SD 32922",889.691.8272x1828,barneslinda@yahoo.com,18/03/2022,01/03/2027,"Butler, Villanueva and Barber",Alexa Evans,Gene Woodward,Alejandro Jacobs,Amber Reyes,PartialContribution,100993,992589
+31-D-North,268-B,Bonnie Marks,"0829 Daniel Light, Kelleyview, TX 09193",708-420-2268x595,samuelbaker@hotmail.com,11/04/2022,17/01/2027,"Smith, Clark and Cruz",John Bailey,Jennifer Freeman,Ethan Blankenship,Veronica Douglas,PartialContribution,267188,946820
+21-A-North,194-B,Kristina Hale,"90340 Tommy Falls Suite 195, South Robertbury, PA 24826",029.359.9908x103,oscargreen@yahoo.com,01/08/2022,04/04/2029,Bailey-Neal,Evan Church,Jose Moody,Marilyn Hurley,George Moore DVM,PartialContribution,127292,943370
+7-A-North,299-B,Douglas Paul,"0801 Caleb View Apt. 405, South Laurie, NH 59822",-6459,timothygallagher@gmail.com,21/08/2023,26/11/2028,Cortez-Hahn,Christina Cross,Adrian Blevins,Erin Mason,Tamara Riley,FullContribution,195665,988532
+65-B-South,344-B,Amber Hardin,"85814 Keith Spur, Joyceside, WY 43921",+1-252-609-6892x09089,george33@hotmail.com,08/09/2024,15/12/2028,Watson-Hernandez,Brandy Davis,Leah Green,George Daniel MD,Matthew Skinner,FullContribution,244592,954785
+58-D-North,304-A,Susan Williams,"27683 Randolph Course, South Christopherview, NM 69520",879.934.5806x2250,ashley37@kelley.com,20/04/2020,04/01/2027,Williams PLC,Monique Cruz,Cynthia Jenkins,Craig Johns,Steven Caldwell,PartialContribution,65974,943368
+4-C-North,42-B,Sara Sims,"8823 Brandi Island Suite 956, Port Robertport, DC 68268",001-995-577-1619x7210,tmaynard@gmail.com,09/12/2022,13/03/2027,"Moreno, Reid and Johnson",Luis White,Lauren Gardner,Robert Phillips,Arthur Mclaughlin,PartialContribution,273543,986204
+9-D-North,360-A,Angela Jones,"USCGC Mendoza, FPO AE 82666",147.361.5173,luke38@woods.net,20/07/2020,20/04/2029,Taylor LLC,Robert Hall,Alex Wagner,Jennifer Brown,Jessica Calderon,FullContribution,210027,984694
+85-B-South,354-A,Jennifer Richardson,"9153 Zimmerman Grove Apt. 012, New Tara, WY 50515",001-796-057-9094x7592,thomasmerritt@tyler.com,20/06/2022,28/08/2026,Diaz Ltd,Anthony Williams,Julie Tanner,Anna Powell,Maria Wright,FullContribution,79233,987968
+40-B-South,14-B,Corey Watson,"5909 Tamara Streets, Hardyton, MS 64280",(398)557-6676x39234,william60@gmail.com,23/12/2024,18/10/2027,"Rodriguez, Campbell and Dunlap",Jon Cannon,Jason Campbell,Gary Day,Sara Sullivan,PartialContribution,255160,971771
+45-D-North,46-B,Brittney Williams,"81537 Hall Square Apt. 342, New Stephen, DC 50653",081.596.7469x4352,jonathan50@hotmail.com,15/08/2023,25/10/2029,Franco-Beltran,Amy Krause,Patrick Wise,Rodney Hurst,Pamela Smith,PartialContribution,166197,995503
+45-A-South,154-B,Alan Reid,"337 Sharon Green Suite 544, East Aprilmouth, NY 73477",+1-653-657-8862x5008,jeffreygreen@yahoo.com,08/07/2022,02/08/2026,"Brown, Williams and Christensen",Ann Nicholson,Kristina Thomas,Ms. Margaret Gilbert,Christina Church,FullContribution,73856,912935
+21-D-South,283-A,Luis Thomas,"216 William Squares Suite 189, Johnsonborough, IA 93033",358-896-6369x620,rosegina@ryan-henderson.com,14/06/2023,09/12/2026,Jordan-Robbins,Jesse Glass,Mitchell Acevedo,Joseph Liu,Dana Turner,PartialContribution,285137,944368
+90-B-South,428-A,Ashley Best,"5006 Perez Motorway, Port Victoria, CA 84144",+1-013-039-0955x856,wheath@roman-fields.com,10/01/2023,29/12/2027,Aguirre-Baker,Aaron Harrison,Heather Rodriguez,Steven Thomas,Cheryl Hernandez,FullContribution,242695,957677
+56-C-North,430-A,Brendan Jones,"289 Caleb Gardens, West Kellystad, IA 01479",001-152-540-0532x7314,jfisher@davis.com,02/02/2022,18/03/2028,Ward Ltd,Tonya Garza,Jason Boyd,Alyssa Curtis MD,Tiffany Brown,PartialContribution,180853,971086
+31-D-North,35-B,Todd White,"493 Patrick Inlet, Nicolehaven, VA 60878",300-098-0809,gcastro@reed.org,13/07/2023,14/12/2029,"Kim, Velez and Williams",Sarah Roberts,Kevin Williams,Kimberly Chan,Paul Barnett,PartialContribution,265652,955560
+88-B-North,375-A,Andrea Rich,"315 Kenneth Centers Suite 729, New Lauren, WA 11785",001-316-831-6830x8265,samantha49@ford.com,27/04/2020,13/06/2027,"Martinez, Hughes and Perkins",Leonard Brown,David Stanley,Crystal Morrison,Matthew Thompson,PartialContribution,188995,944227
+7-D-South,16-B,Amanda Hernandez,"102 Lawson Junction Apt. 456, East Brycemouth, CA 88009",7286738351,jamiehart@jones-perez.com,20/10/2020,02/03/2029,"Cortez, Davenport and Wheeler",Wendy Blair,Ashley Smith,Samantha Newman,Steven Wong,FullContribution,215500,954376
+62-D-North,437-A,Donna Ashley,"894 Torres Center, Jamiemouth, TN 64330",912.514.0449x849,sanchezcathy@barton-coffey.com,01/10/2022,29/01/2029,Bell-Clark,Thomas Bartlett,David Hendrix,Joshua White,Mitchell Perez,FullContribution,73215,938173
+12-A-South,244-B,Aaron Washington,"Unit 9484 Box 0008, DPO AP 11925",9482314122,lisa26@wolf.biz,06/01/2023,24/01/2027,"Robbins, West and Watson",Lauren Stanley,Todd Wilson,Adrian Lee,James Moyer,PartialContribution,290163,960767
+16-A-North,284-A,Jose Cervantes,"27794 Frank Burg Apt. 812, Port Jason, MS 95492",001-723-343-7677x331,michellebeard@yahoo.com,04/10/2021,14/01/2028,Lee Inc,Ms. Erin Holt,Darren Olsen,Justin Brown,Joseph Allen,FullContribution,279361,957429
+5-D-South,320-A,Gina Medina,"8513 Tonya Manor, Taylorburgh, NY 80230",919.621.6738x229,erinsanchez@hotmail.com,31/07/2023,11/12/2028,"Berg, Arias and Page",Lisa Turner,Julie Beck,Heather Griffin,David Potts,PartialContribution,76105,995709
+96-C-South,216-A,Daniel Guzman,"3854 Thomas Views Suite 755, West Garyport, PA 57008",(741)911-4567,michaelcannon@gmail.com,16/06/2024,14/02/2027,Friedman-Mckinney,Natalie Dodson,Catherine Baldwin,Thomas Murphy,Ann Lewis,FullContribution,233622,929788
+61-C-South,149-A,Amy Jenkins,"71123 Wilson Key Apt. 106, East Steven, VA 79987",(211)698-1897,michellesmith@yahoo.com,12/06/2021,11/12/2026,"Valentine, Green and Mcdaniel",Robert Blankenship,Luis Henderson,Joshua Roberts,Brett King,FullContribution,53280,959870
+4-D-South,419-A,Timothy Davis,"49086 Vasquez Green Apt. 808, South Matthew, NH 00953",251-948-5373x7002,krausepatricia@martin-barrera.com,06/09/2022,07/08/2026,"Clark, George and Hernandez",Mark Hudson,Jonathon Lee,Susan Mcbride,John Harris,PartialContribution,59426,973707
+77-A-North,253-A,Timothy Berry,"4698 Pamela Passage, Donnaburgh, NM 99157",436.913.2446x499,pamelacole@hotmail.com,24/05/2020,25/01/2027,Moore Ltd,Krystal Johnson,Gregory Curtis,Joseph Ward,Edward Edwards,PartialContribution,177701,986981
+41-D-South,109-A,Wesley Shepherd,"648 Hughes Ferry, Joshuastad, OH 31488",932.133.7366x0088,ycooke@yahoo.com,12/07/2021,09/10/2029,"Collins, Heath and Macdonald",Evan Clark,Dana Reyes,Charles Crawford,Samuel Williamson,FullContribution,262054,973167
+33-D-North,114-B,Gregory Bradley,"6253 Howard Mount, Sabrinatown, OR 76154",880.376.9852x007,matthew06@blackwell.com,20/04/2021,18/03/2026,"Bradley, Cross and Williams",Steven Diaz,Larry Short,David Gonzalez,Jean Henry,PartialContribution,227206,925255
+95-B-North,17-B,Karen Goodman,"445 Matthew Trafficway Suite 338, Maddoxport, SD 54443",(353)809-9600x893,thomasgregory@stewart.net,09/12/2021,11/07/2029,"Christensen, Hernandez and Wagner",Andrew Anderson,Valerie Roberts,Miss Emily Burke PhD,William Guerrero,FullContribution,256290,959217
+28-A-North,398-A,Timothy Wright,"PSC 7882, Box 2119, APO AE 22977",071-148-0392x690,houstonrhonda@jackson-roy.info,28/10/2024,13/06/2028,Smith-Martin,Gregory White,Jennifer Saunders,Diana Melendez,Carol Perez,PartialContribution,250172,991500
+15-C-North,100-A,Kathryn Watson,"618 Kevin Squares, North Jamesborough, NH 68973",7577334571,juliaacosta@pollard.com,03/12/2021,15/10/2029,Arias-Johnson,Veronica Johnson,Kristy Russo,Kyle Roberson,Samantha Baker,FullContribution,181662,989116
+46-C-North,107-B,Matthew Montgomery,"0263 Brady Drive, Port Kathryn, NM 63980",250-130-1991,mathewsandrew@williams.org,11/01/2020,23/02/2028,"Quinn, Ramirez and Gordon",Paul Scott,Andrew Johnson,Virginia Lopez,Michael Parks,PartialContribution,127950,936893
+42-A-South,423-B,Kathryn Cunningham,"392 Woods Fort Apt. 056, East Jasonfurt, AK 51700",001-082-644-6264x9716,prestonkevin@jones.org,06/11/2023,31/05/2028,Reed-Perry,James Zimmerman,Crystal Riley,Thomas Lewis,Christopher Boyle,PartialContribution,137811,918700
+11-A-North,305-A,John Sanders,"3232 Sharon Ports Apt. 201, Port Katherineport, MD 90092",155.099.8793x429,kimberlyprince@gmail.com,31/12/2021,29/05/2028,Rodriguez-Miller,Anita Pitts,Jessica Carlson,Joel Peterson,Brian Lee,PartialContribution,283186,954903
+28-B-South,483-A,Bonnie Johnson,"90091 Michelle Union Suite 506, West Christophershire, KS 28681",395334394,rreilly@jackson.com,16/06/2024,13/08/2026,Gonzalez LLC,Christopher Williams,Thomas Kaufman,Thomas Villanueva,Matthew Johnson,FullContribution,121628,978615
+98-D-North,258-B,Angela Harper,"622 Marc Coves, Smithview, CA 10682",001-727-229-2065x9783,thomasjeffrey@taylor.info,06/06/2021,10/05/2029,Hernandez-Santiago,Ethan Perez,Stephanie Brown,Patricia Schmitt,Mrs. Veronica Hardin,FullContribution,263881,982069
+61-D-North,187-A,Sarah King,"075 Lee Islands, New Courtney, NC 28890",353.684.4119,wilkinsandrew@morales.com,05/02/2022,27/09/2026,"Davenport, Wood and Thompson",Kelly Shields,Michael Gonzalez,Joseph Bauer,Alisha Wiggins,PartialContribution,202668,983537
+60-B-North,133-B,Pamela Chase,"04574 Ortiz Extensions, Yuview, TX 26391",8072738068,rebecca51@thomas.info,11/08/2023,20/12/2026,Flowers Ltd,Leah Owens,Ryan Pearson,Timothy Chang,Bill Hall,FullContribution,219180,981656
+9-D-North,396-A,Antonio Elliott,"39123 John Pass, Torreshaven, VA 96003",(154)838-4479x91563,lunamichael@campbell-shannon.net,03/01/2022,26/05/2026,Combs Inc,Karen Lopez,Larry Alvarado,Ralph Pearson,Keith Morrison,PartialContribution,111477,983245
+70-B-North,228-A,Patricia Stephens,"483 Wheeler Estates, Gonzalesburgh, ME 51106",671.470.7454,clarencenolan@jones.info,03/09/2021,08/02/2028,"Brooks, Arnold and Campbell",Jacqueline Clayton,Daniel Combs,Valerie Williams,Christina Burns,PartialContribution,174343,973743
+2-C-North,396-A,Hector Dillon,"24281 Ramos Freeway, Emilyside, GA 83199",086.909.5219,heatherarmstrong@marquez-baker.com,10/06/2020,14/03/2028,Rose PLC,Deborah Garcia,Matthew Smith,Michael Ochoa,Sandra Robinson,PartialContribution,117290,934801
+97-D-North,126-A,Seth Jones,"023 Taylor Plains Apt. 339, East Laurie, NH 55933",879.446.8726,bryan60@hoover.net,23/10/2022,30/11/2029,Castillo Inc,Martin Miller,Robin Acosta,Carlos Peterson,Brian Moses,PartialContribution,219675,942773
+64-A-North,86-B,Jonathan Barrett,"07716 Fernando Radial Apt. 678, North Meghan, KS 18960",758-392-3285x9620,fgarza@allen-ross.biz,24/08/2024,09/10/2027,"Jensen, Smith and Morris",Chelsea Bradshaw,Jesus Jones,Kaitlyn Long,Megan Young,PartialContribution,94236,976231
+33-B-South,127-B,Andre Conley,"161 Brian Canyon, Annachester, NC 21724",-4402,hosborne@gmail.com,20/11/2024,13/08/2028,Pitts LLC,Yolanda Hopkins,Sara Potts,Chase Cooper,James Smith,FullContribution,73296,963273
+39-D-South,397-B,Paul Henderson,"140 Walters Trail, Dayville, OH 79376",010-036-6751,schroedermaureen@jones-gonzalez.info,19/11/2022,31/05/2027,Carr-Fernandez,John Jenkins,Danielle King,Nicole West,Jeffrey Gross,PartialContribution,84903,910387
+56-A-South,338-B,Angela Clark,"49627 Bobby Glens Suite 517, East Kevinberg, ND 85959",(051)619-2953,marthabarnes@gonzalez.info,27/01/2021,18/08/2028,Parker PLC,Rachel Cooper,Daniel Fox,Dr. Cheryl Green PhD,Kevin Thompson,PartialContribution,145606,978563
+54-D-North,222-B,Jennifer Gonzalez,"1809 Brown View Suite 898, East David, PA 58295",+1-430-474-9764x4617,michaelfreeman@may.info,06/07/2023,13/11/2029,"Cooper, Webster and Porter",Cindy Rios,Patrick Burke,Angela Bridges,Katherine Myers,FullContribution,188126,977498
+24-C-South,86-B,Hannah Williams,"06142 Harris Canyon, Shawnside, HI 59468",(800)542-2635x667,stevenwebb@hotmail.com,15/12/2024,05/03/2026,Alvarez and Sons,Julie Mitchell,Stacey Gibbs,Derrick Stevenson,Dawn Garza,PartialContribution,85995,956962
+47-B-South,212-A,Gloria Lambert,"780 Caitlin Greens, Autumnchester, IA 02104",001-394-734-7645x715,brandoncalderon@yahoo.com,21/03/2022,14/03/2026,Stewart-Cooper,Elizabeth Mcintosh,Samantha Tapia,Joshua Garcia,Robin Edwards,PartialContribution,98172,992990
+61-A-South,262-A,Jennifer Shaffer,"9818 Vargas Flats, Anthonyhaven, WI 90699",(242)272-9173,kirstenmartin@kent-hernandez.com,12/08/2021,04/12/2027,Rivera and Sons,Ronald Lowery,Christian Vance,Christopher Hurley,Ryan Arroyo,PartialContribution,291110,976397
+93-B-South,434-B,Seth Duran,"4090 Rios Valleys Apt. 985, Terrychester, KY 23901",001-073-933-9136x088,eruiz@yahoo.com,19/07/2022,28/04/2028,Duke Ltd,James Harris,Frank Butler,Andrea Cooke,Jordan Mckenzie,PartialContribution,101531,982227
+70-D-North,251-A,Beverly Blankenship,"15479 Benjamin Keys Apt. 550, Sotoville, IL 29339",001-524-428-2017x0650,kimberly93@yahoo.com,28/04/2024,20/01/2029,Mann-Robinson,Sandra Gordon,Nicholas Mcclure,Ryan Baker,Frederick Cisneros,PartialContribution,236179,992984
+88-A-South,71-A,Nicole Carson,"780 Young Vista Apt. 318, Clarkton, TN 48126",850-101-4724x6570,nbrennan@johnson-logan.org,20/05/2023,05/05/2026,Lyons-Parker,Yvette Ward,Donna Holloway,Joseph Mason,Corey Douglas,PartialContribution,200714,930751
+28-B-North,77-B,Beth Wagner,"Unit 1108 Box 2143, DPO AA 74509",(160)965-3832x16690,mannolivia@harris.org,21/06/2020,16/05/2029,Wood Ltd,Thomas Black,Christopher Greer,Courtney Schneider,Angela Huber,FullContribution,276169,933580
+7-B-South,329-A,Michele Richardson,"593 Richard Hills, Lake Brandonbury, OR 51381",329-852-8973x50594,psmith@ross-burke.com,24/01/2020,28/03/2027,Adams-Rodriguez,Rebecca Peterson,Kristopher Guzman,Stephen Ritter,Stephanie Reynolds,PartialContribution,85155,915912
+48-A-South,164-B,William Hansen,"7707 Jacob Vista Suite 658, Rodriguezside, VT 11075",(034)545-3806,roblesdeanna@ewing.net,11/11/2020,15/04/2028,"Burton, Chang and Short",Ryan Ferguson,Todd Foley,Sarah Davis,Vickie Harris,PartialContribution,107487,934043
+70-B-South,368-B,Destiny Mcgrath,"7283 Nicholas Heights, Louisville, CO 18470",(510)496-7747x9039,taylorjames@jackson.com,28/07/2020,19/02/2029,"Page, Mclean and Fernandez",Melanie Weber,Megan Moore,John Brooks,Jeffrey Jones,PartialContribution,221071,950512
+45-D-North,438-B,Michael Stone,"3764 Roberto Pike Suite 884, North Pamela, NH 32269",001-267-599-2271,carla46@smith.com,17/11/2022,17/10/2026,Patel-Schneider,Danielle Watkins,Timothy Smith,Erica Cardenas,Natasha Williams,FullContribution,136376,955808
+31-B-North,286-B,Bruce Lara,"540 Richardson Corners Suite 612, East Jeremiahview, IL 65346",(438)816-0869x7096,richardhoward@harrison.com,27/05/2020,11/10/2028,"Williams, Brown and Carpenter",Karen Bennett,Chad Anderson,Mary Thomas,Tina Johnson,FullContribution,167438,922905
+14-A-North,88-B,Scott Miranda,"0827 Chang Route, Reneebury, UT 82727",001-463-639-2247x77896,perezjonathan@gmail.com,05/07/2023,05/10/2027,Morris Group,Jennifer Mitchell,Cindy Kim,Kevin Robles,Robert Martin,FullContribution,243595,982730
+20-B-South,162-B,Bryan Velasquez,"479 Weaver Plain, South Anthony, CA 34003",+1-648-038-8716x809,amiller@murphy.biz,23/06/2022,24/02/2029,"Nguyen, Branch and Vargas",Raymond Jackson,Ann Evans,Ashley Peterson,Tara Webb,PartialContribution,196050,960448
+11-A-North,435-B,Krista Murray,"5529 Luis Well Apt. 297, Port Nancyland, MN 36857",252-729-0372x23596,philip11@campbell.com,05/11/2024,17/01/2029,Davis PLC,Daniel Hardin,Michael Holt,Paula Thompson,Amanda Wong,PartialContribution,55848,973375
+83-D-North,400-A,Jamie Porter,"60116 Rodney Mall Suite 594, Maureentown, GA 12378",(130)103-7116x76188,danielle61@yahoo.com,12/11/2022,26/12/2028,Kramer-Watson,Susan Martin,Richard Chavez,James Garza,Catherine Brown,PartialContribution,190425,964397
+33-C-South,53-A,Kayla Heath,"5817 Walter Springs, Whiteport, WY 36019",(703)609-8104,walter70@gmail.com,17/12/2023,20/09/2028,Ellis PLC,Shelby Dunn,Jamie Sims,Katrina Bell,James Ferguson,PartialContribution,256783,955466
+47-C-North,250-A,Anita Smith,"647 Combs Inlet, East Toddport, SC 19143",602.228.1835x611,antoniocoleman@harper.biz,24/10/2024,07/09/2026,"Merritt, Hubbard and Logan",Kyle Miller,Adam Matthews,Chad Sanchez,Anthony Miller,PartialContribution,191552,986443
+56-D-South,388-B,Matthew White,"39391 Matthew Row, Janetbury, CO 04066",+1-379-782-7567x83460,walkerchelsea@hotmail.com,04/10/2023,22/06/2026,Evans LLC,Tyler Patrick,Matthew Macias,Nicholas Strong,Nancy Lane,FullContribution,178892,992381
+13-D-South,350-A,Kathryn Haney,"2298 Stevenson Valleys Suite 866, New Kristina, TX 03013",1783728052,manderson@gmail.com,10/06/2022,23/05/2027,"Miranda, Hall and Welch",Emily Goodman,Ryan Richardson,Virginia Scott,Nathaniel Coffey,FullContribution,95503,983364
+24-B-North,451-B,Mark Johnson,"12723 Glenn Corner, New Elizabeth, WY 85893",1534026381,barbarawoods@gmail.com,09/10/2020,18/09/2026,Mendez-Reyes,Kaitlin Sparks,Lisa Hart,Matthew Scott,Damon Simpson,FullContribution,233917,938452
+94-D-South,166-B,Eric Williamson,"0526 Williams Plain Suite 680, Floreschester, MN 19734",766-807-3789,tristanjones@king-foster.net,15/08/2023,03/10/2026,Lee-Hall,Kimberly Osborn,Nicole Schultz,Stacey Schmidt,Whitney Delgado,PartialContribution,265365,979646
+9-C-North,83-B,Nicole Parker,"0985 Toni Pines Apt. 746, Ryanside, SC 35340",(814)395-3506x45991,rdelgado@gmail.com,07/09/2021,02/08/2028,Levy-Carroll,Brian Hill,Kristina Conley,Stephen Valdez,Alexa Campbell,FullContribution,284185,915006
+71-C-North,98-B,Chris Medina,"1152 Denise Villages, Lake Timothyberg, DE 63799",3120163144,xhopkins@hotmail.com,29/09/2021,29/07/2028,Pope LLC,Kelli James,Jacob Reed,Alyssa Moss,Clayton Sandoval,PartialContribution,205439,990533
+69-C-South,242-A,Erika Jones,"363 Baldwin Skyway Suite 791, Williamland, GA 79571",671-142-0198x847,petersaustin@burgess.com,14/08/2021,08/12/2026,Collins Ltd,Jacqueline Mccoy,Russell Martin,Stephanie Chapman,Stephen Scott,PartialContribution,120691,972563
+55-B-South,13-A,Angelica Atkinson,"5639 Evans Vista Apt. 677, Garcialand, OK 31423",329.755.6034x14986,espinozajames@yahoo.com,07/06/2022,07/03/2028,Garner-Shepherd,Michael Bell,Carlos King,David Delgado,Kimberly Russell,FullContribution,155792,923145
+100-D-North,469-A,Gregory Martinez,"96934 Smith Summit, Jennifertown, ND 19330",718.009.3207x128,cassandra74@yahoo.com,15/10/2020,01/06/2028,"Williams, Rich and Bradshaw",Joshua Obrien,Tyler Robinson,Destiny Clark,Carl Davis,PartialContribution,88889,965155
+79-A-North,448-A,Tina Gutierrez,"559 Caldwell Mountain, Port Charles, HI 90828",776-419-7409x18445,bakerkathleen@hotmail.com,14/09/2021,03/02/2026,Snyder PLC,Kimberly Ramos,John Webster,Nicole Watkins,Sharon Riley,PartialContribution,73250,929203
+32-B-North,139-A,Pamela Jones,"65327 Duncan Mountains Suite 165, Port Thomas, DE 95101",(878)443-6330x636,roger34@hotmail.com,30/03/2023,03/10/2026,"Reynolds, Harris and Graham",Ronald Johnson,Shelley Henson,Stacy Taylor,Jessica Ortiz,PartialContribution,120227,938888
+31-C-North,26-B,Kristina Watkins,"212 Molly Neck Suite 021, Nancymouth, NC 70901",338.682.1951x893,monica25@coleman-morris.com,26/11/2024,06/08/2028,"Herrera, Wilson and Sanders",Katie Flores,Kenneth Schultz,Emily Stevenson,Heather Wilkerson,FullContribution,117696,957978
+73-B-North,168-B,Nicole Harrell DDS,"USNV Watts, FPO AE 06134",374-463-7866x700,chavezoscar@davidson.com,22/11/2024,14/11/2028,Knight-Johnson,John Lawson,Timothy Wilson,Emily Becker,Sandra Fox,FullContribution,150826,939357
+44-A-South,303-B,James Wise,"0317 Thomas Inlet Apt. 332, Silvaside, NH 96474",001-227-705-1435x19295,baileysarah@hotmail.com,06/05/2024,25/02/2029,Ponce-Kim,James Thomas,Robert Turner Jr.,Diana Jordan,Kevin Smith,PartialContribution,67967,922938
+7-A-South,282-A,Brian Fischer,"5157 Lisa Trafficway Suite 146, Lake Michael, MD 04310",001-303-073-5302x3519,fkhan@yahoo.com,04/10/2022,10/11/2026,Moore-Aguilar,David Thomas,Kristin Duran MD,Bruce Campbell,Christine Brown,FullContribution,137813,926002
+33-D-North,487-B,Kent Andrews,"71760 Jose Rue Apt. 030, Petersonmouth, WY 26690",(706)885-3873x48936,jennifer51@yahoo.com,22/08/2021,15/06/2026,Luna-Jones,Dominic Mills DVM,Amber Nguyen,Daniel Clark,Courtney Williamson,FullContribution,50304,993746
+3-D-South,321-A,David Gross,"112 Diana Alley, Huffstad, GA 30545",2108968121,hhernandez@yahoo.com,11/01/2022,15/10/2029,Fox-Evans,Pamela Cooke,Miguel Callahan,Rachel Jones,Michael Davis,FullContribution,282914,957179
+39-C-North,111-B,Joseph Smith,"7066 Bobby Gateway, Christinehaven, MN 95519",841.552.6332x4538,jameswilliams@gmail.com,16/01/2023,02/05/2026,Johnson and Sons,Thomas Cole,Laura Hoffman,Jared Riley,Daniel Sims,FullContribution,67206,970609
+49-B-South,21-A,Mary Villa,"81126 Brown Ranch, West Emilyville, ND 82686",388-765-6847,torresrebecca@perry.net,17/12/2020,14/04/2028,Miller-Campbell,Dana Hawkins,Richard Bullock,Christopher Dominguez,Brenda Olson,FullContribution,269749,921637
+78-B-South,209-A,Melissa Smith MD,"0298 Jessica Glens, East Candacemouth, MI 50698",001-393-158-1438x71220,melissa65@hotmail.com,27/09/2024,27/08/2027,Rodriguez Inc,Katelyn Mcintyre,Shannon Williams,Jeremy Blevins,Margaret Flowers,PartialContribution,144953,929637
+39-D-North,331-A,Ricardo Jackson,"8430 Christopher Falls Apt. 056, Deannafort, IL 85560",+1-219-410-3910x53436,karen04@gmail.com,28/02/2024,19/12/2028,Wilson-Wilson,Todd Ford,Samantha Gardner,Lauren White,Dustin Beck,FullContribution,273653,933215
+11-B-South,249-B,Katherine Hall,"8133 Charlotte Row, Alexandertown, TN 97585",913-423-0361x589,philipmoore@gmail.com,23/07/2020,28/11/2027,"Reid, Dixon and Cox",Jim Lewis,Jerry Hernandez,Maria Carr,Miss Misty Thompson,PartialContribution,274266,956411
+38-B-North,418-B,Ronald Berger,"11961 Kendra Mission Suite 248, East Juanborough, DC 18351",001-565-096-7789x550,christopher66@fry.com,26/04/2022,09/01/2028,Huffman Ltd,Heather Hutchinson,Derek Perez,Sally Delacruz,Travis Reed,PartialContribution,69471,912755
+45-D-South,18-A,Joshua Perez,"582 Johnson Isle, Vasquezmouth, WY 02430",-9847,laura77@hughes-moore.com,08/11/2020,09/07/2028,Smith-Ryan,Melissa Klein,Allen Russell,Steven Boyd MD,Kathryn Lambert,PartialContribution,81931,942731
+47-A-South,158-A,Joseph Taylor,"188 Case Stravenue, New Jackie, MD 78635",(094)554-2818x53550,hectorcarroll@yahoo.com,12/08/2020,28/01/2028,"Mendez, Conrad and Doyle",Jacob Kelly,Kelly Jacobs,Adam Arnold,Amanda Rogers,FullContribution,123210,970033
+79-D-North,188-B,John Washington,"51564 Robin Isle Apt. 541, West Deannafort, WI 84152",064.810.6292x7323,lisa31@duke.com,29/06/2022,29/12/2029,"Kim, Farrell and Mayer",Joseph Davis,Christopher Nolan,Elizabeth Horton,James Brooks,FullContribution,172343,931458
+46-B-South,87-B,Robert Walker,"2023 Young Circle, Chanchester, MT 04460",001-166-874-2393x269,rosarioapril@hotmail.com,20/10/2020,18/01/2029,Wallace LLC,Scott Lopez,Manuel Yates,Debbie Jones,Michael Trujillo,PartialContribution,92516,939261
+44-C-North,72-A,Tamara Cole,"071 Wilson Fords, West Donaldmouth, CT 83316",(162)788-2433x916,dawn35@eaton.com,07/04/2023,09/07/2029,Brady-Watson,Jaime Bryant,Cassie Frazier,Nathaniel Harrison,David Davenport,PartialContribution,261943,918389
+53-C-North,118-A,Lisa James,"637 Guzman Street Apt. 301, Thorntonview, ND 28417",922.736.5640x761,fgoodwin@yahoo.com,24/07/2020,07/03/2026,Hutchinson-Zimmerman,Michael Larsen,Robert Lee,Jeffrey Rodgers,Gregory Hayes,FullContribution,172648,944370
+50-B-North,203-B,Terry Cooper,"61751 Rivers Vista, Gillespiehaven, MT 65792",675-571-2860,perezjohn@garcia.com,16/11/2020,06/08/2029,Nelson PLC,Eric Terry,Crystal Delacruz,Olivia Juarez,Casey Moore,FullContribution,65549,981378
+2-D-South,473-B,Brittany Holland,"39604 Kathy Plaza, South Jill, IL 07344",-8617,yadkins@yahoo.com,07/08/2021,01/12/2027,"Parker, Garcia and Shepard",Steven Edwards,John Taylor,Matthew Wilson,Mary Walker,PartialContribution,235099,986442
+3-C-North,255-B,Ronald Alvarez,"86621 Felicia Knolls Apt. 068, Jorgeview, ME 47037",7447498032,wallacerichard@yahoo.com,15/03/2021,04/05/2028,Raymond Ltd,Glenn Wong,Denise Santiago MD,Ricardo Evans,William Turner,PartialContribution,214760,973843
+56-A-South,154-A,Joshua Green,"71649 Webb Way, East Christine, AZ 45141",001-318-374-2987,tonyrosales@hotmail.com,10/04/2021,30/05/2027,"Grant, Garza and Lucas",Megan Rice,Lisa Vargas,Terry Anderson,Jennifer Bowen,PartialContribution,72683,978883
+76-D-South,485-B,Frank Sullivan,"59759 Owens Ramp Suite 441, West Brittneytown, CO 76195",843-278-7895,vwilson@gmail.com,03/04/2020,21/02/2028,Green-James,Aaron Henderson,April Ellison,Justin Lee,Jose Velasquez,FullContribution,124811,992625
+27-A-North,265-B,Taylor Clark,"89761 Ruth Ramp Apt. 972, Hardyton, MT 79877",863.993.3753x57509,russellmoore@morris-sexton.com,23/05/2021,23/04/2027,"Wallace, Thomas and Shepherd",Robert Anderson,Jesse Combs,Craig Gregory,Laura Roberts,FullContribution,174752,986605
+38-B-South,70-A,Darlene Taylor,"9819 Martin Mill, North Rachael, NC 37161",2606582304,wardscott@hotmail.com,22/12/2020,11/06/2028,"Hall, Bryant and Rivera",Teresa Montes,Sean Faulkner,Christina Rogers,Gregory Bird,PartialContribution,209041,997527
+66-B-North,50-A,Justin George,"661 Downs Valley, Port Christopher, WA 40523",001-978-374-5284x7441,khuang@yahoo.com,08/12/2023,03/08/2026,Castro and Sons,Melissa Moore,Angel Brooks,Krystal Vaughan,Eric Wang,PartialContribution,90893,930544
+24-D-South,32-A,Ashley Brown,"4185 Sutton Way Apt. 574, Mccannstad, NE 98448",+1-191-851-3570x883,lynchlisa@hotmail.com,23/05/2023,15/12/2028,"Shaffer, Juarez and Richards",Jeanne Schneider,Grant Duran,Alan Clark,Christopher Malone,PartialContribution,126566,926196
+72-B-North,431-A,Steven Wood,"7349 Terry Field Apt. 527, Myersborough, AR 44541",001-208-115-9238x49809,levibaker@bennett.com,03/01/2020,12/08/2026,Cross Ltd,Melissa Murray,Stephanie Adams,Amy Garcia,Kevin Jenkins,FullContribution,194329,939167
+27-B-North,422-A,Jennifer Jackson,"08496 Gonzalez Ridges, Samuelfort, NY 89563",001-255-821-4704x18695,katherine83@gmail.com,02/05/2020,30/07/2029,Roberts-Clark,Cynthia Lowery,Jason Smith,Johnny Williams,Kara Guzman,PartialContribution,282219,959701
+52-C-South,107-A,Jose Jones,"42492 Christopher Ramp, Zacharystad, NH 51120",(803)070-3970,xlam@hotmail.com,20/02/2024,31/07/2029,Bennett and Sons,Charles Roman,Amanda White,Tamara Bell,Karl Coleman,FullContribution,107805,986997
+61-C-South,293-B,Trevor Graham,"5933 Mitchell Estate Suite 369, Johnfurt, DC 72919",001-789-845-7464,jasonmurphy@gmail.com,19/12/2021,19/08/2027,"Short, Ryan and Conley",Corey Cameron,Sarah Brown,Gregory Garcia,Monique Griffin,FullContribution,289078,986388
+36-D-North,421-A,Nicholas Brown,"9133 Scott Cliff, Petersonmouth, ME 06996",001-047-751-9301x04043,ericamurray@yahoo.com,13/06/2024,22/01/2029,Shea Group,Richard Garcia,Briana Wood,David Taylor,Eric Mcguire,PartialContribution,288608,932203
+65-D-South,134-B,Linda Newman,"2404 Olivia Points Suite 917, Brooksfurt, IL 32937",799.536.1493x17983,crosbypamela@gmail.com,24/01/2022,26/12/2029,Schwartz Group,Ashley Martin,James Jenkins,Craig Brown,Charlene Little,PartialContribution,193712,973500
+12-B-North,35-A,Karen King,"1757 Shawn Ville Suite 525, East Barbara, IN 00676",(610)253-5449x289,rebeccaduncan@gmail.com,02/07/2024,21/10/2026,"Rodriguez, Luna and Wheeler",Brad Hamilton,Mrs. Tiffany Stephens,Kenneth Hodges,Diana Elliott,PartialContribution,287500,990843
+10-D-North,367-A,Tony Russell V,"08730 Jennifer Estates, Bakerhaven, IA 34890",+1-115-251-3284x7609,sonyahinton@yahoo.com,08/08/2024,18/04/2029,"Mitchell, Hill and Flores",Travis Powell,Connor Smith,Brittany Mccormick,Mitchell Walton,FullContribution,287624,934850
+13-D-North,494-B,Gregory Davies,"05875 Christine Wells, Port Suzanne, MD 41348",604-844-0629x28381,ryansimmons@galvan.net,07/09/2022,07/10/2029,"Garza, Miller and Bridges",Colleen Contreras,Bruce Barry,Victoria Wade,Cathy Smith,PartialContribution,86579,945516
+91-B-North,322-B,Kristi Martin,"495 Henry Pines, Quinntown, PA 06669",083.277.6637x458,dbeck@yahoo.com,28/05/2022,28/10/2027,Gentry-Diaz,Anthony Peterson,Chad Vasquez,Edgar Fisher,Matthew Rush,PartialContribution,289899,922440
+52-D-North,135-A,Jesus Brown,"68560 White Circle Apt. 396, Port Omar, ND 90023",(889)840-8851x965,ushelton@jenkins.com,09/02/2024,19/08/2027,Burton LLC,Mary Mcclure,Jeremy Jones,Linda Berry,Wendy Harper,FullContribution,161090,989111
+42-D-North,173-B,Frank Tucker,"2203 Marvin Unions Apt. 031, Nguyenview, OR 82471",589-587-1855,hortonhannah@gmail.com,19/07/2020,13/09/2028,"Moon, Evans and Duncan",Peter Moore,Natalie Mcgee,Abigail Estes,Andrew Snyder,PartialContribution,255662,924384
+68-B-North,245-A,Justin Cox,"08401 Reynolds Square, New Amy, IN 50646",(487)879-8199x26282,bennettjake@hotmail.com,28/09/2020,20/07/2027,"Little, Richardson and Bradford",Joy Warren,Theodore Morrison,Luis Schmidt,Joanne Noble,PartialContribution,254345,989353
+2-A-South,166-B,Sherry Hawkins,"USNV Perry, FPO AP 80118",+1-117-494-0859x83370,leebrady@owen-hernandez.net,19/08/2022,15/02/2026,"Barnes, Rosario and Jones",Isaac Davis,Vincent Williams,Jessica Walker MD,Brooke Ross,PartialContribution,161749,945891
+28-C-South,206-A,Erin Stanley,"49438 Shirley Port, Carrilloville, FL 36721",+1-199-320-5182x404,garnold@hernandez.net,22/12/2024,29/08/2027,Douglas Ltd,Jermaine Keith,Madison Powell,Ashley Rich,Mark Vega,FullContribution,252771,942261
+40-D-South,18-B,Melissa Guerrero,"3340 Woodard Way Suite 792, East Christineville, MA 23107",054.125.5560x658,hillkathleen@gmail.com,16/10/2022,04/10/2029,Lozano-Guzman,Jason Todd,Michael Pruitt,Kelly Mccormick,Amber Howard,PartialContribution,230848,956301
+42-B-South,73-B,Joshua Taylor,"193 Owen Union Apt. 477, Lindaville, GA 42395",039-749-4196x0073,ashley24@yahoo.com,20/11/2022,22/02/2027,Lucas-Mcdaniel,Jake Fuentes,Suzanne Wheeler,Ryan Ramirez,Crystal Flores,PartialContribution,272374,915305
+40-C-North,102-A,Benjamin Baker,"7583 Benjamin View, North Brenda, MS 73519",984.550.7350x2822,waltersandrew@wells-webster.com,10/09/2021,13/11/2029,"Snyder, Hall and Reeves",William Clay,Daniel Flynn,Sara Copeland,Casey Hunter,PartialContribution,120500,931123
+77-A-North,357-A,Linda Castillo,"1091 Thomas Circle Suite 867, New Dawnland, IN 55093",+1-988-730-2493x11098,christywilson@baker-mcdaniel.com,14/11/2023,03/03/2027,Moore-Riddle,Sherri Stephenson,Courtney Green,Julia Caldwell,Jermaine Mullen,FullContribution,197734,956048
+18-B-South,12-A,Jennifer Kelley,"74038 Contreras Park Suite 280, New Kellychester, OR 61105",342-106-4763x50786,joshuahunter@hotmail.com,19/11/2020,01/12/2029,Stanley Group,William Stafford,Matthew Williams,Taylor Patterson,Breanna Kramer,PartialContribution,224133,960452
+44-C-North,410-A,Dustin Jones,"4315 Luis Prairie Suite 295, Ellenmouth, IL 53022",591.061.3287x27755,jeffreychan@collins.com,10/10/2021,18/08/2029,Patterson LLC,Jessica Barnes,Darrell Carson,Nicholas Vasquez,Brian Franklin,FullContribution,277821,974579
+66-A-North,277-A,Maria Jones,"PSC 4950, Box 6739, APO AE 94471",-1799,williamsjason@pacheco-johnson.com,09/03/2021,05/04/2026,Harrison-Kennedy,Jonathan Ryan,Timothy Williams,Brittney Jones,Lisa Porter,FullContribution,171575,911133
+27-B-South,223-B,Mitchell Mckinney,"2901 Lewis Brooks Suite 493, Anneborough, MI 04035",666.513.3259x2978,jamie69@yahoo.com,15/12/2022,14/07/2027,Oneal-Cook,Natalie Mathis,Cassie Williams,Joseph Howell,Kerry Rodriguez,FullContribution,204470,993067
+25-D-South,451-A,Mr. Isaac Anderson MD,"151 Pamela Mews, Reillyfurt, NJ 91092",656.891.1713x1791,seanleblanc@patel.net,27/08/2024,11/03/2027,"Collins, Mathis and Powers",Matthew Garcia,Tabitha Armstrong,Sabrina Simpson,Denise Villanueva,FullContribution,273238,945341
+92-A-North,46-A,Jesse Palmer,"5932 Baxter Squares Suite 911, Desireeton, WV 55868",301.931.2933,jonesrichard@hotmail.com,18/05/2022,28/03/2028,Rose-Roberts,Taylor Grant,Scott Lucas,Kelsey Bailey,Thomas Webster,FullContribution,222742,964160
+67-D-North,290-A,Vanessa Velasquez,"82247 Frazier Walk Apt. 587, Port Tommy, AL 42830",165.894.8794,zmorris@hotmail.com,10/11/2023,12/04/2027,Peterson-Arnold,Brian Santiago,Jessica Brown,Cassidy Miller,Kyle Mason,PartialContribution,126338,928031
+86-A-South,82-B,Mary Moyer,"93058 Katherine Station, Trevorchester, TN 70684",2895288433,timothy44@matthews.com,03/03/2023,22/08/2027,Lewis-Morales,Timothy Berry,Sean Torres,Mr. John Khan,Nicholas Ray,FullContribution,117318,934102
+4-B-North,304-A,Michael Yu,"Unit 4893 Box 8397, DPO AP 33391",-9440,lisasmith@jacobs-baker.com,28/03/2024,08/08/2026,Cannon PLC,Sarah Peterson,Jaime Washington,James Everett,Tammy Smith,PartialContribution,289794,925513
+35-C-North,206-B,Sabrina Munoz,"692 Young Divide Apt. 073, Tranland, OR 76079",947-492-9855,mjames@henry.info,26/07/2023,26/11/2027,Knight-Romero,Jacob Sanchez DVM,William Perkins,Rachel Jones,Andrew Roberts,FullContribution,137853,917838
+2-C-South,297-B,Michael Adams,"8864 Anthony Coves, Mccartyside, CA 71833",001-657-788-0922x6782,benjamin09@yahoo.com,05/06/2021,22/06/2027,"Duran, Wilson and Miller",Annette Chen,Duane Wright,Michael Porter,Kevin Mcintosh,PartialContribution,159718,931543
+21-D-South,305-A,Catherine Cox,"4534 Walker Oval, West Sarahmouth, CA 42933",493-780-9792x05754,christopher96@hotmail.com,18/08/2020,28/09/2028,Wilson-King,Carmen Fischer,Samantha Howe,Laura Jones,Joshua Johnson,PartialContribution,59304,937373
+88-C-South,389-B,Shawn Rivera,"3477 Ponce Mountain, Romerofurt, TN 60318",(638)634-6330x3335,justin22@gmail.com,20/03/2020,13/07/2029,"Martin, Coleman and Grant",Lawrence Vasquez,Margaret Roberts,Danny Sutton,Eric White,PartialContribution,286199,989564
+2-C-North,128-A,Matthew Jordan,"509 Joe Knolls Apt. 135, Mcdonaldhaven, MS 68459",001-616-987-9136,clara@wall.com,07/03/2023,08/02/2028,Gonzalez LLC,Jermaine Hill,Mary Washington,Ryan Good,Melissa Jones,FullContribution,73197,923626
+38-B-North,473-A,Andrew Middleton,"900 Taylor Springs, Robertfort, NY 08379",-8537,smithjessica@calhoun.info,16/02/2022,18/08/2029,Aguilar-Gomez,Scott Lee,William Freeman,Nicole Moore,Kelsey Blackburn,FullContribution,268297,921056
+58-D-South,204-A,Alexis Taylor,"342 Rebekah Land, North Elizabethchester, IN 58235",9625611880,fsanchez@bauer-lee.com,10/06/2020,02/05/2026,Irwin LLC,Paul Singh,Jason Frazier,Laura Garrett,Donna Davidson,PartialContribution,54729,939822
+80-B-North,203-B,Alan Chavez,"2245 Heather Pines, Bartlettfurt, NM 79870",663-485-8490,willie80@yahoo.com,07/04/2024,20/11/2028,Price-Gray,James Kim,Renee Thompson,Samantha Hughes,Ruben Hart,PartialContribution,179072,939516
+53-B-North,478-B,Roy Jackson,"USNV Yang, FPO AP 55875",683-803-5137x005,nathan93@romero-patterson.net,06/06/2023,28/11/2029,Escobar-Acevedo,Carlos Gray,Angela Kelly,John Ramos,Keith Smith,FullContribution,270870,994573
+39-C-South,298-A,Karen Lopez,"USCGC Frost, FPO AA 12478",-10148,ruizanne@gmail.com,22/04/2020,11/03/2029,"Lee, Adams and Hall",Lee Wallace,Theresa Gates,Carrie Crosby,Ryan Mcbride,FullContribution,178953,955598
+58-D-South,459-A,John Brown,"841 Clarence Pike, Port Williamside, DE 91951",001-705-462-5306,anewman@hotmail.com,08/01/2022,07/12/2029,"Lee, Johnston and Tran",Carl Ramirez,George Davis,Rachel Reese,Chelsea Brown,FullContribution,84262,946159
+91-A-North,302-B,Gregory Matthews,"4179 Mejia Passage Suite 501, Lake Diana, MI 77254",+1-929-490-5748x10315,jeffrey64@richards.com,29/12/2021,03/05/2029,"Rodriguez, Stanley and Johnson",Randall Pierce,Michael Kim,Anna Hall,David Mullen,FullContribution,221863,910191
+23-A-South,287-B,Robert Holmes,"5995 Burke Creek, Emilyborough, WY 44357",-3645,williamsonedwin@williams.com,11/11/2021,31/07/2026,Barber Group,Brandon Henderson,Brian Torres,William Garcia,Allen Becker,PartialContribution,171994,956695
+42-D-South,61-B,Danielle Villarreal,"76248 Tony Crest Suite 747, Perkinsstad, GA 69360",+1-804-618-0087x94906,kroberts@ford.com,14/01/2024,25/05/2029,Romero Inc,Lisa Garrett,Jennifer Sullivan,William Simpson,Jim Pena,PartialContribution,294422,963038
+86-A-North,258-A,Timothy Allen,"815 Troy Shores Apt. 914, East Michelle, FL 27807",+1-109-625-4981x433,dennis11@collins.com,16/11/2021,31/01/2028,"Hale, Sloan and Marquez",Theresa Stafford,Brandy Stout,Rebecca Frank,Leah Palmer,PartialContribution,62401,934861
+80-C-South,391-A,Ann Romero,"1727 Williams Loop Apt. 495, Richardtown, AR 54043",862-494-2190x948,rubentanner@barnes.com,10/07/2022,18/07/2027,"Adkins, Rush and Cooper",Rebecca Wagner,Casey Long,George Bates,Patricia Mathews,PartialContribution,123649,957832
+14-D-North,369-B,Carrie Harrison,"63684 David Run, New Cassidy, NE 44242",223.580.0158x33246,williamglass@gmail.com,26/07/2022,06/08/2029,Roberts and Sons,Kurt Mccarthy,Steven Parsons,Jennifer Glover,Mrs. Elizabeth Collins,FullContribution,114818,986511
+29-B-North,94-A,Maria Lawson,"1890 Silva Bypass, Danastad, MO 26001",087-362-7973,jamesdavis@yahoo.com,06/10/2020,15/02/2028,Hernandez-Smith,Willie Taylor,Justin Garcia,Michael May,Nichole Leonard,PartialContribution,63873,961133
+84-D-North,218-A,Shelby Booth,"62439 William Parkways Apt. 897, Jonesside, AK 81638",001-494-889-8258x410,keith76@morrow.com,25/01/2023,09/03/2027,"Phillips, Pratt and Vasquez",Brenda Johnson,Joshua Calhoun,Vicki Sanchez,Mary Simon,PartialContribution,107384,914307
+79-B-North,92-B,Kevin Gill,"92978 Brooke Glen, North Mariaborough, DE 93219",001-119-112-5537x28831,david32@hotmail.com,12/04/2023,08/11/2027,"Tucker, Mcgrath and Johnson",Natalie Mahoney,Larry Morgan,Mark Phillips,Robert Miller,FullContribution,127233,960137
+73-B-South,47-A,Carla Delgado,"952 Davis Valley, Jefferyville, AZ 89792",504.244.8646,katelyn22@arnold.com,10/06/2023,10/09/2026,Morales Inc,Elizabeth Harrison,Barry Nelson,Christopher Ochoa,Johnny Farrell,FullContribution,223418,918233
+58-C-North,457-B,Michelle Calderon,"4574 Henderson Ports Apt. 529, Lake Laura, WI 30803",252.255.8610,barbara03@munoz.biz,10/05/2022,03/12/2028,Livingston-Mcdaniel,Lauren Bullock,Samuel Scott,Daisy Petersen,Rhonda Rangel,PartialContribution,169010,963623
+77-D-South,Vacant,,,,,,,,,,,,Vacant,0,
+27-A-South,Vacant,,,,,,,,,,,,Vacant,0,
+52-D-South,Vacant,,,,,,,,,,,,Vacant,0,
+30-D-South,Vacant,,,,,,,,,,,,Vacant,0,
+64-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+31-A-South,Vacant,,,,,,,,,,,,Vacant,0,
+76-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+90-A-North,Vacant,,,,,,,,,,,,Vacant,0,
+60-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+73-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+61-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+7-B-North,Vacant,,,,,,,,,,,,Vacant,0,
+32-D-North,Vacant,,,,,,,,,,,,Vacant,0,
+68-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+36-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+7-D-North,Vacant,,,,,,,,,,,,Vacant,0,
+82-D-North,Vacant,,,,,,,,,,,,Vacant,0,
+14-A-South,Vacant,,,,,,,,,,,,Vacant,0,
+55-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+73-B-North,Vacant,,,,,,,,,,,,Vacant,0,
+44-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+80-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+5-D-South,Vacant,,,,,,,,,,,,Vacant,0,
+33-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+55-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+43-A-South,Vacant,,,,,,,,,,,,Vacant,0,
+22-A-South,Vacant,,,,,,,,,,,,Vacant,0,
+24-A-North,Vacant,,,,,,,,,,,,Vacant,0,
+99-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+83-A-North,Vacant,,,,,,,,,,,,Vacant,0,
+86-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+76-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+73-A-South,Vacant,,,,,,,,,,,,Vacant,0,
+75-D-South,Vacant,,,,,,,,,,,,Vacant,0,
+100-D-North,Vacant,,,,,,,,,,,,Vacant,0,
+39-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+4-D-South,Vacant,,,,,,,,,,,,Vacant,0,
+78-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+7-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+39-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+66-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+66-A-South,Vacant,,,,,,,,,,,,Vacant,0,
+31-D-South,Vacant,,,,,,,,,,,,Vacant,0,
+79-D-North,Vacant,,,,,,,,,,,,Vacant,0,
+71-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+13-A-North,Vacant,,,,,,,,,,,,Vacant,0,
+11-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+92-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+78-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+66-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+73-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+33-A-North,Vacant,,,,,,,,,,,,Vacant,0,
+10-A-North,Vacant,,,,,,,,,,,,Vacant,0,
+48-A-North,Vacant,,,,,,,,,,,,Vacant,0,
+66-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+57-B-North,Vacant,,,,,,,,,,,,Vacant,0,
+11-B-North,Vacant,,,,,,,,,,,,Vacant,0,
+77-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+99-B-North,Vacant,,,,,,,,,,,,Vacant,0,
+72-A-South,Vacant,,,,,,,,,,,,Vacant,0,
+26-A-South,Vacant,,,,,,,,,,,,Vacant,0,
+81-B-North,Vacant,,,,,,,,,,,,Vacant,0,
+49-B-North,Vacant,,,,,,,,,,,,Vacant,0,
+94-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+86-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+9-A-South,Vacant,,,,,,,,,,,,Vacant,0,
+55-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+96-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+68-B-North,Vacant,,,,,,,,,,,,Vacant,0,
+100-D-North,Vacant,,,,,,,,,,,,Vacant,0,
+6-A-North,Vacant,,,,,,,,,,,,Vacant,0,
+52-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+15-D-North,Vacant,,,,,,,,,,,,Vacant,0,
+28-A-North,Vacant,,,,,,,,,,,,Vacant,0,
+13-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+34-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+47-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+57-A-South,Vacant,,,,,,,,,,,,Vacant,0,
+90-D-South,Vacant,,,,,,,,,,,,Vacant,0,
+1-D-North,Vacant,,,,,,,,,,,,Vacant,0,
+39-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+5-D-North,Vacant,,,,,,,,,,,,Vacant,0,
+92-A-North,Vacant,,,,,,,,,,,,Vacant,0,
+63-A-North,Vacant,,,,,,,,,,,,Vacant,0,
+45-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+92-A-South,Vacant,,,,,,,,,,,,Vacant,0,
+10-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+88-A-North,Vacant,,,,,,,,,,,,Vacant,0,
+49-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+34-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+40-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+3-A-South,Vacant,,,,,,,,,,,,Vacant,0,
+18-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+79-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+68-D-South,Vacant,,,,,,,,,,,,Vacant,0,
+39-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+91-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+29-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+5-A-North,Vacant,,,,,,,,,,,,Vacant,0,
+27-B-North,Vacant,,,,,,,,,,,,Vacant,0,
+63-D-North,Vacant,,,,,,,,,,,,Vacant,0,
+92-A-North,Vacant,,,,,,,,,,,,Vacant,0,
+65-D-North,Vacant,,,,,,,,,,,,Vacant,0,
+54-D-North,Vacant,,,,,,,,,,,,Vacant,0,
+73-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+27-B-North,Vacant,,,,,,,,,,,,Vacant,0,
+27-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+52-D-North,Vacant,,,,,,,,,,,,Vacant,0,
+76-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+58-A-North,Vacant,,,,,,,,,,,,Vacant,0,
+82-B-North,Vacant,,,,,,,,,,,,Vacant,0,
+44-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+33-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+53-B-North,Vacant,,,,,,,,,,,,Vacant,0,
+97-A-North,Vacant,,,,,,,,,,,,Vacant,0,
+57-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+100-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+53-B-North,Vacant,,,,,,,,,,,,Vacant,0,
+76-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+76-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+45-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+21-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+78-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+64-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+6-B-North,Vacant,,,,,,,,,,,,Vacant,0,
+62-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+4-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+83-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+59-D-North,Vacant,,,,,,,,,,,,Vacant,0,
+6-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+38-D-South,Vacant,,,,,,,,,,,,Vacant,0,
+49-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+98-D-South,Vacant,,,,,,,,,,,,Vacant,0,
+1-A-South,Vacant,,,,,,,,,,,,Vacant,0,
+8-B-North,Vacant,,,,,,,,,,,,Vacant,0,
+40-D-South,Vacant,,,,,,,,,,,,Vacant,0,
+12-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+15-D-North,Vacant,,,,,,,,,,,,Vacant,0,
+66-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+97-D-South,Vacant,,,,,,,,,,,,Vacant,0,
+18-A-North,Vacant,,,,,,,,,,,,Vacant,0,
+22-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+14-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+99-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+5-B-North,Vacant,,,,,,,,,,,,Vacant,0,
+36-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+22-D-North,Vacant,,,,,,,,,,,,Vacant,0,
+21-D-South,Vacant,,,,,,,,,,,,Vacant,0,
+51-A-South,Vacant,,,,,,,,,,,,Vacant,0,
+77-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+42-B-North,Vacant,,,,,,,,,,,,Vacant,0,
+76-B-North,Vacant,,,,,,,,,,,,Vacant,0,
+24-A-South,Vacant,,,,,,,,,,,,Vacant,0,
+5-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+56-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+19-D-North,Vacant,,,,,,,,,,,,Vacant,0,
+21-B-North,Vacant,,,,,,,,,,,,Vacant,0,
+23-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+87-A-South,Vacant,,,,,,,,,,,,Vacant,0,
+44-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+1-D-North,Vacant,,,,,,,,,,,,Vacant,0,
+52-D-South,Vacant,,,,,,,,,,,,Vacant,0,
+56-A-South,Vacant,,,,,,,,,,,,Vacant,0,
+17-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+86-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+80-D-South,Vacant,,,,,,,,,,,,Vacant,0,
+32-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+41-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+61-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+63-D-South,Vacant,,,,,,,,,,,,Vacant,0,
+81-A-North,Vacant,,,,,,,,,,,,Vacant,0,
+96-D-South,Vacant,,,,,,,,,,,,Vacant,0,
+46-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+64-D-South,Vacant,,,,,,,,,,,,Vacant,0,
+94-B-North,Vacant,,,,,,,,,,,,Vacant,0,
+15-A-South,Vacant,,,,,,,,,,,,Vacant,0,
+65-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+20-A-North,Vacant,,,,,,,,,,,,Vacant,0,
+68-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+62-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+75-D-North,Vacant,,,,,,,,,,,,Vacant,0,
+17-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+58-C-South,Vacant,,,,,,,,,,,,Vacant,0,
+96-B-North,Vacant,,,,,,,,,,,,Vacant,0,
+80-A-North,Vacant,,,,,,,,,,,,Vacant,0,
+11-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+98-B-North,Vacant,,,,,,,,,,,,Vacant,0,
+57-B-South,Vacant,,,,,,,,,,,,Vacant,0,
+52-B-North,Vacant,,,,,,,,,,,,Vacant,0,
+96-B-North,Vacant,,,,,,,,,,,,Vacant,0,
+84-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+71-A-North,Vacant,,,,,,,,,,,,Vacant,0,
+90-D-North,Vacant,,,,,,,,,,,,Vacant,0,
+78-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+37-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+11-A-South,Vacant,,,,,,,,,,,,Vacant,0,
+4-A-North,Vacant,,,,,,,,,,,,Vacant,0,
+90-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+20-C-North,Vacant,,,,,,,,,,,,Vacant,0,
+84-C-North,Vacant,,,,,,,,,,,,Vacant,0,

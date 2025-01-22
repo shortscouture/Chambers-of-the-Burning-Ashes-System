@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/Headers.css') }}">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #fff;
+            z-index: 1000; 
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-top: 100px;
+            height: calc(100vh - 140px);
+            background-color: #ADD8E6; 
+            margin-top: 100px;
+        }
+
+        .headname {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .headname li {
+            margin: 0 10px;
+        }
+
+        .headname li a {
+            text-decoration: none;
+            color: #333;
+        }
+
+        .headname li a:hover {
+            color: #007BFF;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div id="header">
+            <div class="container">
+                <nav>
+                    <img src="{{ url_for('static', filename='images/logohead.png') }}" alt="logoheader" class="logohead">
+                    <ul class="headname">
+                        <li><a href="{{ url_for('home') }}">Home</a></li>
+                        <li><a href="{{ url_for('columbary_records') }}">Records</a></li>
+                        <li><a href="{{ url_for('columbary') }}">Columbary</a></li>
+                        <li><a id="logoutBtn" href="{{ url_for('logout') }}" class="custom-signup-btn mb-2">Log Out</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <div id="dashboard"></div>
+    </div>
+
+    <script>
+        fetch('/dashboard')
+            .then(response => response.json())
+            .then(chartSpec => {
+                chartSpec.config = {
+                    legend: { orient: "right" }
+                };
+                vegaEmbed('#dashboard', chartSpec, { renderer: "canvas" }).catch(console.error);
+            });
+    </script>
+</body>
+</html>
