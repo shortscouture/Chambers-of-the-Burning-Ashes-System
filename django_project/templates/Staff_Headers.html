@@ -16,7 +16,7 @@
         <nav>
           <img src="{% static 'images/logohead.png' %}" alt="logoheader" class="logohead">
           <ul class="headname">
-            <li><a href='pages/home.html'>Home </a></li>
+            <li><a href="{% url 'dashboard'%}" >Home </a></li>
             <li><a href="{% url 'columbaryrecords' %}">Records </a></li>
             <li><a href='pages/columbaryrecords.html'>Columbary</a></li>
             <li><a id="logoutBtn" href="{% url 'account_logout' %}" class="custom-signup-btn mb-2">Log Out</a></li>

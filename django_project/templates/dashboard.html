@@ -3,108 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytic Dashboard</title>
+    <title>Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1>Analytic Dashboard</h1>
-    
-    <!-- Customer Status Chart -->
-    <div>
-        <h2>Customer Status</h2>
-        <canvas id="customerStatusChart" width="400" height="200"></canvas>
-    </div>
-    
-    <!-- Columbary Status Chart -->
-    <div>
-        <h2>Columbary Status</h2>
-        <canvas id="columbaryStatusChart" width="400" height="200"></canvas>
-    </div>
-    
-    <!-- Payment Chart -->
-    <div>
-        <h2>Payment Methods</h2>
-        <canvas id="paymentChart" width="400" height="200"></canvas>
-    </div>
-    
-    <!-- Inquiry Count -->
-    <div>
-        <h2>Inquiry Records</h2>
-        <p>Total Inquiries: {{ inquiry_counts }}</p>
-    </div>
-    
-    <!-- Parish Admin and Staff Count -->
-    <div>
-        <h2>Parish Personnel</h2>
-        <p>Total Parish Administrators: {{ parish_admin_count }}</p>
-        <p>Total Parish Staff: {{ parish_staff_count }}</p>
-    </div>
-    
+    <h1>Dashboard</h1>
+    <label for="data-selector">Select Data:</label>
+    <select id="data-selector">
+        <option value="customer">Customer Status</option>
+        <option value="columbary">Columbary Records</option>
+        <option value="payment">Payment Counts</option>
+        <option value="inquiry">Total Inquiries</option>
+    </select>
+    <canvas id="dashboardChart"></canvas>
+
     <script>
-        // Customer Status Chart
-        const customerStatusData = {
-            labels: {{ customer_status_counts|map(attribute='status')|list|safe }},
-            datasets: [{
-                label: 'Customer Status',
-                data: {{ customer_status_counts|map(attribute='count')|list|safe }},
-                backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(75, 192, 192, 0.2)'],
-                borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(75, 192, 192, 1)'],
-                borderWidth: 1
-            }]
+        const ctx = document.getElementById('dashboardChart').getContext('2d');
+        let chart;
+
+        const dataSets = {
+            customer: {
+                labels: {{ customer_status_labels|safe }},
+                data: {{ customer_status_data|safe }}
+            },
+            columbary: {
+                labels: {{ columbary_status_counts|map(attribute='urns_per_columbary')|list|safe }},
+                data: {{ columbary_status_counts|map(attribute='count')|list|safe }}
+            },
+            payment: {
+                labels: ['Full Contribution', 'Six Month Installment'],
+                data: [{{ payment_counts.full_contribution }}, {{ payment_counts.six_month_installment }}]
+            },
+            inquiry: {
+                labels: ['Total Inquiries'],
+                data: [{{ inquiry_counts }}]
+            }
         };
-        
-        const customerStatusChart = new Chart(document.getElementById('customerStatusChart'), {
-            type: 'bar',
-            data: customerStatusData,
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
+
+        function createChart(dataKey) {
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: dataSets[dataKey].labels,
+                    datasets: [{
+                        label: dataKey.charAt(0).toUpperCase() + dataKey.slice(1),
+                        data: dataSets[dataKey].data,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
                     }
                 }
-            }
+            });
+        }
+
+        document.getElementById('data-selector').addEventListener('change', function() {
+            createChart(this.value);
         });
-        
-        // Columbary Status Chart
-        const columbaryStatusData = {
-            labels: {{ columbary_status_counts|map(attribute='urns_per_columbary')|list|safe }},
-            datasets: [{
-                label: 'Columbary Status',
-                data: {{ columbary_status_counts|map(attribute='count')|list|safe }},
-                backgroundColor: ['rgba(255, 159, 64, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(201, 203, 207, 0.2)'],
-                borderColor: ['rgba(255, 159, 64, 1)', 'rgba(153, 102, 255, 1)', 'rgba(201, 203, 207, 1)'],
-                borderWidth: 1
-            }]
-        };
-        
-        const columbaryStatusChart = new Chart(document.getElementById('columbaryStatusChart'), {
-            type: 'bar',
-            data: columbaryStatusData,
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-        
-        // Payment Chart
-        const paymentData = {
-            labels: ['Full Contribution', 'Six Month Installment'],
-            datasets: [{
-                label: 'Payment Methods',
-                data: [{{ payment_counts.full_contribution }}, {{ payment_counts.six_month_installment }}],
-                backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)'],
-                borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)'],
-                borderWidth: 1
-            }]
-        };
-        
-        const paymentChart = new Chart(document.getElementById('paymentChart'), {
-            type: 'pie',
-            data: paymentData,
-        });
+
+        createChart('customer'); // Default chart
     </script>
 </body>
 </html>
