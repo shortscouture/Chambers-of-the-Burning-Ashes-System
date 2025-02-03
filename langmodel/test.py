@@ -9,15 +9,15 @@ env = environ.Env(
 
 
 # Read env file
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+environ.Env.read_env(os.path.join('.env'))
 
 #secret key
-OPENAI_KEY = env("OPENAI_SECRET_KEY")
+OPENAI_KEY = env("OPEN_AI_API_KEY")
 client = OpenAI()
 
 
 completion = client.chat.completions.create(
-    model="gpt-4o-mini",
+    model="gpt-3.5-turbo",
     messages=[
         {"role": "system", "content": "You are a helpful assistant."},
         {

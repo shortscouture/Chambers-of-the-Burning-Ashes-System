@@ -28,6 +28,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
+OPEN_AI_API_KEY = env("OPEN_AI_API_KEY")
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#debug
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -58,6 +59,9 @@ INSTALLED_APPS = [
     # Local
     "accounts",
     "pages",
+    #external apps
+    "rest_framework",
+    "rest_framework.authtoken",
 ]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
