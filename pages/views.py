@@ -16,6 +16,8 @@ from django.urls import reverse_lazy
 from django.views.generic.base import TemplateView
 from .models import Customer, ColumbaryRecord, Beneficiary
 from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm
+from django.db import transaction
+
 
 class SuccesView(TemplateView):
     template_name = "success.html"
@@ -313,8 +315,26 @@ def add_columbary_record(request):
         'beneficiary_form': beneficiary_form
     })
 
+
 def delete_customer(request, customer_id):
     customer = get_object_or_404(Customer, pk=customer_id)
+    
     if request.method == 'POST':
-        customer.delete()
-        return redirect('columbary_records')  # Redirect to the appropriate page
+        try:
+            with transaction.atomic():
+                # Fetch all columbary records linked to this customer
+                columbary_records = ColumbaryRecord.objects.filter(customer=customer)
+
+                # Delete beneficiaries linked to those columbary records
+                Beneficiary.objects.filter(id__in=[record.beneficiary_id for record in columbary_records]).delete()
+
+                # Delete the columbary records themselves
+                columbary_records.delete()
+
+                # Finally, delete the customer
+                customer.delete()
+                
+        except Exception as e:
+            print(f"Error during deletion: {e}")
+        
+        return redirect('columbary_records')
