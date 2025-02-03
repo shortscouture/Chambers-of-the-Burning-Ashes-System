@@ -16,45 +16,112 @@
             
             <fieldset>
                 <legend>Customer Information</legend>
-                {{ customer_form.as_p }}
+            <!-- Full Name -->
+            <div>
+                <label for="full_name">Full Name</label>
+                {{ customer_form.full_name }}
+            </div>
+
+            <!-- Street Address -->
+            <div>
+                <label for="street_address">Street Address or P.O. Box</label>
+                {{ customer_form.street_address }}
+            </div>
+
+            <!-- Barangay -->
+            <div>
+                <label for="barangay">Barangay (Neighborhood or District)</label>
+                {{ customer_form.barangay }}
+            </div>
+
+            <!-- City -->
+            <div>
+                <label for="city">City or Municipality</label>
+                {{ customer_form.city }}
+            </div>
+
+            <!-- Province -->
+            <div>
+                <label for="province">Province</label>
+                {{ customer_form.province }}
+            </div>
+
+            <!-- Landline Number -->
+            <div>
+                <label for="landline_number">Landline Number</label>
+                {{ customer_form.landline_number }}
+            </div>
+
+            <!-- Mobile Number -->
+            <div>
+                <label for="mobile_number">Mobile Number</label>
+                {{ customer_form.mobile_number }}
+            </div>
+
+            <!-- Email Address -->
+            <div>
+                <label for="email_address">Email Address</label>
+                {{ customer_form.email_address }}
+            </div>
+
             </fieldset>
 
             <fieldset>
                 <legend>Columbary Record Information</legend>
 
-                <!-- Vault ID (Ensure this is passed correctly) -->
-                <label for="vault_id">Vault ID</label>
-                <input type="text" id="vault_id" name="vault_id" required>
+                <!-- Vault ID -->
+                <div>
+                    <label for="vault_id">Vault ID</label>
+                    {{ record_form.vault_id }}
+                </div>
 
-                <!-- Issuance Date as Calendar -->
-                <label for="issuance_date">Issuance Date</label>
-                <input type="date" id="issuance_date" name="issuance_date" value="{{ record_form.issuance_date.value|default:'' }}" required>
+                <!-- Issuance Date (Calendar Picker) -->
+                <div>
+                    <label for="issuance_date">Issuance Date</label>
+                    <input type="date" id="issuance_date" name="issuance_date" value="{{ record_form.issuance_date.value|default:'' }}">
+                </div>
 
-                <!-- Expiration Date as Calendar -->
-                <label for="expiration_date">Expiration Date</label>
-                <input type="date" id="expiration_date" name="expiration_date" value="{{ record_form.expiration_date.value|default:'' }}" required>
+                <!-- Expiration Date (Calendar Picker) -->
+                <div>
+                    <label for="expiration_date">Expiration Date</label>
+                    <input type="date" id="expiration_date" name="expiration_date" value="{{ record_form.expiration_date.value|default:'' }}">
+                </div>
 
-                <!-- Inurnment Date as Calendar -->
-                <label for="inurnment_date">Inurnment Date</label>
-                <input type="date" id="inurnment_date" name="inurnment_date" value="{{ record_form.inurnment_date.value|default:'' }}">
+                <!-- Inurnment Date (Calendar Picker) -->
+                <div>
+                    <label for="inurnment_date">Inurnment Date</label>
+                    <input type="date" id="inurnment_date" name="inurnment_date" value="{{ record_form.inurnment_date.value|default:'' }}">
+                </div>
 
                 <!-- Issuing Parish Priest -->
-                <label for="issuing_parish_priest">Issuing Parish Priest</label>
-                <input type="text" id="issuing_parish_priest" name="issuing_parish_priest" value="{{ record_form.issuing_parish_priest.value|default:'' }}">
+                <div>
+                    <label for="issuing_parish_priest">Issuing Parish Priest</label>
+                    {{ record_form.issuing_parish_priest }}
+                </div>
 
                 <!-- Urns per Columbary -->
-                <label for="urns_per_columbary">Urns Per Columbary</label>
-                <select id="urns_per_columbary" name="urns_per_columbary" required>
-                    <option value="1" {% if record_form.urns_per_columbary.value == '1' %}selected{% endif %}>1</option>
-                    <option value="2" {% if record_form.urns_per_columbary.value == '2' %}selected{% endif %}>2</option>
-                    <option value="3" {% if record_form.urns_per_columbary.value == '3' %}selected{% endif %}>3</option>
-                    <option value="4" {% if record_form.urns_per_columbary.value == '4' %}selected{% endif %}>4</option>
-                </select>
+                <div>
+                    <label for="urns_per_columbary">Urns per Columbary</label>
+                    {{ record_form.urns_per_columbary }}
+                </div>
             </fieldset>
 
             <fieldset>
                 <legend>Beneficiary Information</legend>
-                {{ beneficiary_form.as_p }}
+                <div>
+                    <label for="first_beneficiary_name">First Beneficiary Name</label>
+                    {{ beneficiary_form.first_beneficiary_name }}
+                </div>
+
+                <div>
+                    <label for="second_beneficiary_name">Second Beneficiary Name</label>
+                    {{ beneficiary_form.second_beneficiary_name }}
+                </div>
+
+                <div>
+                    <label for="third_beneficiary_name">Third Beneficiary Name</label>
+                    {{ beneficiary_form.third_beneficiary_name }}
+                </div>
             </fieldset>
 
             <button type="submit" class="submit-btn">Save Record</button>
