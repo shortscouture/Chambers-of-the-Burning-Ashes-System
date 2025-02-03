@@ -62,7 +62,9 @@ INSTALLED_APPS = [
     #external apps
     "rest_framework",
     "rest_framework.authtoken",
-]
+    #internal apps
+    "api",
+    ]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
 MIDDLEWARE = [
