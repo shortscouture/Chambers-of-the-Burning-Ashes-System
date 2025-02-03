@@ -17,9 +17,8 @@ urlpatterns = [
     path("Success/", SuccesView.as_view(),name = "Success"),
     path('accept/<int:intent_id>/', accept_letter_of_intent, name='accept_letter_of_intent'),
     path('decline/<int:intent_id>/', decline_letter_of_intent, name='decline_letter_of_intent'),
-    path('dashboard/', include('dashboard.urls')),
     path('recordsdetails/<int:customer_id>/', RecordsDetailsView.as_view(), name='recordsdetails'),
     path('edit_customer/<int:customer_id>/', CustomerEditView.as_view(), name='edit_customer'),
-
+    path('dashboard/', include('dashboard.urls')),
 
 ]
