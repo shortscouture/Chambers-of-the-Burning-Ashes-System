@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import include, path
 
 
 from .views import HomePageView,AboutPageView, MainDashView, ColumbaryRecordsView, CustomerHomeView, MemorialView, send_letter_of_intent, verify_otp, memorials_verification,accept_letter_of_intent, decline_letter_of_intent, RecordsDetailsView, CustomerEditView, SuccesView
@@ -17,7 +17,7 @@ urlpatterns = [
     path("Success/", SuccesView.as_view(),name = "Success"),
     path('accept/<int:intent_id>/', accept_letter_of_intent, name='accept_letter_of_intent'),
     path('decline/<int:intent_id>/', decline_letter_of_intent, name='decline_letter_of_intent'),
-
+    path('dashboard/', include('dashboard.urls')),
     path('recordsdetails/<int:customer_id>/', RecordsDetailsView.as_view(), name='recordsdetails'),
     path('edit_customer/<int:customer_id>/', CustomerEditView.as_view(), name='edit_customer'),
 
