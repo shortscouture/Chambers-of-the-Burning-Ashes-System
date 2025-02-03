@@ -24,5 +24,8 @@ urlpatterns = [
 
     path('columbaryrecords/', views.columbary_records, name='columbary_records'),
     path('columbaryrecords/add/', views.add_columbary_record, name='add_columbary_record'),
+    
+    path('customer/delete/<int:customer_id>/', views.delete_customer, name='delete_customer'),
+
 
 ]

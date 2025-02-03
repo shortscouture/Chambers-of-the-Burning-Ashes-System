@@ -312,3 +312,9 @@ def add_columbary_record(request):
         'record_form': record_form,
         'beneficiary_form': beneficiary_form
     })
+
+def delete_customer(request, customer_id):
+    customer = get_object_or_404(Customer, pk=customer_id)
+    if request.method == 'POST':
+        customer.delete()
+        return redirect('columbary_records')  # Redirect to the appropriate page
