@@ -85,25 +85,26 @@
             <div class="details-section">
                 <h3 class="sub-header">Beneficiary Details</h3>
                 {% if beneficiary %}
-                    <div class="row">
-                        <span class="label">First Beneficiary Name:</span>
-                        <span class="value">{{ beneficiary.first_beneficiary_name }}</span>
-                    </div>
-                    {% if beneficiary.second_beneficiary_name %}
-                        <div class="row">
-                            <span class="label">Second Beneficiary Name:</span>
-                            <span class="value">{{ beneficiary.second_beneficiary_name }}</span>
-                        </div>
-                    {% endif %}
-                    {% if beneficiary.third_beneficiary_name %}
-                        <div class="row">
-                            <span class="label">Third Beneficiary Name:</span>
-                            <span class="value">{{ beneficiary.third_beneficiary_name }}</span>
-                        </div>
-                    {% endif %}
-                {% else %}
-                    <p class="no-records">No Beneficiary Details found for this customer.</p>
-                {% endif %}
+    <div class="row">
+        <span class="label">First Beneficiary Name:</span>
+        <span class="value">{{ beneficiary.first_beneficiary_name }}</span>
+    </div>
+    {% if beneficiary.second_beneficiary_name %}
+        <div class="row">
+            <span class="label">Second Beneficiary Name:</span>
+            <span class="value">{{ beneficiary.second_beneficiary_name }}</span>
+        </div>
+    {% endif %}
+    {% if beneficiary.third_beneficiary_name %}
+        <div class="row">
+            <span class="label">Third Beneficiary Name:</span>
+            <span class="value">{{ beneficiary.third_beneficiary_name }}</span>
+        </div>
+    {% endif %}
+{% else %}
+    <p class="no-records">No Beneficiary Details found for this customer.</p>
+{% endif %}
+                
             </div>
 
             <!-- Buttons Section -->
