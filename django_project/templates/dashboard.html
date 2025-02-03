@@ -3,89 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/Headers.css') }}">
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: #fff;
-            z-index: 1000; 
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .dashboard-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding-top: 100px;
-            height: calc(100vh - 140px);
-            background-color: #ADD8E6; 
-            margin-top: 100px;
-        }
-
-        .headname {
-            display: flex;
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .headname li {
-            margin: 0 10px;
-        }
-
-        .headname li a {
-            text-decoration: none;
-            color: #333;
-        }
-
-        .headname li a:hover {
-            color: #007BFF;
-        }
-    </style>
+    <title>Analytic Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <header>
-        <div id="header">
-            <div class="container">
-                <nav>
-                    <img src="{{ url_for('static', filename='images/logohead.png') }}" alt="logoheader" class="logohead">
-                    <ul class="headname">
-                        <li><a href="{{ url_for('home') }}">Home</a></li>
-                        <li><a href="{{ url_for('columbary_records') }}">Records</a></li>
-                        <li><a href="{{ url_for('columbary') }}">Columbary</a></li>
-                        <li><a id="logoutBtn" href="{{ url_for('logout') }}" class="custom-signup-btn mb-2">Log Out</a></li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-    </header>
-
-    <div class="dashboard-container">
-        <div id="dashboard"></div>
+    <h1>Analytic Dashboard</h1>
+    
+    <!-- Customer Status Chart -->
+    <div>
+        <h2>Customer Status</h2>
+        <canvas id="customerStatusChart" width="400" height="200"></canvas>
     </div>
-
-    <script>
-        fetch('/dashboard')
-            .then(response => response.json())
-            .then(chartSpec => {
-                chartSpec.config = {
-                    legend: { orient: "right" }
-                };
-                vegaEmbed('#dashboard', chartSpec, { renderer: "canvas" }).catch(console.error);
-            });
-    </script>
-</body>
-</html>
+    
+    <!-- Columbary Status Chart -->
+    <div>
+        <h2>Columbary Status</h2>
+        <canvas id="columbaryStatusChart" width="400" height="200"></canvas>
+    </div>
+    
+    <!-- Payment Chart -->
+    <div>
+        <h2>Payment Methods</h2>
+        <canvas id="paymentChart" width="400" height="200"></canvas>
+    </div>
+    
+    <!-- Inquiry Count -->
+    <div>
+        <h2>Inquiry Records</h2>
+        <p>Total Inquiries: {{ inquiry_counts }}</p>
+    </div>
+    
+    <!-- Parish Admin and Staff Count -->
+    <div>
+        <h2>Parish Personnel</h2>
+        <p>Total Parish Administrators: {{ parish_admin_count }}</p>
+        <p>Total Parish Staff: {{ parish_staff_count }}</p>
+    </div>
