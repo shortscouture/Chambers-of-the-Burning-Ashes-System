@@ -264,3 +264,63 @@ def verify_otp(request):
 
 def success(request):
     return render(request, 'pages/success.html')
+
+
+
+def columbary_records(request):
+    """List all Columbary records."""
+    records = ColumbaryRecord.objects.select_related('customer').all()
+    return render(request, 'columbaryrecords.html', {'records': records})
+
+from django.shortcuts import render, redirect
+from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm
+from .models import Customer, ColumbaryRecord, Beneficiary, Payment, HolderOfPrivilege
+
+def add_columbary_record(request):
+    if request.method == 'POST':
+        customer_form = CustomerForm(request.POST)
+        record_form = ColumbaryRecordForm(request.POST)
+        beneficiary_form = BeneficiaryForm(request.POST)
+
+        # Check if all forms are valid
+        if customer_form.is_valid() and record_form.is_valid() and beneficiary_form.is_valid():
+            # Save the customer form first
+            customer = customer_form.save()
+
+            # Save the beneficiary form
+            beneficiary = beneficiary_form.save()
+
+            # You may need to manually handle 'vault_id' (auto-generated, or passed in some other way)
+            # Save ColumbaryRecord but commit=False to avoid saving immediately
+            columbary_record = record_form.save(commit=False)
+
+            # Link the ForeignKey fields manually
+            columbary_record.customer = customer  # Set customer relation
+            columbary_record.beneficiary = beneficiary  # Set beneficiary relation
+            # You can add additional fields for 'payment', 'holder_of_privilege', etc., similarly
+            # Example for Payment or HolderOfPrivilege
+            # columbary_record.payment = payment_instance  # Set the payment relation if available
+            # columbary_record.holder_of_privilege = holder_of_privilege_instance  # Set holder_of_privilege if necessary
+
+            # Save the ColumbaryRecord instance
+            columbary_record.save()
+
+            # Optionally redirect to another page after saving (like a list of records)
+            return redirect('columbary_records')
+        else:
+            # Print the form errors to the console for debugging
+            print("Customer Form Errors:", customer_form.errors)
+            print("Record Form Errors:", record_form.errors)
+            print("Beneficiary Form Errors:", beneficiary_form.errors)
+    
+    else:
+        # If the form is not submitted, instantiate empty forms
+        customer_form = CustomerForm()
+        record_form = ColumbaryRecordForm()
+        beneficiary_form = BeneficiaryForm()
+
+    return render(request, 'pages/addnewrecord.html', {
+        'customer_form': customer_form,
+        'record_form': record_form,
+        'beneficiary_form': beneficiary_form
+    })

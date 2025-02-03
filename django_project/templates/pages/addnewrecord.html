@@ -1,0 +1,64 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Columbary Record</title>
+    <link rel="stylesheet" href="{% static 'css/addnewrecord.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h2>Add New Columbary Record</h2>
+        <form method="POST">
+            {% csrf_token %}
+            
+            <fieldset>
+                <legend>Customer Information</legend>
+                {{ customer_form.as_p }}
+            </fieldset>
+
+            <fieldset>
+                <legend>Columbary Record Information</legend>
+
+                <!-- Vault ID (Ensure this is passed correctly) -->
+                <label for="vault_id">Vault ID</label>
+                <input type="text" id="vault_id" name="vault_id" required>
+
+                <!-- Issuance Date as Calendar -->
+                <label for="issuance_date">Issuance Date</label>
+                <input type="date" id="issuance_date" name="issuance_date" value="{{ record_form.issuance_date.value|default:'' }}" required>
+
+                <!-- Expiration Date as Calendar -->
+                <label for="expiration_date">Expiration Date</label>
+                <input type="date" id="expiration_date" name="expiration_date" value="{{ record_form.expiration_date.value|default:'' }}" required>
+
+                <!-- Inurnment Date as Calendar -->
+                <label for="inurnment_date">Inurnment Date</label>
+                <input type="date" id="inurnment_date" name="inurnment_date" value="{{ record_form.inurnment_date.value|default:'' }}">
+
+                <!-- Issuing Parish Priest -->
+                <label for="issuing_parish_priest">Issuing Parish Priest</label>
+                <input type="text" id="issuing_parish_priest" name="issuing_parish_priest" value="{{ record_form.issuing_parish_priest.value|default:'' }}">
+
+                <!-- Urns per Columbary -->
+                <label for="urns_per_columbary">Urns Per Columbary</label>
+                <select id="urns_per_columbary" name="urns_per_columbary" required>
+                    <option value="1" {% if record_form.urns_per_columbary.value == '1' %}selected{% endif %}>1</option>
+                    <option value="2" {% if record_form.urns_per_columbary.value == '2' %}selected{% endif %}>2</option>
+                    <option value="3" {% if record_form.urns_per_columbary.value == '3' %}selected{% endif %}>3</option>
+                    <option value="4" {% if record_form.urns_per_columbary.value == '4' %}selected{% endif %}>4</option>
+                </select>
+            </fieldset>
+
+            <fieldset>
+                <legend>Beneficiary Information</legend>
+                {{ beneficiary_form.as_p }}
+            </fieldset>
+
+            <button type="submit" class="submit-btn">Save Record</button>
+        </form>
+    </div>
+</body>
+</html>

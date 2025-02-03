@@ -1,5 +1,5 @@
 from django.urls import path
-
+from . import views
 
 from .views import HomePageView,AboutPageView, MainDashView, ColumbaryRecordsView, CustomerHomeView, MemorialView, send_letter_of_intent, verify_otp, memorials_verification,accept_letter_of_intent, decline_letter_of_intent, RecordsDetailsView, CustomerEditView, SuccesView
 
@@ -21,5 +21,8 @@ urlpatterns = [
     path('recordsdetails/<int:customer_id>/', RecordsDetailsView.as_view(), name='recordsdetails'),
     path('edit_customer/<int:customer_id>/', CustomerEditView.as_view(), name='edit_customer'),
 
+
+    path('columbaryrecords/', views.columbary_records, name='columbary_records'),
+    path('columbaryrecords/add/', views.add_columbary_record, name='add_columbary_record'),
 
 ]
