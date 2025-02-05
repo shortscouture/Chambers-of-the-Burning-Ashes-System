@@ -11,4 +11,4 @@ def send_code_to_api(code):
             {"role": "user", "content": f"Tell me what language is this code: {code}"},
         ],
     )
-    return res.choices[0].message.content   
+    return res.choices[0].message.content
