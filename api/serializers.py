@@ -6,7 +6,7 @@ from api.utils import send_code_to_api
 class CodeExplainSerializer(serializers.ModelSerializer):
     class Meta:
         model = CodeExplainer
-        fields = ("id", "_input", "_output")
+        fields = ["id", "_input", "_output"]
         extra_kwargs = {
             "_output": {"read_only": True}, #bruh obviously
         }

@@ -6,15 +6,17 @@ from rest_framework.response import Response
 # internals
 from api.serializers import CodeExplainSerializer
 from api.models import CodeExplainer
+
 # Create your views here.
 class CodeExplainView(views.APIView):
     serializer_class = CodeExplainSerializer
     
-    def get(self,request,format=None):
+    def get(self,request,format=None): 
         qs = CodeExplainer.objects.all()
         serializer = self.serializer_class(qs, many=True)
         return Response(serializer.data)
     
+        
     def post(self,request,format=None):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
