@@ -318,23 +318,26 @@ def add_columbary_record(request):
 
 def delete_customer(request, customer_id):
     customer = get_object_or_404(Customer, pk=customer_id)
-    
+
     if request.method == 'POST':
         try:
             with transaction.atomic():
-                # Fetch all columbary records linked to this customer
+                # Fetch and delete all columbary records linked to the customer
                 columbary_records = ColumbaryRecord.objects.filter(customer=customer)
 
-                # Delete beneficiaries linked to those columbary records
-                Beneficiary.objects.filter(id__in=[record.beneficiary_id for record in columbary_records]).delete()
+                # Collect beneficiary IDs from the columbary records
+                beneficiary_id = [record.beneficiary_id for record in columbary_records]
 
-                # Delete the columbary records themselves
+                # Delete columbary records
                 columbary_records.delete()
 
-                # Finally, delete the customer
+                # Delete beneficiaries associated with those records
+                Beneficiary.objects.filter(id__in=beneficiary_id).delete()
+
+                # Delete the customer
                 customer.delete()
-                
+
         except Exception as e:
             print(f"Error during deletion: {e}")
-        
+
         return redirect('columbary_records')

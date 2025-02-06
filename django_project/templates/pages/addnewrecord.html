@@ -1,5 +1,4 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,53 +15,72 @@
             
             <fieldset>
                 <legend>Customer Information</legend>
-            <!-- Full Name -->
-            <div>
-                <label for="full_name">Full Name</label>
-                {{ customer_form.full_name }}
-            </div>
 
-            <!-- Street Address -->
-            <div>
-                <label for="street_address">Street Address or P.O. Box</label>
-                {{ customer_form.street_address }}
-            </div>
+                <!-- First Name -->
+                <div>
+                    <label for="first_name">First Name</label>
+                    {{ customer_form.first_name }}
+                </div>
 
-            <!-- Barangay -->
-            <div>
-                <label for="barangay">Barangay (Neighborhood or District)</label>
-                {{ customer_form.barangay }}
-            </div>
+                <!-- Middle Name -->
+                <div>
+                    <label for="middle_name">Middle Name (Optional)</label>
+                    {{ customer_form.middle_name }}
+                </div>
 
-            <!-- City -->
-            <div>
-                <label for="city">City or Municipality</label>
-                {{ customer_form.city }}
-            </div>
+                <!-- Last Name -->
+                <div>
+                    <label for="last_name">Last Name</label>
+                    {{ customer_form.last_name }}
+                </div>
 
-            <!-- Province -->
-            <div>
-                <label for="province">Province</label>
-                {{ customer_form.province }}
-            </div>
+                <!-- Suffix -->
+                <div>
+                    <label for="suffix">Suffix (e.g., Jr., Sr., III)</label>
+                    {{ customer_form.suffix }}
+                </div>
 
-            <!-- Landline Number -->
-            <div>
-                <label for="landline_number">Landline Number</label>
-                {{ customer_form.landline_number }}
-            </div>
+                <!-- Street Address -->
+                <div>
+                    <label for="street_address">Street Address or P.O. Box</label>
+                    {{ customer_form.street_address }}
+                </div>
 
-            <!-- Mobile Number -->
-            <div>
-                <label for="mobile_number">Mobile Number</label>
-                {{ customer_form.mobile_number }}
-            </div>
+                <!-- Barangay -->
+                <div>
+                    <label for="barangay">Barangay (Neighborhood or District)</label>
+                    {{ customer_form.barangay }}
+                </div>
 
-            <!-- Email Address -->
-            <div>
-                <label for="email_address">Email Address</label>
-                {{ customer_form.email_address }}
-            </div>
+                <!-- City -->
+                <div>
+                    <label for="city">City or Municipality</label>
+                    {{ customer_form.city }}
+                </div>
+
+                <!-- Province -->
+                <div>
+                    <label for="province">Province</label>
+                    {{ customer_form.province }}
+                </div>
+
+                <!-- Landline Number -->
+                <div>
+                    <label for="landline_number">Landline Number</label>
+                    {{ customer_form.landline_number }}
+                </div>
+
+                <!-- Mobile Number -->
+                <div>
+                    <label for="mobile_number">Mobile Number</label>
+                    {{ customer_form.mobile_number }}
+                </div>
+
+                <!-- Email Address -->
+                <div>
+                    <label for="email_address">Email Address</label>
+                    {{ customer_form.email_address }}
+                </div>
 
             </fieldset>
 
@@ -108,6 +126,7 @@
 
             <fieldset>
                 <legend>Beneficiary Information</legend>
+
                 <div>
                     <label for="first_beneficiary_name">First Beneficiary Name</label>
                     {{ beneficiary_form.first_beneficiary_name }}
