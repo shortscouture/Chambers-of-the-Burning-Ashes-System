@@ -26,7 +26,7 @@ class CodeExplainView(views.APIView):
 
 class UserView(views.APIView):
     serializer_class = UserSerializer
-    def get(self.request,format=None):
+    def get(self, request,format=None):
         qs =  User.objects.all()
         serializer = self.serializer_class(qs,many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
