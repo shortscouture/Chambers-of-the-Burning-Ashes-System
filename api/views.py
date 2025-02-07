@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from django.contrib.auth.models import User
 
 # internals
-from api.serializers import CodeExplainSerializer
+from api.serializers import CodeExplainSerializer, UserSerializer
 from api.models import CodeExplainer
 
 # Create your views here.
@@ -26,10 +26,11 @@ class CodeExplainView(views.APIView):
 
 class UserView(views.APIView):
     serializer_class = UserSerializer
-    def get(self,request,format=None):
+    def get(self.request,format=None):
         qs =  User.objects.all()
         serializer = self.serializer_class(qs,many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class TokenView:
     pass
+
