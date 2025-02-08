@@ -33,11 +33,6 @@
     <h1>Dashboard</h1>
 
     <div class="container">
-        <!-- Customer Status as Text -->
-        <div class="info-box">
-            <h2>Customer Status</h2>
-            <p>{{ customer_status_text }}</p>
-        </div>
 
         <!-- Columbary Records Line Chart -->
         <div class="chart-container">
@@ -51,25 +46,20 @@
             <canvas id="paymentChart"></canvas>
         </div>
 
-        <!-- Total Inquiries Bar Chart -->
-        <div class="chart-container">
-            <h2>Total Inquiries</h2>
-            <canvas id="inquiryChart"></canvas>
-        </div>
-
         <!-- Available Columbaries as Text -->
         <div class="info-box">
             <h2>Available Columbaries</h2>
             <p>{{ vacant_columbaries }}</p>
         </div>
-    </div>
+        
         <div class="info-box">
             <h2>Occupied Columbaries</h2>
-            <p>{{ occupied_columbary }}</p>
+            <p>{{ occupied_columbaries }}</p>
         </div>
+        
         <div class="info-box">
-            <h2>Occupied Columbaries</h2>
-            <p>{{ occupied_columbary }}</p>
+            <h2>Pending Letter of Intents</h2>
+            <p>{{ pending_counts }}</p>
         </div>
 </div>
 

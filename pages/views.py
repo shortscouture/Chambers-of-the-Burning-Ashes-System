@@ -70,10 +70,15 @@ class dashboardView(TemplateView):
 
         # Inquiry Record Analytics
         inquiry_counts = InquiryRecord.objects.count()
+        
+        #Customer Status
+        pending_counts = Customer.objects.filter(status = "pending").count()
 
         # Available (vacant) columbaries
         vacant_columbaries = ColumbaryRecord.objects.filter(status="Vacant").count()
+        
         occupied_columbaries = ColumbaryRecord.objects.filter(status="Occupied").count()
+        
 
         context = {
             'customer_status_labels': customer_status_labels,
@@ -83,7 +88,8 @@ class dashboardView(TemplateView):
             'payment_counts': payment_counts,
             'inquiry_counts': inquiry_counts,
             'vacant_columbaries': vacant_columbaries,
-            'occupied_columbaries': occupied_columbaries
+            'occupied_columbaries': occupied_columbaries,
+            'pending_counts' : pending_counts
         }
 
         return render(request, 'dashboard.html', context)
