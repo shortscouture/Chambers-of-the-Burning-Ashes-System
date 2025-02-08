@@ -40,10 +40,10 @@
             <canvas id="columbaryChart"></canvas>
         </div>
 
-        <!-- Payment Counts Bar Chart -->
+        <!-- Inquiry Chart -->
         <div class="chart-container">
-            <h2>Payment Counts</h2>
-            <canvas id="paymentChart"></canvas>
+            <h2>Inquiry Records</h2>
+            <canvas id="inquiryChart"></canvas>
         </div>
 
         <!-- Available Columbaries as Text -->
@@ -61,7 +61,13 @@
             <h2>Pending Letter of Intents</h2>
             <p>{{ pending_counts }}</p>
         </div>
-</div>
+
+        <!-- Payment Distribution Pie Chart -->
+        <div class="chart-container">
+            <h2>Payment Distribution</h2>
+            <canvas id="paymentChart"></canvas>
+        </div>
+    </div>
 
     <script>
         function createChart(canvasId, type, labels, data, labelText) {
@@ -86,15 +92,37 @@
                 }
             });
         }
-
+        
         // Columbary Records (Line Chart)
         createChart("columbaryChart", "line", {{ columbary_status_labels|safe }}, {{ columbary_status_data|safe }}, "Columbary Records");
 
-        // Payment Counts (Bar Chart)
-        createChart("paymentChart", "bar", ["Full Contribution", "Six Month Installment"], [{{ payment_counts.full_contribution }}, {{ payment_counts.six_month_installment }}], "Payment Counts");
-
         // Total Inquiries (Bar Chart)
         createChart("inquiryChart", "bar", ["Total Inquiries"], [{{ inquiry_counts }}], "Total Inquiries");
+        
+        // Payment Pie Chart
+        var fullPayment = {{ full_payment_count }};
+        var installment = {{ installment_count }};
+
+        var ctx = document.getElementById('paymentChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Full Payment', '6-Month Installment'],
+                datasets: [{
+                    data: [fullPayment, installment],
+                    backgroundColor: ['#36A2EB', '#FF6384'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
     </script>
 </body>
 </html>

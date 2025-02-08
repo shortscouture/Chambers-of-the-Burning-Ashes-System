@@ -62,12 +62,6 @@ class dashboardView(TemplateView):
         columbary_status_labels = [entry['urns_per_columbary'] for entry in columbary_status_counts]
         columbary_status_data = [entry['count'] for entry in columbary_status_counts]
 
-        # Payment Analytics
-        payment_counts = Payment.objects.aggregate(
-            full_contribution=Count('full_contribution', filter=Q(full_contribution=True)),
-            six_month_installment=Count('six_month_installment', filter=Q(six_month_installment=True))
-        )
-
         # Inquiry Record Analytics
         inquiry_counts = InquiryRecord.objects.count()
         
@@ -79,24 +73,27 @@ class dashboardView(TemplateView):
         
         occupied_columbaries = ColumbaryRecord.objects.filter(status="Occupied").count()
         
+        # Payment Mode Statistics
+        full_payment_count = Payment.objects.filter(mode_of_payment="Full Payment").count()
+        installment_count = Payment.objects.filter(mode_of_payment="6-Month Installment").count()
+
 
         context = {
             'customer_status_labels': customer_status_labels,
             'customer_status_data': customer_status_data,
             'columbary_status_labels': columbary_status_labels,
             'columbary_status_data': columbary_status_data,
-            'payment_counts': payment_counts,
             'inquiry_counts': inquiry_counts,
             'vacant_columbaries': vacant_columbaries,
             'occupied_columbaries': occupied_columbaries,
-            'pending_counts' : pending_counts
+            'pending_counts' : pending_counts,
+            'full_payment_count': full_payment_count,
+            'installment_count': installment_count
         }
 
         return render(request, 'dashboard.html', context)
 
-
-
-    
+            
 def send_letter_of_intent(request):
     if request.method == 'POST':
 

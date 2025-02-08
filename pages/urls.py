@@ -1,7 +1,7 @@
 from django.urls import path
 
 
-from .views import HomePageView,AboutPageView, MainDashView, ColumbaryRecordsView, CustomerHomeView, dashboardView, MemorialView, send_letter_of_intent, verify_otp, memorials_verification,accept_letter_of_intent, decline_letter_of_intent, RecordsDetailsView, CustomerEditView, SuccesView
+from .views import payment_chart, HomePageView,AboutPageView, MainDashView, ColumbaryRecordsView, CustomerHomeView, dashboardView, MemorialView, send_letter_of_intent, verify_otp, memorials_verification,accept_letter_of_intent, decline_letter_of_intent, RecordsDetailsView, CustomerEditView, SuccesView
 
 urlpatterns = [
     path("", HomePageView.as_view(), name="home"),
@@ -19,4 +19,5 @@ urlpatterns = [
     path('recordsdetails/<int:customer_id>/', RecordsDetailsView.as_view(), name='recordsdetails'),
     path('edit_customer/<int:customer_id>/', CustomerEditView.as_view(), name='edit_customer'),
     path('dashboard/',dashboardView.dashboard, name='dashboard'),
+    path("payment-chart/", payment_chart, name="payment_chart"),
 ]
