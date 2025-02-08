@@ -50,46 +50,44 @@ class MemorialView(TemplateView):
 class dashboardView(TemplateView):
     template_name = "dashboard.html"
     
-from django.db.models import Count, Q
-from django.shortcuts import render
-from .models import Customer, ColumbaryRecord, Payment, InquiryRecord, ParishAdministrator, ParishStaff
+    def dashboard(request):
+        # Customer Status Analytics
+        customer_status_counts = Customer.objects.values('status').annotate(count=Count('status'))
+        customer_status_labels = [entry['status'] for entry in customer_status_counts]
+        customer_status_data = [entry['count'] for entry in customer_status_counts]
 
-def dashboard(request):
-    # Customer Status Analytics
-    customer_status_counts = Customer.objects.values('status').annotate(count=Count('status'))
-    
-    # Extracting 'status' and 'count' into separate lists
-    customer_status_labels = [entry['status'] for entry in customer_status_counts]
-    customer_status_data = [entry['count'] for entry in customer_status_counts]
+        # Columbary Records Analytics
+        columbary_records = ColumbaryRecord.objects.all()
+        columbary_status_counts = columbary_records.values('urns_per_columbary').annotate(count=Count('urns_per_columbary'))
+        columbary_status_labels = [entry['urns_per_columbary'] for entry in columbary_status_counts]
+        columbary_status_data = [entry['count'] for entry in columbary_status_counts]
 
-    # Columbary Record Analytics
-    columbary_records = ColumbaryRecord.objects.all()
-    columbary_status_counts = columbary_records.values('urns_per_columbary').annotate(count=Count('urns_per_columbary'))
-    
-    # Payment Analytics
-    payment_counts = Payment.objects.aggregate(
-        full_contribution=Count('full_contribution', filter=Q(full_contribution=True)),
-        six_month_installment=Count('six_month_installment', filter=Q(six_month_installment=True))
-    )
-    
-    # Inquiry Record Analytics
-    inquiry_counts = InquiryRecord.objects.count()
-    
-    # Parish Staff and Admin Counts
-    parish_admin_count = ParishAdministrator.objects.count()
-    parish_staff_count = ParishStaff.objects.count()
-    
-    context = {
-        'customer_status_labels': customer_status_labels,  # List of statuses
-        'customer_status_data': customer_status_data,  # List of counts
-        'columbary_status_counts': list(columbary_status_counts),
-        'payment_counts': payment_counts,
-        'inquiry_counts': inquiry_counts,
-        'parish_admin_count': parish_admin_count,
-        'parish_staff_count': parish_staff_count,
-    }
-    
-    return render(request, 'dashboard.html', context)
+        # Payment Analytics
+        payment_counts = Payment.objects.aggregate(
+            full_contribution=Count('full_contribution', filter=Q(full_contribution=True)),
+            six_month_installment=Count('six_month_installment', filter=Q(six_month_installment=True))
+        )
+
+        # Inquiry Record Analytics
+        inquiry_counts = InquiryRecord.objects.count()
+
+        # Available (vacant) columbaries
+        vacant_columbaries = ColumbaryRecord.objects.filter(status="Vacant").count()
+        occupied_columbaries = ColumbaryRecord.objects.filter(status="Occupied").count()
+
+        context = {
+            'customer_status_labels': customer_status_labels,
+            'customer_status_data': customer_status_data,
+            'columbary_status_labels': columbary_status_labels,
+            'columbary_status_data': columbary_status_data,
+            'payment_counts': payment_counts,
+            'inquiry_counts': inquiry_counts,
+            'vacant_columbaries': vacant_columbaries,
+            'occupied_columbaries': occupied_columbaries
+        }
+
+        return render(request, 'dashboard.html', context)
+
 
 
     

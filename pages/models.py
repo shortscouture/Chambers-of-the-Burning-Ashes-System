@@ -110,9 +110,28 @@ class ColumbaryRecord(models.Model):
     beneficiary = models.ForeignKey(Beneficiary, on_delete=models.SET_NULL, null=True, blank=True)
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, null=True, blank=True)
     holder_of_privilege = models.ForeignKey(HolderOfPrivilege, on_delete=models.SET_NULL, null=True, blank=True)
+    
+    STATUS_CHOICES = [('Vacant', 'Vacant'), ('Occupied', 'Occupied')]
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Vacant', null=True)
+
+    def update_status(self):
+        fields_to_check = [
+            self.issuance_date, self.expiration_date, self.inurnment_date,
+            self.issuing_parish_priest, self.urns_per_columbary,
+            self.customer, self.parish_staff, self.beneficiary, self.payment, self.holder_of_privilege
+        ]
+        if any(fields_to_check):  
+            self.status = "Occupied"  # If any field has a value, status is Occupied
+        elif not any(fields_to_check) and self.status == "Occupied":
+            self.status = "Vacant"
+
+    def save(self, *args, **kwargs):
+        self.update_status()  # Ensure status is updated before saving
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Vault {self.vault_id}"
+        return f"Vault {self.vault_id} - {self.status}"
+    
     def get_record_data(self):
         """Get formatted record data"""
         data = {

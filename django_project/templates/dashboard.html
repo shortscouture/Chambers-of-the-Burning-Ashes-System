@@ -5,71 +5,106 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+        }
+        .chart-container {
+            margin: 20px 0;
+        }
+        .info-box {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
     <h1>Dashboard</h1>
-    <label for="data-selector">Select Data:</label>
-    <select id="data-selector">
-        <option value="customer">Customer Status</option>
-        <option value="columbary">Columbary Records</option>
-        <option value="payment">Payment Counts</option>
-        <option value="inquiry">Total Inquiries</option>
-    </select>
-    <canvas id="dashboardChart"></canvas>
+
+    <div class="container">
+        <!-- Customer Status as Text -->
+        <div class="info-box">
+            <h2>Customer Status</h2>
+            <p>{{ customer_status_text }}</p>
+        </div>
+
+        <!-- Columbary Records Line Chart -->
+        <div class="chart-container">
+            <h2>Columbary Records</h2>
+            <canvas id="columbaryChart"></canvas>
+        </div>
+
+        <!-- Payment Counts Bar Chart -->
+        <div class="chart-container">
+            <h2>Payment Counts</h2>
+            <canvas id="paymentChart"></canvas>
+        </div>
+
+        <!-- Total Inquiries Bar Chart -->
+        <div class="chart-container">
+            <h2>Total Inquiries</h2>
+            <canvas id="inquiryChart"></canvas>
+        </div>
+
+        <!-- Available Columbaries as Text -->
+        <div class="info-box">
+            <h2>Available Columbaries</h2>
+            <p>{{ vacant_columbaries }}</p>
+        </div>
+    </div>
+        <div class="info-box">
+            <h2>Occupied Columbaries</h2>
+            <p>{{ occupied_columbary }}</p>
+        </div>
+        <div class="info-box">
+            <h2>Occupied Columbaries</h2>
+            <p>{{ occupied_columbary }}</p>
+        </div>
+</div>
 
     <script>
-        const ctx = document.getElementById('dashboardChart').getContext('2d');
-        let chart;
-
-        const dataSets = {
-            customer: {
-                labels: {{ customer_status_labels|safe }},
-                data: {{ customer_status_data|safe }}
-            },
-            columbary: {
-                labels: {{ columbary_status_counts|map(attribute='urns_per_columbary')|list|safe }},
-                data: {{ columbary_status_counts|map(attribute='count')|list|safe }}
-            },
-            payment: {
-                labels: ['Full Contribution', 'Six Month Installment'],
-                data: [{{ payment_counts.full_contribution }}, {{ payment_counts.six_month_installment }}]
-            },
-            inquiry: {
-                labels: ['Total Inquiries'],
-                data: [{{ inquiry_counts }}]
-            }
-        };
-
-        function createChart(dataKey) {
-            if (chart) chart.destroy();
-            chart = new Chart(ctx, {
-                type: 'bar',
+        function createChart(canvasId, type, labels, data, labelText) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            new Chart(ctx, {
+                type: type,
                 data: {
-                    labels: dataSets[dataKey].labels,
+                    labels: labels,
                     datasets: [{
-                        label: dataKey.charAt(0).toUpperCase() + dataKey.slice(1),
-                        data: dataSets[dataKey].data,
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
+                        label: labelText,
+                        data: data,
+                        backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(255, 99, 132, 0.2)'],
+                        borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
                         borderWidth: 1
                     }]
                 },
                 options: {
                     responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
+                    scales: type === 'pie' ? {} : {
+                        y: { beginAtZero: true }
                     }
                 }
             });
         }
 
-        document.getElementById('data-selector').addEventListener('change', function() {
-            createChart(this.value);
-        });
+        // Columbary Records (Line Chart)
+        createChart("columbaryChart", "line", {{ columbary_status_labels|safe }}, {{ columbary_status_data|safe }}, "Columbary Records");
 
-        createChart('customer'); // Default chart
+        // Payment Counts (Bar Chart)
+        createChart("paymentChart", "bar", ["Full Contribution", "Six Month Installment"], [{{ payment_counts.full_contribution }}, {{ payment_counts.six_month_installment }}], "Payment Counts");
+
+        // Total Inquiries (Bar Chart)
+        createChart("inquiryChart", "bar", ["Total Inquiries"], [{{ inquiry_counts }}], "Total Inquiries");
     </script>
 </body>
 </html>
