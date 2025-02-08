@@ -153,6 +153,7 @@ class ColumbaryRecord(models.Model):
     
     STATUS_CHOICES = [('Vacant', 'Vacant'), ('Occupied', 'Occupied')]
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Vacant')
+    
 
     def update_status(self):
         fields_to_check = [

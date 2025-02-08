@@ -14,7 +14,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic.base import TemplateView
-from django.db.models import Count, Q
+from django.db.models import Count, Sum
 
 class SuccesView(TemplateView):
     template_name = "success.html"
@@ -76,6 +76,15 @@ class dashboardView(TemplateView):
         # Payment Mode Statistics
         full_payment_count = Payment.objects.filter(mode_of_payment="Full Payment").count()
         installment_count = Payment.objects.filter(mode_of_payment="6-Month Installment").count()
+        earnings_by_date = (
+        ColumbaryRecord.objects.filter(payment__isnull=False)
+        .values("issuance_date")
+        .annotate(total_earnings= Sum("payment__total_amount"))
+        .order_by("issuance_date")
+         )
+
+        earnings_labels = [entry["issuance_date"].strftime("%Y-%m-%d") for entry in earnings_by_date]
+        earnings_data = [float(entry["total_earnings"]) for entry in earnings_by_date]    
 
 
         context = {
@@ -88,7 +97,9 @@ class dashboardView(TemplateView):
             'occupied_columbaries': occupied_columbaries,
             'pending_counts' : pending_counts,
             'full_payment_count': full_payment_count,
-            'installment_count': installment_count
+            'installment_count': installment_count,
+            "earnings_labels": earnings_labels,
+            "earnings_data": earnings_data
         }
 
         return render(request, 'dashboard.html', context)
