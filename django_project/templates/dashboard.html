@@ -33,19 +33,6 @@
     <h1>Dashboard</h1>
 
     <div class="container">
-
-        <!-- Columbary Records Line Chart -->
-        <div class="chart-container">
-            <h2>Columbary Records</h2>
-            <canvas id="columbaryChart"></canvas>
-        </div>
-
-        <!-- Inquiry Chart -->
-        <div class="chart-container">
-            <h2>Inquiry Records</h2>
-            <canvas id="inquiryChart"></canvas>
-        </div>
-
         <!-- Available Columbaries as Text -->
         <div class="info-box">
             <h2>Available Columbaries</h2>
@@ -60,6 +47,10 @@
         <div class="info-box">
             <h2>Pending Letter of Intents</h2>
             <p>{{ pending_counts }}</p>
+        </div>
+        <div class="info-box">
+            <h2>Unissued Columbaries</h2>
+            <p>{{ unissued_columbaries }}</p>
         </div>
 
         <!-- Payment Distribution Pie Chart -->
@@ -113,10 +104,7 @@
         }
         
         // Columbary Records (Line Chart)
-        createChart("columbaryChart", "line", {{ columbary_status_labels|safe }}, {{ columbary_status_data|safe }}, "Columbary Records");
-
         // Total Inquiries (Bar Chart)
-        createChart("inquiryChart", "bar", ["Total Inquiries"], [{{ inquiry_counts }}], "Total Inquiries");
         createChart(
             "earningsChart",
             "line",
