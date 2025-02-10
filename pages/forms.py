@@ -51,8 +51,18 @@ class ColumbaryRecordForm(forms.ModelForm):
     class Meta:
         model = ColumbaryRecord
         fields = ['vault_id', 'issuance_date', 'expiration_date', 'inurnment_date', 'issuing_parish_priest', 'urns_per_columbary']
+        widgets = {
+            'issuance_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'expiration_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'inurnment_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
+        }
 
 class BeneficiaryForm(forms.ModelForm):
     class Meta:
         model = Beneficiary
         fields = ['first_beneficiary_name', 'second_beneficiary_name', 'third_beneficiary_name']
+        widgets = {
+            'first_beneficiary_name': forms.TextInput(attrs={'placeholder': 'First Beneficiary', 'class': 'form-control'}),
+            'second_beneficiary_name': forms.TextInput(attrs={'placeholder': 'Second Beneficiary', 'class': 'form-control'}),
+            'third_beneficiary_name': forms.TextInput(attrs={'placeholder': 'Third Beneficiary', 'class': 'form-control'})
+        }

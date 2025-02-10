@@ -5,15 +5,16 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
 from django.utils import timezone
-from datetime import timedelta
+from datetime import datetime, timedelta
 from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm
-from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth
+from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, InquiryRecord, ParishAdministrator, ParishStaff
 from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic.base import TemplateView
+from django.db.models import Count, Sum
 from .models import Customer, ColumbaryRecord, Beneficiary
 from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm
 from rest_framework.views import APIView
@@ -56,7 +57,68 @@ class ColumbaryRecordsView(TemplateView):
 class MemorialView(TemplateView):
     template_name = "pages/Memorials.html"
 
+class dashboardView(TemplateView):
+    template_name = "dashboard.html"
+    
+    def dashboard(request):
+        # Customer Status Analytics
+        customer_status_counts = Customer.objects.values('status').annotate(count=Count('status'))
+        customer_status_labels = [entry['status'] for entry in customer_status_counts]
+        customer_status_data = [entry['count'] for entry in customer_status_counts]
 
+        # Columbary Records Analytics
+        columbary_records = ColumbaryRecord.objects.all()
+        columbary_status_counts = columbary_records.values('urns_per_columbary').annotate(count=Count('urns_per_columbary'))
+        columbary_status_labels = [entry['urns_per_columbary'] for entry in columbary_status_counts]
+        columbary_status_data = [entry['count'] for entry in columbary_status_counts]
+
+        # Inquiry Record Analytics
+        inquiry_counts = InquiryRecord.objects.count()
+        
+        #Customer Status
+        pending_counts = Customer.objects.filter(status = "pending").count()
+
+        # Available (vacant) columbaries
+        vacant_columbaries = ColumbaryRecord.objects.filter(status="Vacant").count()
+        
+        occupied_columbaries = ColumbaryRecord.objects.filter(status="Occupied").count()
+        
+        #Unissued Columbaries
+        unissued_columbaries = ColumbaryRecord.objects.filter(issuance_date__isnull=True, status = "Occupied").count()
+        
+        # Payment Mode Statistics
+        full_payment_count = Payment.objects.filter(mode_of_payment="Full Payment").count()
+        installment_count = Payment.objects.filter(mode_of_payment="6-Month Installment").count()
+        earnings_by_date = (
+        ColumbaryRecord.objects.filter(payment__isnull=False)
+        .values("issuance_date")
+        .annotate(total_earnings= Sum("payment__total_amount"))
+        .order_by("issuance_date")
+         )
+
+        earnings_labels = [entry["issuance_date"].strftime("%Y-%m-%d") for entry in earnings_by_date]
+        earnings_data = [float(entry["total_earnings"]) for entry in earnings_by_date]    
+
+
+        context = {
+            'customer_status_labels': customer_status_labels,
+            'customer_status_data': customer_status_data,
+            'columbary_status_labels': columbary_status_labels,
+            'columbary_status_data': columbary_status_data,
+            'inquiry_counts': inquiry_counts,
+            'vacant_columbaries': vacant_columbaries,
+            'occupied_columbaries': occupied_columbaries,
+            'pending_counts' : pending_counts,
+            'full_payment_count': full_payment_count,
+            'installment_count': installment_count,
+            "earnings_labels": earnings_labels,
+            "earnings_data": earnings_data,
+            'unissued_columbaries': unissued_columbaries
+        }
+
+        return render(request, 'dashboard.html', context)
+
+            
 def send_letter_of_intent(request):
     if request.method == 'POST':
 
@@ -158,8 +220,6 @@ class RecordsDetailsView(TemplateView):
         context['columbary_records'] = ColumbaryRecord.objects.filter(customer=customer)
         context['beneficiary'] = Beneficiary.objects.filter(columbaryrecord__customer=customer).first()
         return context
-
-
 
 
 class CustomerEditView(TemplateView):

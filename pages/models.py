@@ -88,14 +88,54 @@ class Beneficiary(models.Model):
         return self.first_beneficiary_name
 
 
-class Payment(models.Model):
-    payment_id = models.AutoField(primary_key=True)
-    full_contribution = models.BooleanField()
-    six_month_installment = models.BooleanField()
-    official_receipt = models.IntegerField(blank=True, null=True)
 
-    def __str__(self):
-        return f"Payment {self.payment_id}"
+class Payment(models.Model):
+    PAYMENT_MODES = [
+        ("Full Payment", "Full Payment"),
+        ("6-Month Installment", "6-Month Installment"),
+    ]
+    
+    payment_id = models.AutoField(primary_key=True)
+    mode_of_payment = models.CharField(max_length=20, choices=PAYMENT_MODES, default="Full Payment")
+
+    # Seven receipt fields
+    Full_payment_receipt_1 = models.IntegerField(blank=True, null=True)
+    six_month_receipt_1 = models.IntegerField(blank=True, null=True)
+    six_month_receipt_2 = models.IntegerField(blank=True, null=True)
+    six_month_receipt_3 = models.IntegerField(blank=True, null=True)
+    six_month_receipt_4 = models.IntegerField(blank=True, null=True)
+    six_month_receipt_5 = models.IntegerField(blank=True, null=True)
+    six_month_receipt_6 = models.IntegerField(blank=True, null=True)
+    
+    Full_payment_amount_1 = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True) 
+    six_month_amount_1 = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    six_month_amount_2 = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    six_month_amount_3 = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    six_month_amount_4 = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    six_month_amount_5 = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    six_month_amount_6 = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True) 
+    
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, editable=False)
+    
+    def save(self, *args, **kwargs):
+        if self.mode_of_payment == "Full Payment":
+            full_payment_value = 220000  # Adjust based on actual pricing
+            self.amount_1 = full_payment_value
+            self.total_amount = full_payment_value  # Assign total amount
+
+            # Clear unused fields
+            self.receipt_2 = self.receipt_3 = self.receipt_4 = self.receipt_5 = self.receipt_6 = self.receipt_7 = None
+            self.amount_2 = self.amount_3 = self.amount_4 = self.amount_5 = self.amount_6 = self.amount_7 = None
+        
+        elif self.mode_of_payment == "6-Month Installment":
+            installment_value = 60000 / 6  # Divide total amount into 6 payments
+            self.amount_1 = self.amount_2 = self.amount_3 = self.amount_4 = self.amount_5 = self.amount_6 = installment_value
+            self.amount_7 = None  # Not used for installment
+
+            # Sum all non-null amounts
+            self.total_amount = sum(filter(None, [self.amount_1, self.amount_2, self.amount_3, self.amount_4, self.amount_5, self.amount_6]))
+
+        super().save(*args, **kwargs)
 
 
 class ColumbaryRecord(models.Model):
@@ -110,9 +150,29 @@ class ColumbaryRecord(models.Model):
     beneficiary = models.ForeignKey(Beneficiary, on_delete=models.SET_NULL, null=True, blank=True)
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, null=True, blank=True)
     holder_of_privilege = models.ForeignKey(HolderOfPrivilege, on_delete=models.SET_NULL, null=True, blank=True)
+    
+    STATUS_CHOICES = [('Vacant', 'Vacant'), ('Occupied', 'Occupied')]
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Vacant')
+    
+
+    def update_status(self):
+        fields_to_check = [
+            self.issuance_date, self.expiration_date, self.inurnment_date,
+            self.issuing_parish_priest, self.urns_per_columbary,
+            self.customer, self.parish_staff, self.beneficiary, self.payment, self.holder_of_privilege
+        ]
+        if any(fields_to_check):  
+            self.status = "Occupied"  # If any field has a value, status is Occupied
+        elif not any(fields_to_check) and self.status == "Occupied":
+            self.status = "Vacant"
+
+    def save(self, *args, **kwargs):
+        self.update_status()  # Ensure status is updated before saving
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Vault {self.vault_id}"
+        return f"Vault {self.vault_id} - {self.status}"
+    
     def get_record_data(self):
         """Get formatted record data"""
         data = {

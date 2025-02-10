@@ -4,88 +4,139 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/Headers.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
-            margin: 0;
             font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
         }
-
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: #fff;
-            z-index: 1000; 
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        .container {
+            width: 80%;
+            margin: auto;
         }
-
-        .dashboard-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding-top: 100px;
-            height: calc(100vh - 140px);
-            background-color: #ADD8E6; 
-            margin-top: 100px;
+        .chart-container {
+            margin: 20px 0;
         }
-
-        .headname {
-            display: flex;
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .headname li {
-            margin: 0 10px;
-        }
-
-        .headname li a {
-            text-decoration: none;
-            color: #333;
-        }
-
-        .headname li a:hover {
-            color: #007BFF;
+        .info-box {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
-    <header>
-        <div id="header">
-            <div class="container">
-                <nav>
-                    <img src="{{ url_for('static', filename='images/logohead.png') }}" alt="logoheader" class="logohead">
-                    <ul class="headname">
-                        <li><a href="{{ url_for('home') }}">Home</a></li>
-                        <li><a href="{{ url_for('columbary_records') }}">Records</a></li>
-                        <li><a href="{{ url_for('columbary') }}">Columbary</a></li>
-                        <li><a id="logoutBtn" href="{{ url_for('logout') }}" class="custom-signup-btn mb-2">Log Out</a></li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-    </header>
+    <h1>Dashboard</h1>
 
-    <div class="dashboard-container">
-        <div id="dashboard"></div>
+    <div class="container">
+        <!-- Available Columbaries as Text -->
+        <div class="info-box">
+            <h2>Available Columbaries</h2>
+            <p>{{ vacant_columbaries }}</p>
+        </div>
+        
+        <div class="info-box">
+            <h2>Occupied Columbaries</h2>
+            <p>{{ occupied_columbaries }}</p>
+        </div>
+        
+        <div class="info-box">
+            <h2>Pending Letter of Intents</h2>
+            <p>{{ pending_counts }}</p>
+        </div>
+        <div class="info-box">
+            <h2>Unissued Columbaries</h2>
+            <p>{{ unissued_columbaries }}</p>
+        </div>
+
+        <!-- Payment Distribution Pie Chart -->
+        <div class="chart-container">
+            <h2>Payment Distribution</h2>
+            <canvas id="paymentChart"></canvas>
+        </div>
+        <!-- Total Earnings Overtime-->
+        <div class="chart-container">
+            <h2>Total Earnings Over Time</h2>
+            <canvas id="earningsChart"></canvas>
+        </div>
     </div>
+    
 
     <script>
-        fetch('/dashboard')
-            .then(response => response.json())
-            .then(chartSpec => {
-                chartSpec.config = {
-                    legend: { orient: "right" }
-                };
-                vegaEmbed('#dashboard', chartSpec, { renderer: "canvas" }).catch(console.error);
+        function createChart(canvasId, type, labels, data, labelText) {
+            const ctx = document.getElementById(canvasId).getContext("2d");
+            new Chart(ctx, {
+                type: type,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: labelText,
+                        data: data,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 2,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: "Issuance Date"
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: "Total Earnings (PHP)"
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
             });
+        }
+        
+        // Columbary Records (Line Chart)
+        // Total Inquiries (Bar Chart)
+        createChart(
+            "earningsChart",
+            "line",
+            {{ earnings_labels|safe }},
+            {{ earnings_data|safe }},
+            "Total Earnings"
+        );
+        
+        // Payment Pie Chart
+        var fullPayment = {{ full_payment_count }};
+        var installment = {{ installment_count }};
+
+        var ctx = document.getElementById('paymentChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Full Payment', '6-Month Installment'],
+                datasets: [{
+                    data: [fullPayment, installment],
+                    backgroundColor: ['#36A2EB', '#FF6384'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
     </script>
 </body>
 </html>
