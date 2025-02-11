@@ -1,0 +1,67 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    text-align: center;
+    background-color: #f0f8ff; /* Light sky blue background */
+    color: #333;
+}
+
+h1 {
+    color: #007bff;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Info Boxes */
+.info-box {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #e3f2fd; /* Light blue */
+    border-left: 5px solid #007bff;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+.info-box:hover {
+    background-color: #d1ecff;
+    transform: scale(1.02);
+}
+
+.info-box h2 {
+    color: #0056b3;
+}
+
+/* Chart Containers */
+.chart-container {
+    margin: 30px 0;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.chart-container h2 {
+    color: #007bff;
+}
+
+canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+    }
+}
