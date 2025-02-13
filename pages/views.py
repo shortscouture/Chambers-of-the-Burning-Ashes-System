@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import datetime, timedelta
 from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm
-from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, InquiryRecord, ParishAdministrator, ParishStaff
+from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, InquiryRecord, ParishAdministrator, ParishStaff, ChatQuery
 from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -351,12 +351,16 @@ class ChatbotAPIView(APIView):
 
         try:
             response = openai.chat.completions.create(
-                model="gpt-3.5-turbo",  # Using GPT-3.5 model
+                model="gpt-3.5-turbo",  # Using GPT-3.5 models
                 messages=[{"role": "user", "content": user_message}],
                 max_tokens=150
             )
             bot_reply = response.choices[0].message.content.strip()  # Get the response from GPT-3.5
+            #save to database
+            ChatQuery.objects.create(user_message=user_message, bot_response=bot_reply)
+
             return Response({'response': bot_reply}, status=status.HTTP_200_OK)
+
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
