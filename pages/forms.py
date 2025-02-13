@@ -66,3 +66,10 @@ class BeneficiaryForm(forms.ModelForm):
             'second_beneficiary_name': forms.TextInput(attrs={'placeholder': 'Second Beneficiary', 'class': 'form-control'}),
             'third_beneficiary_name': forms.TextInput(attrs={'placeholder': 'Third Beneficiary', 'class': 'form-control'})
         }
+
+
+class DocumentUploadForm(forms.Form):
+    document = forms.ImageField(
+        label='Upload Document',
+        help_text='Upload a clear image of the handwritten form'
+    )
