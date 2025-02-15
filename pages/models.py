@@ -44,7 +44,7 @@ class Customer(models.Model):
     
     # Name Fields
     first_name = models.CharField(max_length=50)
-    middle_name = models.CharField(max_length=50, blank=True)  # Optional
+    middle_name = models.CharField(max_length=50)  
     last_name = models.CharField(max_length=50)
     suffix = models.CharField(max_length=10, blank=True)  # Optional
 
@@ -58,8 +58,8 @@ class Customer(models.Model):
 
     # Contact Fields
     landline_number = models.CharField(max_length=15, blank=True)
-    mobile_number = models.CharField(max_length=11)
-    email_address = models.EmailField(max_length=45, default='no-email@example.com')
+    mobile_number = models.CharField(max_length=11, blank= True)
+    email_address = models.EmailField(max_length=45 blank= True)
 
     # Status
     status = models.CharField(
