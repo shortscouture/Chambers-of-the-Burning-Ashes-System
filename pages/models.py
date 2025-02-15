@@ -43,23 +43,23 @@ class Customer(models.Model):
     ]
     
     # Name Fields
-    first_name = models.CharField(max_length=50)
-    middle_name = models.CharField(max_length=50)  
-    last_name = models.CharField(max_length=50)
-    suffix = models.CharField(max_length=10, blank=True)  # Optional
+    first_name = models.CharField(max_length=50, default="Unknown")
+    middle_name = models.CharField(max_length=50, blank=True, null=True)  
+    last_name = models.CharField(max_length=50, default="Unknown")
+    suffix = models.CharField(max_length=10, blank=True, null=True)  # Optional
 
     # Address Fields
     country = models.CharField(max_length=100, default="Philippines")
-    address_line_1 = models.CharField(max_length=255)
-    address_line_2 = models.CharField(max_length=255, blank=True)  # Optional
-    city = models.CharField(max_length=100)
-    province_or_state = models.CharField(max_length=100)
-    postal_code = models.CharField(max_length=20)
+    address_line_1 = models.CharField(max_length=255, default="Unknown Address")
+    address_line_2 = models.CharField(max_length=255, blank=True, null=True)  # Optional
+    city = models.CharField(max_length=100, default="Unknown City")
+    province_or_state = models.CharField(max_length=100, default="Unknown Province")
+    postal_code = models.CharField(max_length=20, blank=True, null=True)
 
     # Contact Fields
-    landline_number = models.CharField(max_length=15, blank=True)
-    mobile_number = models.CharField(max_length=11, blank= True)
-    email_address = models.EmailField(max_length=45, blank= True)
+    landline_number = models.CharField(max_length=15, blank=True, null=True)
+    mobile_number = models.CharField(max_length=11, blank=True, null=True)
+    email_address = models.EmailField(max_length=45, blank=True, null=True)  # Fixed missing comma
 
     # Status
     status = models.CharField(
@@ -67,9 +67,10 @@ class Customer(models.Model):
         choices=STATUS_CHOICES, 
         default='pending'
     )
-# for status
+
     def __str__(self):
-        return f"{self.first_name} {self.middle_name} {self.last_name}"
+        return f"{self.first_name} {self.middle_name or ''} {self.last_name}"
+
 
 
 class InquiryRecord(models.Model):
