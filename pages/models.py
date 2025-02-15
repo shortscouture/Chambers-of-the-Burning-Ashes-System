@@ -35,24 +35,41 @@ class ParishStaff(models.Model):
 
 class Customer(models.Model):
     customer_id = models.AutoField(primary_key=True)
+    
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('approved', 'Approved'),
         ('declined', 'Declined'),
     ]
-    full_name = models.CharField(max_length=45)
+    
+    # Name Fields
+    first_name = models.CharField(max_length=50)
+    middle_name = models.CharField(max_length=50, blank=True)  # Optional
+    last_name = models.CharField(max_length=50)
+    suffix = models.CharField(max_length=10, blank=True)  # Optional
 
-    permanent_address = models.TextField(max_length=255)
+    # Address Fields
+    country = models.CharField(max_length=100, default="Philippines")
+    address_line_1 = models.CharField(max_length=255)
+    address_line_2 = models.CharField(max_length=255, blank=True)  # Optional
+    city = models.CharField(max_length=100)
+    province_or_state = models.CharField(max_length=100)
+    postal_code = models.CharField(max_length=20)
+
+    # Contact Fields
     landline_number = models.CharField(max_length=15, blank=True)
     mobile_number = models.CharField(max_length=11)
     email_address = models.EmailField(max_length=45, default='no-email@example.com')
+
+    # Status
     status = models.CharField(
         max_length=10, 
         choices=STATUS_CHOICES, 
         default='pending'
-    )  # Add this field for status
+    )
+# for status
     def __str__(self):
-        return self.full_name
+        return f"{self.first_name} {self.middle_name} {self.last_name}"
 
 
 class InquiryRecord(models.Model):
