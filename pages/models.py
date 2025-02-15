@@ -59,7 +59,7 @@ class Customer(models.Model):
     # Contact Fields
     landline_number = models.CharField(max_length=15, blank=True)
     mobile_number = models.CharField(max_length=11, blank= True)
-    email_address = models.EmailField(max_length=45 blank= True)
+    email_address = models.EmailField(max_length=45, blank= True)
 
     # Status
     status = models.CharField(
