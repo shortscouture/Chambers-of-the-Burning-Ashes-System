@@ -2,66 +2,74 @@
 from django import forms
 from .models import Customer, ColumbaryRecord, Beneficiary
 
+from django import forms
+from .models import Customer
+
+from django import forms
+from .models import Customer
+
 class CustomerForm(forms.ModelForm):
     # Name Fields
-    first_name = forms.CharField(max_length=255, required=True, widget=forms.TextInput(attrs={
+    first_name = forms.CharField(max_length=50, required=True, widget=forms.TextInput(attrs={
         'placeholder': 'First Name',
         'class': 'form-control'
     }))
-    middle_name = forms.CharField(max_length=255, required=False, widget=forms.TextInput(attrs={
+    middle_name = forms.CharField(max_length=50, required=False, widget=forms.TextInput(attrs={
         'placeholder': 'Middle Name (Optional)',
         'class': 'form-control'
     }))
-    last_name = forms.CharField(max_length=255, required=True, widget=forms.TextInput(attrs={
+    last_name = forms.CharField(max_length=50, required=True, widget=forms.TextInput(attrs={
         'placeholder': 'Last Name',
         'class': 'form-control'
     }))
-    suffix = forms.CharField(max_length=50, required=False, widget=forms.TextInput(attrs={
+    suffix = forms.CharField(max_length=10, required=False, widget=forms.TextInput(attrs={
         'placeholder': 'Suffix (e.g., Jr., Sr., III)',
         'class': 'form-control'
     }))
 
     # Address Fields
-    street_address = forms.CharField(max_length=255, required=True, widget=forms.TextInput(attrs={
-        'placeholder': 'Street Address or P.O. Box',
+    country = forms.CharField(max_length=100, required=True, widget=forms.TextInput(attrs={
+        'placeholder': 'Country',
         'class': 'form-control'
     }))
-    barangay = forms.CharField(max_length=255, required=True, widget=forms.TextInput(attrs={
-        'placeholder': 'Barangay (Neighborhood or District)',
+    address_line_1 = forms.CharField(max_length=255, required=True, widget=forms.TextInput(attrs={
+        'placeholder': 'Address Line 1',
         'class': 'form-control'
     }))
-    city = forms.CharField(max_length=255, required=True, widget=forms.TextInput(attrs={
-        'placeholder': 'City or Municipality',
+    address_line_2 = forms.CharField(max_length=255, required=False, widget=forms.TextInput(attrs={
+        'placeholder': 'Address Line 2 (Optional)',
         'class': 'form-control'
     }))
-    province = forms.CharField(max_length=255, required=True, widget=forms.TextInput(attrs={
-        'placeholder': 'Province',
+    city = forms.CharField(max_length=100, required=True, widget=forms.TextInput(attrs={
+        'placeholder': 'City',
+        'class': 'form-control'
+    }))
+    province_or_state = forms.CharField(max_length=100, required=True, widget=forms.TextInput(attrs={
+        'placeholder': 'Province/State',
+        'class': 'form-control'
+    }))
+    postal_code = forms.CharField(max_length=20, required=False, widget=forms.TextInput(attrs={
+        'placeholder': 'Postal Code',
         'class': 'form-control'
     }))
 
     class Meta:
         model = Customer
-        fields = ['landline_number', 'mobile_number', 'email_address']
+        fields = [
+            'first_name', 'middle_name', 'last_name', 'suffix',
+            'country', 'address_line_1', 'address_line_2', 'city', 
+            'province_or_state', 'postal_code',
+            'landline_number', 'mobile_number', 'email_address', 'status'
+        ]
 
     def save(self, commit=True):
         instance = super().save(commit=False)
 
-        # Combine name fields and assign to full_name
-        name_parts = [
-            self.cleaned_data.get('first_name', ''),
-            self.cleaned_data.get('middle_name', ''),
-            self.cleaned_data.get('last_name', ''),
-            self.cleaned_data.get('suffix', '')
-        ]
-        # Join non-empty parts and assign to full_name
-        instance.full_name = ' '.join(part for part in name_parts if part)
-
-        # Combine address fields and assign to permanent_address
-        instance.permanent_address = f"{self.cleaned_data['street_address']}, {self.cleaned_data['barangay']}, {self.cleaned_data['city']}, {self.cleaned_data['province']}"
-
         if commit:
             instance.save()
         return instance
+
+
 
 
 class EmailVerificationForm(forms.Form):

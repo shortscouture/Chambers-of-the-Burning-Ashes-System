@@ -12,74 +12,80 @@
         <h2>Add New Columbary Record</h2>
         <form method="POST">
             {% csrf_token %}
-            
+
             <fieldset>
                 <legend>Customer Information</legend>
 
-                <!-- First Name -->
                 <div>
                     <label for="first_name">First Name</label>
                     {{ customer_form.first_name }}
                 </div>
 
-                <!-- Middle Name -->
                 <div>
                     <label for="middle_name">Middle Name (Optional)</label>
                     {{ customer_form.middle_name }}
                 </div>
 
-                <!-- Last Name -->
                 <div>
                     <label for="last_name">Last Name</label>
                     {{ customer_form.last_name }}
                 </div>
 
-                <!-- Suffix -->
                 <div>
                     <label for="suffix">Suffix (e.g., Jr., Sr., III)</label>
                     {{ customer_form.suffix }}
                 </div>
 
-                <!-- Street Address -->
+                <!-- Address Fields -->
                 <div>
-                    <label for="street_address">Street Address or P.O. Box</label>
-                    {{ customer_form.street_address }}
+                    <label for="country">Country</label>
+                    {{ customer_form.country }}
                 </div>
 
-                <!-- Barangay -->
                 <div>
-                    <label for="barangay">Barangay (Neighborhood or District)</label>
-                    {{ customer_form.barangay }}
+                    <label for="address_line_1">Address Line 1</label>
+                    {{ customer_form.address_line_1 }}
                 </div>
 
-                <!-- City -->
                 <div>
-                    <label for="city">City or Municipality</label>
+                    <label for="address_line_2">Address Line 2 (Optional)</label>
+                    {{ customer_form.address_line_2 }}
+                </div>
+
+                <div>
+                    <label for="city">City</label>
                     {{ customer_form.city }}
                 </div>
 
-                <!-- Province -->
                 <div>
-                    <label for="province">Province</label>
-                    {{ customer_form.province }}
+                    <label for="province_or_state">Province/State</label>
+                    {{ customer_form.province_or_state }}
                 </div>
 
-                <!-- Landline Number -->
+                <div>
+                    <label for="postal_code">Postal Code</label>
+                    {{ customer_form.postal_code }}
+                </div>
+
+                <!-- Contact Information -->
                 <div>
                     <label for="landline_number">Landline Number</label>
                     {{ customer_form.landline_number }}
                 </div>
 
-                <!-- Mobile Number -->
                 <div>
                     <label for="mobile_number">Mobile Number</label>
                     {{ customer_form.mobile_number }}
                 </div>
 
-                <!-- Email Address -->
                 <div>
                     <label for="email_address">Email Address</label>
                     {{ customer_form.email_address }}
+                </div>
+
+                <div>
+                    <label for="status">Status</label>
+                    {{ customer_form.status }}
                 </div>
 
             </fieldset>
@@ -87,37 +93,31 @@
             <fieldset>
                 <legend>Columbary Record Information</legend>
 
-                <!-- Vault ID -->
                 <div>
                     <label for="vault_id">Vault ID</label>
                     {{ record_form.vault_id }}
                 </div>
 
-                <!-- Issuance Date (Calendar Picker) -->
                 <div>
                     <label for="issuance_date">Issuance Date</label>
                     <input type="date" id="issuance_date" name="issuance_date" value="{{ record_form.issuance_date.value|default:'' }}">
                 </div>
 
-                <!-- Expiration Date (Calendar Picker) -->
                 <div>
                     <label for="expiration_date">Expiration Date</label>
                     <input type="date" id="expiration_date" name="expiration_date" value="{{ record_form.expiration_date.value|default:'' }}">
                 </div>
 
-                <!-- Inurnment Date (Calendar Picker) -->
                 <div>
                     <label for="inurnment_date">Inurnment Date</label>
                     <input type="date" id="inurnment_date" name="inurnment_date" value="{{ record_form.inurnment_date.value|default:'' }}">
                 </div>
 
-                <!-- Issuing Parish Priest -->
                 <div>
                     <label for="issuing_parish_priest">Issuing Parish Priest</label>
                     {{ record_form.issuing_parish_priest }}
                 </div>
 
-                <!-- Urns per Columbary -->
                 <div>
                     <label for="urns_per_columbary">Urns per Columbary</label>
                     {{ record_form.urns_per_columbary }}

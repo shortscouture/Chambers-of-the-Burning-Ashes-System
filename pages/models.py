@@ -70,7 +70,24 @@ class Customer(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.middle_name or ''} {self.last_name}"
+    
+    def full_name(self):
+        return f"{self.first_name} {self.middle_name or ''} {self.last_name} {self.suffix or ''}".strip()
+    
+    
+    def full_address(self):
+        address_parts = [
+            self.address_line_1,
+            self.address_line_2 if self.address_line_2 else None,  # Only include if exists
+            self.city,
+            self.province_or_state,
+            self.postal_code if self.postal_code else None,  # Only include if exists
+            self.country
+        ]
+        return ", ".join(filter(None, address_parts))  # Join and remove None values
 
+    def __str__(self):
+        return self.full_address()
 
 
 class InquiryRecord(models.Model):
