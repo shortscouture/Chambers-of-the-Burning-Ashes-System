@@ -3,7 +3,7 @@ from . import views
 
 
 
-from .views import HomePageView,AboutPageView, MainDashView, ColumbaryRecordsView, CustomerHomeView, MemorialView, send_letter_of_intent, verify_otp, memorials_verification,accept_letter_of_intent, decline_letter_of_intent, RecordsDetailsView, CustomerEditView, SuccesView, ChatbotAPIView
+from .views import HomePageView,AboutPageView, MainDashView, ColumbaryRecordsView, CustomerHomeView, MemorialView, send_letter_of_intent, verify_otp, memorials_verification,accept_letter_of_intent, decline_letter_of_intent, RecordsDetailsView, CustomerEditView, SuccesView, ChatbotAPIView, dashboardView
 
 
 urlpatterns = [
@@ -22,6 +22,6 @@ urlpatterns = [
 
     path('recordsdetails/<int:customer_id>/', RecordsDetailsView.as_view(), name='recordsdetails'),
     path('edit_customer/<int:customer_id>/', CustomerEditView.as_view(), name='edit_customer'),
-    path('dashboard/',dashboardView.dashboard, name='dashboard')
+    path('dashboard/',dashboardView.dashboard, name='dashboard'),
     path('chatbot/', ChatbotAPIView.as_view(), name='chatbot'),
 ]

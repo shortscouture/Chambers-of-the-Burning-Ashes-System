@@ -90,7 +90,7 @@ class BeneficiaryForm(forms.ModelForm):
     class Meta:
         model = Beneficiary
         fields = ['first_beneficiary_name', 'second_beneficiary_name', 'third_beneficiary_name']
-<<<<<<< HEAD
+        
         widgets = {
             'first_beneficiary_name': forms.TextInput(attrs={'placeholder': 'First Beneficiary', 'class': 'form-control'}),
             'second_beneficiary_name': forms.TextInput(attrs={'placeholder': 'Second Beneficiary', 'class': 'form-control'}),
@@ -103,5 +103,4 @@ class DocumentUploadForm(forms.Form):
         label='Upload Document',
         help_text='Upload a clear image of the handwritten form'
     )
-=======
->>>>>>> 4148332d792efbe9426f816f70afda62d91714f9
+
