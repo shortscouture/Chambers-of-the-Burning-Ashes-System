@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
 from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm
-from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth
+from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, InquiryRecord, ParishAdministrator, ParishStaff, ChatQuery
 from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
@@ -267,75 +267,31 @@ def verify_otp(request):
 def success(request):
     return render(request, 'pages/success.html')
 
+#chatbot env
+env = environ.Env(
+    DEBUG=(bool, False) #default value for DEBUG = False
+)
 
-
-def columbary_records(request):
-    """List all Columbary records."""
-    records = ColumbaryRecord.objects.select_related('customer').all()
-    return render(request, 'columbaryrecords.html', {'records': records})
-
-from django.shortcuts import render, redirect
-from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm
-from .models import Customer, ColumbaryRecord, Beneficiary, Payment, HolderOfPrivilege
-
-def add_columbary_record(request):
-    if request.method == 'POST':
-        customer_form = CustomerForm(request.POST)
-        record_form = ColumbaryRecordForm(request.POST)
-        beneficiary_form = BeneficiaryForm(request.POST)
-
-        if customer_form.is_valid() and record_form.is_valid() and beneficiary_form.is_valid():
-            # Save the customer form first
-            customer = customer_form.save()
-
-            # Save the beneficiary form
-            beneficiary = beneficiary_form.save()
-
-            columbary_record = record_form.save(commit=False)
-            columbary_record.customer = customer
-            columbary_record.beneficiary = beneficiary
-
-            # Save the ColumbaryRecord instance
-            columbary_record.save()
-
-            return redirect('columbary_records')
-        else:
-            print("Customer Form Errors:", customer_form.errors)
-            print("Record Form Errors:", record_form.errors)
-            print("Beneficiary Form Errors:", beneficiary_form.errors)
+openai.api_key = env("OPEN_AI_API_KEY")
+class ChatbotAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        return Response({"message": "Chatbot API is running! Use POST to send messages."}, status=status.HTTP_200_OK)
     
-    else:
-        customer_form = CustomerForm()
-        record_form = ColumbaryRecordForm()
-        beneficiary_form = BeneficiaryForm()
+    def post(self, request, *args, **kwargs):
+        user_message = request.data.get('message')
 
-    return render(request, 'pages/addnewrecord.html', {
-        'customer_form': customer_form,
-        'record_form': record_form,
-        'beneficiary_form': beneficiary_form
-    })
+        if not user_message:
+            return Response({'error': 'Message is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-
-def delete_customer(request, customer_id):
-    customer = get_object_or_404(Customer, pk=customer_id)
-
-    if request.method == 'POST':
         try:
-            with transaction.atomic():
-                # Fetch and delete all columbary records linked to the customer
-                columbary_records = ColumbaryRecord.objects.filter(customer=customer)
+            response = openai.chat.completions.create(
+                model="gpt-3.5-turbo",  # Using GPT-3.5 models
+                messages=[{"role": "user", "content": user_message}],
+                max_tokens=150
+            )
+            bot_reply = response.choices[0].message.content.strip()  # Get the response from GPT-3.5
+            return Response({'response': bot_reply}, status=status.HTTP_200_OK)
 
-                # Collect beneficiary IDs from the columbary records
-                beneficiary_id = [record.beneficiary_id for record in columbary_records]
-
-                # Delete columbary records
-                columbary_records.delete()
-
-                # Delete beneficiaries associated with those records
-                Beneficiary.objects.filter(id__in=beneficiary_id).delete()
-
-                # Delete the customer
-                customer.delete()
 
         except Exception as e:
             print(f"Error during deletion: {e}")
