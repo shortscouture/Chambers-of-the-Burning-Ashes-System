@@ -1,7 +1,11 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <link rel="stylesheet" href="../static/css/dashboard.css">
+
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
@@ -12,13 +16,16 @@
             margin: 20px;
             text-align: center;
         }
+
         .container {
             width: 80%;
             margin: auto;
         }
+
         .chart-container {
             margin: 20px 0;
         }
+
         .info-box {
             font-size: 20px;
             font-weight: bold;
@@ -30,42 +37,94 @@
         }
     </style>
 </head>
+
 <body>
     <h1>Dashboard</h1>
 
-    <div class="container">
-        <!-- Available Columbaries as Text -->
-        <div class="info-box">
+    <div class="dashboard-grid">
+        <div class="info-box" onclick="toggleAvailableTable()">
             <h2>Available Columbaries</h2>
             <p>{{ vacant_columbaries }}</p>
         </div>
-        
         <div class="info-box">
             <h2>Occupied Columbaries</h2>
             <p>{{ occupied_columbaries }}</p>
-        </div>
-        
-        <div class="info-box">
-            <h2>Pending Letter of Intents</h2>
-            <p>{{ pending_counts }}</p>
         </div>
         <div class="info-box">
             <h2>Unissued Columbaries</h2>
             <p>{{ unissued_columbaries }}</p>
         </div>
+        <div class="info-box" onclick="toggleTable()">
+            <h2>Pending Letter of Intents</h2>
+            <p>{{ pending_counts }}</p>
+        </div>
+    </div>
 
-        <!-- Payment Distribution Pie Chart -->
+    <!-- Pending Letter of Intent Table (Initially Hidden) -->
+    <div id="pendingTableContainer" class="table-container hidden">
+        <h3>Pending Letter of Intents</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Mobile</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for customer in pending_customers %}
+                <tr>
+                    <td>{{ customer.full_name }}</td>
+                    <td>{{ customer.email_address }}</td>
+                    <td>{{ customer.mobile_number }}</td>
+                    <td>
+                        <a href="{% url 'accept_letter_of_intent' customer.customer_id %}" class="btn-accept">Accept</a>
+                        <a href="{% url 'decline_letter_of_intent' customer.customer_id %}"
+                            class="btn-decline">Decline</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Available Columbaries Table (Initially Hidden) -->
+    <div id="availableTableContainer" class="table-container hidden">
+        <h3>Available Columbaries</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Columbary Name</th>
+                    <th>Location</th>
+                    <th>Capacity</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for columbary in available_columbaries %}
+                <tr>
+                    <td>{{ columbary.name }}</td>
+                    <td>{{ columbary.location }}</td>
+                    <td>{{ columbary.capacity }}</td>
+                    <td>{{ columbary.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+    <div class="dashboard-grid">
         <div class="chart-container">
             <h2>Payment Distribution</h2>
             <canvas id="paymentChart"></canvas>
         </div>
-        <!-- Total Earnings Overtime-->
         <div class="chart-container">
             <h2>Total Earnings Over Time</h2>
             <canvas id="earningsChart"></canvas>
         </div>
     </div>
-    
 
     <script>
         function createChart(canvasId, type, labels, data, labelText) {
@@ -103,20 +162,21 @@
                 }
             });
         }
-        
+
         // Columbary Records (Line Chart)
         // Total Inquiries (Bar Chart)
         createChart(
             "earningsChart",
             "line",
-            {{ earnings_labels|safe }},
-            {{ earnings_data|safe }},
+            JSON.parse('{{ earnings_labels|safe }}'), // Convert to JavaScript array
+            JSON.parse('{{ earnings_data|safe }}'),   // Convert to JavaScript array
             "Total Earnings"
         );
-        
+
+
         // Payment Pie Chart
-        var fullPayment = {{ full_payment_count }};
-        var installment = {{ installment_count }};
+        var fullPayment = JSON.parse('{{ full_payment_count|default:"0" }}');
+        var installment = JSON.parse('{{ installment_count|default:"0" }}');
 
         var ctx = document.getElementById('paymentChart').getContext('2d');
         new Chart(ctx, {
@@ -138,6 +198,17 @@
                 }
             }
         });
+
+        function toggleTable() {
+            var tableContainer = document.getElementById("pendingTableContainer");
+            tableContainer.classList.toggle("hidden");
+        }
+
+        function toggleAvailableTable() {
+            var availableTable = document.getElementById("availableTableContainer");
+            availableTable.classList.toggle("hidden");
+        }
     </script>
 </body>
+
 </html>

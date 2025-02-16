@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import datetime, timedelta
 from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm
-from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, InquiryRecord, ParishAdministrator, ParishStaff
+from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, InquiryRecord, ParishAdministrator, ParishStaff, ChatQuery
 from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -86,6 +86,9 @@ class dashboardView(TemplateView):
         #Unissued Columbaries
         unissued_columbaries = ColumbaryRecord.objects.filter(issuance_date__isnull=True, status = "Occupied").count()
         
+        #Pending Customers
+        pending_customers = Customer.objects.filter(status="pending")
+
         # Payment Mode Statistics
         full_payment_count = Payment.objects.filter(mode_of_payment="Full Payment").count()
         installment_count = Payment.objects.filter(mode_of_payment="6-Month Installment").count()
@@ -113,7 +116,9 @@ class dashboardView(TemplateView):
             'installment_count': installment_count,
             "earnings_labels": earnings_labels,
             "earnings_data": earnings_data,
-            'unissued_columbaries': unissued_columbaries
+            'unissued_columbaries': unissued_columbaries,
+            'pending_counts': pending_customers.count(),
+            'pending_customers': pending_customers,
         }
 
         return render(request, 'dashboard.html', context)
@@ -351,12 +356,16 @@ class ChatbotAPIView(APIView):
 
         try:
             response = openai.chat.completions.create(
-                model="gpt-3.5-turbo",  # Using GPT-3.5 model
+                model="gpt-3.5-turbo",  # Using GPT-3.5 models
                 messages=[{"role": "user", "content": user_message}],
                 max_tokens=150
             )
             bot_reply = response.choices[0].message.content.strip()  # Get the response from GPT-3.5
+            #save to database
+            ChatQuery.objects.create(user_message=user_message, bot_response=bot_reply)
+
             return Response({'response': bot_reply}, status=status.HTTP_200_OK)
+
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

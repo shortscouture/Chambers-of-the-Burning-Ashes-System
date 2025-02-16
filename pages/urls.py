@@ -2,7 +2,11 @@ from django.urls import path
 
 
 
+<<<<<<< HEAD
 from .views import dashboardView, HomePageView,AboutPageView, MainDashView, ColumbaryRecordsView, CustomerHomeView, MemorialView, send_letter_of_intent, verify_otp, memorials_verification,accept_letter_of_intent, decline_letter_of_intent, RecordsDetailsView, CustomerEditView, SuccesView, ChatbotAPIView
+=======
+from .views import HomePageView,AboutPageView, MainDashView, ColumbaryRecordsView, CustomerHomeView, MemorialView, send_letter_of_intent, verify_otp, memorials_verification,accept_letter_of_intent, decline_letter_of_intent, RecordsDetailsView, CustomerEditView, SuccesView, ChatbotAPIView, dashboardView
+>>>>>>> 4630f4e4896ac4c586b1961e461d736238fedc48
 
 
 urlpatterns = [
