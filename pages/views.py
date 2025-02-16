@@ -86,6 +86,9 @@ class dashboardView(TemplateView):
         #Unissued Columbaries
         unissued_columbaries = ColumbaryRecord.objects.filter(issuance_date__isnull=True, status = "Occupied").count()
         
+        #Pending Customers
+        pending_customers = Customer.objects.filter(status="pending")
+
         # Payment Mode Statistics
         full_payment_count = Payment.objects.filter(mode_of_payment="Full Payment").count()
         installment_count = Payment.objects.filter(mode_of_payment="6-Month Installment").count()
@@ -113,7 +116,9 @@ class dashboardView(TemplateView):
             'installment_count': installment_count,
             "earnings_labels": earnings_labels,
             "earnings_data": earnings_data,
-            'unissued_columbaries': unissued_columbaries
+            'unissued_columbaries': unissued_columbaries,
+            'pending_counts': pending_customers.count(),
+            'pending_customers': pending_customers,
         }
 
         return render(request, 'dashboard.html', context)
