@@ -76,18 +76,15 @@ class dashboardView(TemplateView):
         inquiry_counts = InquiryRecord.objects.count()
         
         #Customer Status
-        pending_counts = Customer.objects.filter(status = "pending").count()
+        pending_counts = Customer.objects.filter(status = "pending")
 
         # Available (vacant) columbaries
-        vacant_columbaries = ColumbaryRecord.objects.filter(status="Vacant").count()
+        vacant_columbaries = ColumbaryRecord.objects.filter(status="Vacant")
         
-        occupied_columbaries = ColumbaryRecord.objects.filter(status="Occupied").count()
+        occupied_columbaries = ColumbaryRecord.objects.filter(status="Occupied")
         
         #Unissued Columbaries
         unissued_columbaries = ColumbaryRecord.objects.filter(issuance_date__isnull=True, status = "Occupied").count()
-        
-        #Pending Customers
-        pending_customers = Customer.objects.filter(status="pending")
 
         # Payment Mode Statistics
         full_payment_count = Payment.objects.filter(mode_of_payment="Full Payment").count()
@@ -109,16 +106,17 @@ class dashboardView(TemplateView):
             'columbary_status_labels': columbary_status_labels,
             'columbary_status_data': columbary_status_data,
             'inquiry_counts': inquiry_counts,
-            'vacant_columbaries': vacant_columbaries,
-            'occupied_columbaries': occupied_columbaries,
-            'pending_counts' : pending_counts,
+            'vacant_columbaries': vacant_columbaries.count(),
+            'pending_counts' : pending_counts.count(),
             'full_payment_count': full_payment_count,
             'installment_count': installment_count,
             "earnings_labels": earnings_labels,
             "earnings_data": earnings_data,
             'unissued_columbaries': unissued_columbaries,
-            'pending_counts': pending_customers.count(),
-            'pending_customers': pending_customers,
+            'pending_customers': pending_counts,
+            'available_columbaries': vacant_columbaries,
+            'occupied_columbaries': occupied_columbaries,
+            'occupied_columbaries_count': occupied_columbaries.count(),
         }
 
         return render(request, 'dashboard.html', context)

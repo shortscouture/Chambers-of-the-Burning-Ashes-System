@@ -14,7 +14,9 @@ h1 {
     font-family: Impact, sans-serif;
     font-size: 50px;
     background: url("/static/images/BGM.jpg") no-repeat center center fixed;
-    background-size: cover;
+    background-size: 100% 75%;
+    margin-top: 10px; /* Add space under the fixed header */
+    padding-top: 200px;
 }
 
 .container {

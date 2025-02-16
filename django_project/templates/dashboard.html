@@ -39,6 +39,9 @@
 </head>
 
 <body>
+
+    {% include 'Staff_Headers.html' %}
+
     <h1>Dashboard</h1>
 
     <div class="dashboard-grid">
@@ -46,9 +49,9 @@
             <h2>Available Columbaries</h2>
             <p>{{ vacant_columbaries }}</p>
         </div>
-        <div class="info-box">
+        <div class="info-box" onclick="toggleOccupiedTable()">
             <h2>Occupied Columbaries</h2>
-            <p>{{ occupied_columbaries }}</p>
+            <p>{{ occupied_columbaries_count }}</p>
         </div>
         <div class="info-box">
             <h2>Unissued Columbaries</h2>
@@ -107,6 +110,33 @@
                     <td>{{ columbary.name }}</td>
                     <td>{{ columbary.location }}</td>
                     <td>{{ columbary.capacity }}</td>
+                    <td>{{ columbary.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Occupied Columbaries Table (Initially Hidden) -->
+    <div id="occupiedTableContainer" class="table-container hidden">
+        <h3>Occupied Columbaries</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Columbary Name</th>
+                    <th>Location</th>
+                    <th>Capacity</th>
+                    <th>Occupied By</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for columbary in occupied_columbaries %}
+                <tr>
+                    <td>{{ columbary.name }}</td>
+                    <td>{{ columbary.location }}</td>
+                    <td>{{ columbary.capacity }}</td>
+                    <td>{{ columbary.customer.full_name }}</td>
                     <td>{{ columbary.status }}</td>
                 </tr>
                 {% endfor %}
@@ -207,6 +237,11 @@
         function toggleAvailableTable() {
             var availableTable = document.getElementById("availableTableContainer");
             availableTable.classList.toggle("hidden");
+        }
+
+        function toggleOccupiedTable() {
+            var occupiedTable = document.getElementById("occupiedTableContainer");
+            occupiedTable.classList.toggle("hidden");
         }
     </script>
 </body>
