@@ -120,13 +120,12 @@ class Beneficiary(models.Model):
     first_beneficiary_name = models.CharField(max_length=255)
     second_beneficiary_name = models.CharField(max_length=45, blank=True, null=True)
     third_beneficiary_name = models.CharField(max_length=45, blank=True, null=True)
-
-    # Add ForeignKey with default value
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="beneficiaries", default=1)
+    
+    # Add ForeignKey relationship
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="beneficiaries")
 
     def __str__(self):
         return self.first_beneficiary_name
-
 
 
 
@@ -138,6 +137,12 @@ class Payment(models.Model):
     ]
     
     payment_id = models.AutoField(primary_key=True)
+    customer = models.ForeignKey(
+        Customer, 
+        on_delete=models.CASCADE, 
+        related_name='payments', 
+        default=1  # Replace 1 with the ID of an existing customer
+    )
     mode_of_payment = models.CharField(max_length=20, choices=PAYMENT_MODES, default="Full Payment")
 
     # Seven receipt fields
@@ -158,24 +163,23 @@ class Payment(models.Model):
     six_month_amount_6 = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True) 
     
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, editable=False)
-    
+
     def save(self, *args, **kwargs):
         if self.mode_of_payment == "Full Payment":
             full_payment_value = 220000  # Adjust based on actual pricing
-            self.amount_1 = full_payment_value
+            self.Full_payment_amount_1 = full_payment_value
             self.total_amount = full_payment_value  # Assign total amount
 
             # Clear unused fields
-            self.receipt_2 = self.receipt_3 = self.receipt_4 = self.receipt_5 = self.receipt_6 = self.receipt_7 = None
-            self.amount_2 = self.amount_3 = self.amount_4 = self.amount_5 = self.amount_6 = self.amount_7 = None
+            self.six_month_receipt_1 = self.six_month_receipt_2 = self.six_month_receipt_3 = self.six_month_receipt_4 = self.six_month_receipt_5 = self.six_month_receipt_6 = None
+            self.six_month_amount_1 = self.six_month_amount_2 = self.six_month_amount_3 = self.six_month_amount_4 = self.six_month_amount_5 = self.six_month_amount_6 = None
         
         elif self.mode_of_payment == "6-Month Installment":
             installment_value = 60000 / 6  # Divide total amount into 6 payments
-            self.amount_1 = self.amount_2 = self.amount_3 = self.amount_4 = self.amount_5 = self.amount_6 = installment_value
-            self.amount_7 = None  # Not used for installment
+            self.six_month_amount_1 = self.six_month_amount_2 = self.six_month_amount_3 = self.six_month_amount_4 = self.six_month_amount_5 = self.six_month_amount_6 = installment_value
 
             # Sum all non-null amounts
-            self.total_amount = sum(filter(None, [self.amount_1, self.amount_2, self.amount_3, self.amount_4, self.amount_5, self.amount_6]))
+            self.total_amount = sum(filter(None, [self.six_month_amount_1, self.six_month_amount_2, self.six_month_amount_3, self.six_month_amount_4, self.six_month_amount_5, self.six_month_amount_6]))
 
         super().save(*args, **kwargs)
 
