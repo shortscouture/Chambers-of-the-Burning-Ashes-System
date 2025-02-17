@@ -31,18 +31,10 @@
                     <span class="label">Full Name:</span>
                     <span class="value">{{ customer.full_name }}</span>
                 </div>
-
-                <!-- Updated Address Section -->
                 <div class="row">
                     <span class="label">Address:</span>
-                    <span class="value">
-                        {{ customer.country }}, 
-                        {{ customer.address_line_1 }}{% if customer.address_line_2 %}, {{ customer.address_line_2 }}{% endif %}, 
-                        {{ customer.city }}, 
-                        {{ customer.province_or_state }}{% if customer.postal_code %}, {{ customer.postal_code }}{% endif %}
-                    </span>
+                    <span class="value">{{ customer.permanent_address }}</span>
                 </div>
-
                 <div class="row">
                     <span class="label">Landline:</span>
                     <span class="value">{{ customer.landline_number }}</span>
@@ -93,33 +85,39 @@
             <div class="details-section">
                 <h3 class="sub-header">Beneficiary Details</h3>
                 {% if beneficiary %}
-                    <div class="row">
-                        <span class="label">First Beneficiary Name:</span>
-                        <span class="value">{{ beneficiary.first_beneficiary_name }}</span>
-                    </div>
-                    {% if beneficiary.second_beneficiary_name %}
-                        <div class="row">
-                            <span class="label">Second Beneficiary Name:</span>
-                            <span class="value">{{ beneficiary.second_beneficiary_name }}</span>
-                        </div>
-                    {% endif %}
-                    {% if beneficiary.third_beneficiary_name %}
-                        <div class="row">
-                            <span class="label">Third Beneficiary Name:</span>
-                            <span class="value">{{ beneficiary.third_beneficiary_name }}</span>
-                        </div>
-                    {% endif %}
-                {% else %}
-                    <p class="no-records">No Beneficiary Details found for this customer.</p>
-                {% endif %}
+    <div class="row">
+        <span class="label">First Beneficiary Name:</span>
+        <span class="value">{{ beneficiary.first_beneficiary_name }}</span>
+    </div>
+    {% if beneficiary.second_beneficiary_name %}
+        <div class="row">
+            <span class="label">Second Beneficiary Name:</span>
+            <span class="value">{{ beneficiary.second_beneficiary_name }}</span>
+        </div>
+    {% endif %}
+    {% if beneficiary.third_beneficiary_name %}
+        <div class="row">
+            <span class="label">Third Beneficiary Name:</span>
+            <span class="value">{{ beneficiary.third_beneficiary_name }}</span>
+        </div>
+    {% endif %}
+{% else %}
+    <p class="no-records">No Beneficiary Details found for this customer.</p>
+{% endif %}
+                
             </div>
 
             <!-- Buttons Section -->
+            <!-- Using back-button CSS design for both buttons -->
             <div class="back-button" style="display: flex; justify-content: center; margin-top: 20px;">
+                <!-- Back to Records Button -->
                 {% if customer %}
+                    <!-- Back to Records Button -->
                     <a href="{% url 'columbaryrecords' %}" style="margin-right: 10px;">
                         <button>Back to Records</button> 
                     </a>
+
+                    <!-- Edit Customer Button -->
                     <a href="{% url 'edit_customer' customer_id=customer.customer_id %}">
                         <button>Edit Customer</button> 
                     </a> 
@@ -132,3 +130,4 @@
     </div> <!-- End of page-container -->
 </body>
 </html>
+

@@ -364,3 +364,36 @@ class ChatbotAPIView(APIView):
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from .forms import CustomerForm
+from .models import Customer
+
+# views.py
+from django.shortcuts import render, redirect
+from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm
+
+def addnewrecord(request):
+    if request.method == 'POST':
+        customer_form = CustomerForm(request.POST)
+        record_form = ColumbaryRecordForm(request.POST)
+        beneficiary_form = BeneficiaryForm(request.POST)
+        
+        if all([customer_form.is_valid(), record_form.is_valid(), beneficiary_form.is_valid()]):
+            customer = customer_form.save()
+            record = record_form.save(commit=False)
+            record.customer = customer
+            record.save()
+            beneficiary_form.save()
+            return redirect('columbaryrecords')
+    else:
+        customer_form = CustomerForm()
+        record_form = ColumbaryRecordForm()
+        beneficiary_form = BeneficiaryForm()
+    
+    return render(request, 'pages/addnewrecord.html', {
+        'customer_form': customer_form,
+        'record_form': record_form,
+        'beneficiary_form': beneficiary_form
+    })

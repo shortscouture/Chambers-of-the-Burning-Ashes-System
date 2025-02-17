@@ -1,5 +1,5 @@
 from django.urls import path
-
+from . import views
 
 
 from .views import HomePageView,AboutPageView, MainDashView, ColumbaryRecordsView, CustomerHomeView, MemorialView, send_letter_of_intent, verify_otp, memorials_verification,accept_letter_of_intent, decline_letter_of_intent, RecordsDetailsView, CustomerEditView, SuccesView, ChatbotAPIView, dashboardView
@@ -22,4 +22,7 @@ urlpatterns = [
     path('edit_customer/<int:customer_id>/', CustomerEditView.as_view(), name='edit_customer'),
     path('dashboard/',dashboardView.dashboard, name='dashboard'),
     path('chatbot/', ChatbotAPIView.as_view(), name='chatbot'),
+
+    path('columbaryrecords/', views.ColumbaryRecord, name='columbaryrecords'),  # Define this view for your records page
+    path('addnewrecord/', views.addnewrecord, name='addnewrecord'),
 ]

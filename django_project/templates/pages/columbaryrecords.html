@@ -30,7 +30,9 @@
                     <input type="text" placeholder="Insert Name" id="search-name" aria-label="Search by Name">
                     <input type="text" placeholder="Insert Crypt No." id="search-crypt" aria-label="Search by Crypt Number">
                     <button id="search-button" aria-label="Search">Search</button>
-                    <button id="search-button" aria-label="Add New Record">Add New</button>
+                    <a href="{% url 'addnewrecord' %}">
+                        <button id="add-new-button" aria-label="Add New Record">Add New</button>
+                    </a>
                 </div>
             </div>
 
