@@ -5,18 +5,27 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
 from django.utils import timezone
-from datetime import timedelta
-from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm
-from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, InquiryRecord, ParishAdministrator, ParishStaff, ChatQuery
+from datetime import datetime, timedelta
+from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm, DocumentUploadForm
+from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, InquiryRecord, ParishAdministrator, ParishStaff
 from django.urls import reverse_lazy
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic.base import TemplateView
+from django.db.models import Count, Sum
+from django.db import transaction
 from .models import Customer, ColumbaryRecord, Beneficiary
 from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm
-from django.db import transaction
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+import pytesseract
+from PIL import Image
+import re
+import openai
+import environ
 
 
 class SuccesView(TemplateView):
@@ -50,7 +59,68 @@ class ColumbaryRecordsView(TemplateView):
 class MemorialView(TemplateView):
     template_name = "pages/Memorials.html"
 
+class dashboardView(TemplateView):
+    template_name = "dashboard.html"
+    
+    def dashboard(request):
+        # Customer Status Analytics
+        customer_status_counts = Customer.objects.values('status').annotate(count=Count('status'))
+        customer_status_labels = [entry['status'] for entry in customer_status_counts]
+        customer_status_data = [entry['count'] for entry in customer_status_counts]
 
+        # Columbary Records Analytics
+        columbary_records = ColumbaryRecord.objects.all()
+        columbary_status_counts = columbary_records.values('urns_per_columbary').annotate(count=Count('urns_per_columbary'))
+        columbary_status_labels = [entry['urns_per_columbary'] for entry in columbary_status_counts]
+        columbary_status_data = [entry['count'] for entry in columbary_status_counts]
+
+        # Inquiry Record Analytics
+        inquiry_counts = InquiryRecord.objects.count()
+        
+        #Customer Status
+        pending_counts = Customer.objects.filter(status = "pending").count()
+
+        # Available (vacant) columbaries
+        vacant_columbaries = ColumbaryRecord.objects.filter(status="Vacant").count()
+        
+        occupied_columbaries = ColumbaryRecord.objects.filter(status="Occupied").count()
+        
+        #Unissued Columbaries
+        unissued_columbaries = ColumbaryRecord.objects.filter(issuance_date__isnull=True, status = "Occupied").count()
+        
+        # Payment Mode Statistics
+        full_payment_count = Payment.objects.filter(mode_of_payment="Full Payment").count()
+        installment_count = Payment.objects.filter(mode_of_payment="6-Month Installment").count()
+        earnings_by_date = (
+        ColumbaryRecord.objects.filter(payment__isnull=False)
+        .values("issuance_date")
+        .annotate(total_earnings= Sum("payment__total_amount"))
+        .order_by("issuance_date")
+         )
+
+        earnings_labels = [entry["issuance_date"].strftime("%Y-%m-%d") for entry in earnings_by_date]
+        earnings_data = [float(entry["total_earnings"]) for entry in earnings_by_date]    
+
+
+        context = {
+            'customer_status_labels': customer_status_labels,
+            'customer_status_data': customer_status_data,
+            'columbary_status_labels': columbary_status_labels,
+            'columbary_status_data': columbary_status_data,
+            'inquiry_counts': inquiry_counts,
+            'vacant_columbaries': vacant_columbaries,
+            'occupied_columbaries': occupied_columbaries,
+            'pending_counts' : pending_counts,
+            'full_payment_count': full_payment_count,
+            'installment_count': installment_count,
+            "earnings_labels": earnings_labels,
+            "earnings_data": earnings_data,
+            'unissued_columbaries': unissued_columbaries
+        }
+
+        return render(request, 'dashboard.html', context)
+
+            
 def send_letter_of_intent(request):
     if request.method == 'POST':
 
@@ -152,8 +222,6 @@ class RecordsDetailsView(TemplateView):
         context['columbary_records'] = ColumbaryRecord.objects.filter(customer=customer)
         context['beneficiary'] = Beneficiary.objects.filter(columbaryrecord__customer=customer).first()
         return context
-
-
 
 
 class CustomerEditView(TemplateView):
@@ -292,8 +360,189 @@ class ChatbotAPIView(APIView):
             bot_reply = response.choices[0].message.content.strip()  # Get the response from GPT-3.5
             return Response({'response': bot_reply}, status=status.HTTP_200_OK)
 
-
         except Exception as e:
-            print(f"Error during deletion: {e}")
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 
-        return redirect('columbary_records')
+        
+def preprocess_image(image):
+    """
+    Preprocess the image to improve OCR accuracy
+    """
+    img = Image.open(image).convert('L')
+    img = img.point(lambda x: 0 if x < 128 else 255)
+    return img
+
+def extract_text(image):
+    """
+    Extract text from image using pytesseract
+    """
+    preprocessed_img = preprocess_image(image)
+    text = pytesseract.image_to_string(preprocessed_img)
+    return text
+
+def parse_text_to_dict(text):
+    """
+    Parse extracted text into a dictionary matching model fields
+    """
+    data = {
+        # Customer fields
+        'full_name': None,
+        'permanent_address': None,
+        'landline_number': None,
+        'mobile_number': None,
+        'email_address': None,
+        
+        # Beneficiary fields
+        'first_beneficiary_name': None,
+        'second_beneficiary_name': None,
+        'third_beneficiary_name': None,
+        
+        # HolderOfPrivilege fields
+        'holder_name': None,
+        'holder_email': None,
+        'holder_address': None,
+        'holder_landline': None,
+        'holder_mobile': None,
+        
+        # Payment fields
+        'full_contribution': False,
+        'six_month_installment': False,
+        'official_receipt': None,
+        
+        # ColumbaryRecord fields
+        'vault_id': None,
+        'issuance_date': None,
+        'expiration_date': None,
+        'inurnment_date': None,
+        'issuing_parish_priest': None,
+        'urns_per_columbary': None,
+    }
+    
+    # Pattern matching for all fields
+    patterns = {
+        # Customer patterns
+        'full_name': r'Name:[\s]*([^\n]*)',
+        'permanent_address': r'Address:[\s]*([^\n]*)',
+        'landline_number': r'Landline:[\s]*(\d+)',
+        'mobile_number': r'Mobile:[\s]*(\d{11})',
+        'email_address': r'Email:[\s]*([^\s@]+@[^\s@]+\.[^\s@]+)',
+        
+        # Beneficiary patterns
+        'first_beneficiary_name': r'First Beneficiary:[\s]*([^\n]*)',
+        'second_beneficiary_name': r'Second Beneficiary:[\s]*([^\n]*)',
+        'third_beneficiary_name': r'Third Beneficiary:[\s]*([^\n]*)',
+        
+        # HolderOfPrivilege patterns
+        'holder_name': r'Holder Name:[\s]*([^\n]*)',
+        'holder_email': r'Holder Email:[\s]*([^\s@]+@[^\s@]+\.[^\s@]+)',
+        'holder_address': r'Holder Address:[\s]*([^\n]*)',
+        'holder_landline': r'Holder Landline:[\s]*(\d+)',
+        'holder_mobile': r'Holder Mobile:[\s]*(\d+)',
+        
+        # ColumbaryRecord patterns
+        'vault_id': r'Vault ID:[\s]*([A-Za-z0-9-]+)',
+        'issuance_date': r'Issuance Date:[\s]*(\d{2}/\d{2}/\d{4})',
+        'expiration_date': r'Expiration Date:[\s]*(\d{2}/\d{2}/\d{4})',
+        'inurnment_date': r'Inurnment Date:[\s]*(\d{2}/\d{2}/\d{4})',
+        'issuing_parish_priest': r'Parish Priest:[\s]*([^\n]*)',
+        'urns_per_columbary': r'Urns:[\s]*([1-4])',
+    }
+    
+    # Extract payment information
+    data['full_contribution'] = bool(re.search(r'Payment Type:[\s]*Full', text, re.IGNORECASE))
+    data['six_month_installment'] = bool(re.search(r'Payment Type:[\s]*Installment', text, re.IGNORECASE))
+    receipt_match = re.search(r'Receipt Number:[\s]*(\d+)', text)
+    if receipt_match:
+        data['official_receipt'] = int(receipt_match.group(1))
+    
+    # Extract all other fields using patterns
+    for field, pattern in patterns.items():
+        match = re.search(pattern, text)
+        if match:
+            data[field] = match.group(1).strip()
+            
+            # Convert dates to proper format
+            if 'date' in field and data[field]:
+                try:
+                    date_obj = datetime.strptime(data[field], '%d/%m/%Y')
+                    data[field] = date_obj.date()
+                except ValueError:
+                    data[field] = None
+    
+    return data
+
+def upload_document(request):
+    if request.method == 'POST':
+        form = DocumentUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            image = request.FILES['document']
+            
+            try:
+                # Extract and parse text
+                extracted_text = extract_text(image)
+                data = parse_text_to_dict(extracted_text)
+                
+                # Create Customer
+                customer = Customer.objects.create(
+                    full_name=data['full_name'],
+                    permanent_address=data['permanent_address'],
+                    landline_number=data['landline_number'],
+                    mobile_number=data['mobile_number'],
+                    email_address=data['email_address']
+                )
+                
+                # Create Beneficiary
+                beneficiary = None
+                if data['first_beneficiary_name']:
+                    beneficiary = Beneficiary.objects.create(
+                        first_beneficiary_name=data['first_beneficiary_name'],
+                        second_beneficiary_name=data['second_beneficiary_name'],
+                        third_beneficiary_name=data['third_beneficiary_name']
+                    )
+                
+                # Create HolderOfPrivilege
+                holder = None
+                if data['holder_name']:
+                    holder = HolderOfPrivilege.objects.create(
+                        full_name=data['holder_name'],
+                        email_address=data['holder_email'],
+                        address=data['holder_address'],
+                        landline_number=data['holder_landline'],
+                        mobile_number=data['holder_mobile']
+                    )
+                
+                # Create Payment
+                payment = None
+                if data['full_contribution'] or data['six_month_installment']:
+                    payment = Payment.objects.create(
+                        full_contribution=data['full_contribution'],
+                        six_month_installment=data['six_month_installment'],
+                        official_receipt=data['official_receipt']
+                    )
+                
+                # Create ColumbaryRecord
+                if data['vault_id']:
+                    columbary = ColumbaryRecord.objects.create(
+                        vault_id=data['vault_id'],
+                        issuance_date=data['issuance_date'],
+                        expiration_date=data['expiration_date'],
+                        inurnment_date=data['inurnment_date'],
+                        issuing_parish_priest=data['issuing_parish_priest'],
+                        urns_per_columbary=data['urns_per_columbary'],
+                        customer=customer,
+                        beneficiary=beneficiary,
+                        payment=payment,
+                        holder_of_privilege=holder
+                    )
+                
+                messages.success(request, 'Document processed successfully!')
+                return redirect('success_url')
+                
+            except Exception as e:
+                messages.error(request, f'Error processing document: {str(e)}')
+                return redirect('upload_document')
+    else:
+        form = DocumentUploadForm()
+    
+    return render(request, 'ocr_app/upload.html', {'form': form})
