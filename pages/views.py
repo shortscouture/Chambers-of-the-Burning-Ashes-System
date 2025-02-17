@@ -229,9 +229,14 @@ class CustomerEditView(TemplateView):
     def get(self, request, *args, **kwargs):
         customer_id = self.kwargs.get('customer_id')  # Retrieve customer_id from URL
         customer = get_object_or_404(Customer, customer_id=customer_id)  # Use 'customer_id'
-        columbary_record = ColumbaryRecord.objects.filter(customer=customer).first()
-        beneficiary = Beneficiary.objects.filter(columbaryrecord__customer=customer).first()
 
+        # Fetch the first columbary record related to the customer
+        columbary_record = ColumbaryRecord.objects.filter(customer=customer).first()
+        
+        # Fetch the first beneficiary related to the customer
+        beneficiary = Beneficiary.objects.filter(customer=customer).first()
+
+        # Initialize forms with the customer, columbary record, and beneficiary data
         customer_form = CustomerForm(instance=customer)
         columbary_record_form = ColumbaryRecordForm(instance=columbary_record) if columbary_record else ColumbaryRecordForm()
         beneficiary_form = BeneficiaryForm(instance=beneficiary) if beneficiary else BeneficiaryForm()
@@ -246,9 +251,14 @@ class CustomerEditView(TemplateView):
     def post(self, request, *args, **kwargs):
         customer_id = self.kwargs.get('customer_id')  # Retrieve customer_id from URL
         customer = get_object_or_404(Customer, customer_id=customer_id)  # Use 'customer_id'
-        columbary_record = ColumbaryRecord.objects.filter(customer=customer).first()
-        beneficiary = Beneficiary.objects.filter(columbaryrecord__customer=customer).first()
 
+        # Fetch the first columbary record related to the customer
+        columbary_record = ColumbaryRecord.objects.filter(customer=customer).first()
+        
+        # Fetch the first beneficiary related to the customer
+        beneficiary = Beneficiary.objects.filter(customer=customer).first()
+
+        # Initialize forms with the POST data and instance
         customer_form = CustomerForm(request.POST, instance=customer)
         columbary_record_form = ColumbaryRecordForm(request.POST, instance=columbary_record) if columbary_record else ColumbaryRecordForm(request.POST)
         beneficiary_form = BeneficiaryForm(request.POST, instance=beneficiary) if beneficiary else BeneficiaryForm(request.POST)
@@ -270,6 +280,7 @@ class CustomerEditView(TemplateView):
             'beneficiary_form': beneficiary_form,
             'customer': customer
         })
+
 
 
 def memorials_verification(request):
