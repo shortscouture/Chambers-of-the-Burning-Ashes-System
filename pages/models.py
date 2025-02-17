@@ -139,7 +139,7 @@ class Payment(models.Model):
 
 
 class ColumbaryRecord(models.Model):
-    vault_id = models.CharField(primary_key=True, max_length=7)
+    vault_id = models.CharField(primary_key=True, max_length=8)
     issuance_date = models.DateField(null=True)
     expiration_date = models.DateField(null=True)
     inurnment_date = models.DateField(blank=True, null=True)

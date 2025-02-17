@@ -8,10 +8,10 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'columbary_db',  # Replace with your database name
-        'USER': 'root',              # Replace with your MySQL username
-        'PASSWORD': 'root',  # Replace with your MySQL password
-        'HOST': '127.0.0.1',          # Use '127.0.0.1' or your database host
+        'NAME': 'sql12763206',  # Replace with your database name
+        'USER': 'sql12763206',              # Replace with your MySQL username
+        'PASSWORD': '3hVbVMYGbB',  # Replace with your MySQL password
+        'HOST': 'sql12.freesqldatabase.com',          # Use '127.0.0.1' or your database host
         'PORT': '3306',               # Default MySQL port
     }
 }
