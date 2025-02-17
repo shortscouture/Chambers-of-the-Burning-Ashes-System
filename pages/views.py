@@ -5,9 +5,10 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
 from django.utils import timezone
-from datetime import timedelta
-from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm
-from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, InquiryRecord, ParishAdministrator, ParishStaff, ChatQuery
+from datetime import datetime, timedelta
+from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm, PaymentForm
+from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, InquiryRecord, Payment, ChatQuery, ParishAdministrator
+
 from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
@@ -150,7 +151,8 @@ class RecordsDetailsView(TemplateView):
         
         context['customer'] = customer
         context['columbary_records'] = ColumbaryRecord.objects.filter(customer=customer)
-        context['beneficiary'] = Beneficiary.objects.filter(columbaryrecord__customer=customer).first()
+        context['beneficiary'] = Beneficiary.objects.filter(customer=customer).first()
+        
         return context
 
 
@@ -162,9 +164,14 @@ class CustomerEditView(TemplateView):
     def get(self, request, *args, **kwargs):
         customer_id = self.kwargs.get('customer_id')  # Retrieve customer_id from URL
         customer = get_object_or_404(Customer, customer_id=customer_id)  # Use 'customer_id'
-        columbary_record = ColumbaryRecord.objects.filter(customer=customer).first()
-        beneficiary = Beneficiary.objects.filter(columbaryrecord__customer=customer).first()
 
+        # Fetch the first columbary record related to the customer
+        columbary_record = ColumbaryRecord.objects.filter(customer=customer).first()
+        
+        # Fetch the first beneficiary related to the customer
+        beneficiary = Beneficiary.objects.filter(customer=customer).first()
+
+        # Initialize forms with the customer, columbary record, and beneficiary data
         customer_form = CustomerForm(instance=customer)
         columbary_record_form = ColumbaryRecordForm(instance=columbary_record) if columbary_record else ColumbaryRecordForm()
         beneficiary_form = BeneficiaryForm(instance=beneficiary) if beneficiary else BeneficiaryForm()
@@ -179,9 +186,14 @@ class CustomerEditView(TemplateView):
     def post(self, request, *args, **kwargs):
         customer_id = self.kwargs.get('customer_id')  # Retrieve customer_id from URL
         customer = get_object_or_404(Customer, customer_id=customer_id)  # Use 'customer_id'
-        columbary_record = ColumbaryRecord.objects.filter(customer=customer).first()
-        beneficiary = Beneficiary.objects.filter(columbaryrecord__customer=customer).first()
 
+        # Fetch the first columbary record related to the customer
+        columbary_record = ColumbaryRecord.objects.filter(customer=customer).first()
+        
+        # Fetch the first beneficiary related to the customer
+        beneficiary = Beneficiary.objects.filter(customer=customer).first()
+
+        # Initialize forms with the POST data and instance
         customer_form = CustomerForm(request.POST, instance=customer)
         columbary_record_form = ColumbaryRecordForm(request.POST, instance=columbary_record) if columbary_record else ColumbaryRecordForm(request.POST)
         beneficiary_form = BeneficiaryForm(request.POST, instance=beneficiary) if beneficiary else BeneficiaryForm(request.POST)
@@ -203,6 +215,7 @@ class CustomerEditView(TemplateView):
             'beneficiary_form': beneficiary_form,
             'customer': customer
         })
+
 
 
 def memorials_verification(request):
@@ -294,6 +307,69 @@ class ChatbotAPIView(APIView):
 
 
         except Exception as e:
-            print(f"Error during deletion: {e}")
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        return redirect('columbary_records')
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from .forms import CustomerForm
+from .models import Customer
+
+# views.py
+from django.shortcuts import render, redirect
+from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm
+
+def addnewrecord(request):
+    if request.method == 'POST':
+        customer_form = CustomerForm(request.POST)
+        record_form = ColumbaryRecordForm(request.POST)
+        beneficiary_form = BeneficiaryForm(request.POST)
+        payment_form = PaymentForm(request.POST)  # Add payment form
+        
+        # Check if all forms are valid
+        if all([customer_form.is_valid(), record_form.is_valid(), beneficiary_form.is_valid(), payment_form.is_valid()]):
+            # Save the customer record
+            customer = customer_form.save()
+
+            # Save the Columbary record
+            record = record_form.save(commit=False)
+            record.customer = customer  # Associate the customer with the record
+            record.save()
+
+            # Save the beneficiary record
+            beneficiary_form.save()
+
+            # Handle payment data based on the payment mode
+            payment = payment_form.save(commit=False)
+            payment.customer = customer  # Associate the customer with the payment
+            if payment.mode_of_payment == 'Full Payment':
+                payment.save()  # Save full payment
+            elif payment.mode_of_payment == '6-Month Installment':
+                # If installment, save each installment receipt
+                for i in range(1, 7):  # 6 months
+                    receipt_field = f'six_month_receipt_{i}'
+                    amount_field = f'six_month_amount_{i}'
+                    receipt = payment_form.cleaned_data.get(receipt_field)
+                    amount = payment_form.cleaned_data.get(amount_field)
+                    if receipt and amount:
+                        Payment.objects.create(
+                            customer=customer,
+                            mode_of_payment='6-Month Installment',
+                            receipt_number=receipt,
+                            amount=amount,
+                            installment_month=i
+                        )
+
+            # Redirect after successful record and payment save
+            return redirect('columbaryrecords')
+    else:
+        customer_form = CustomerForm()
+        record_form = ColumbaryRecordForm()
+        beneficiary_form = BeneficiaryForm()
+        payment_form = PaymentForm()  # Initialize payment form
+
+    return render(request, 'pages/addnewrecord.html', {
+        'customer_form': customer_form,
+        'record_form': record_form,
+        'beneficiary_form': beneficiary_form,
+        'payment_form': payment_form  # Pass the payment form to the template
+    })

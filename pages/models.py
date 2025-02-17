@@ -33,6 +33,8 @@ class ParishStaff(models.Model):
         return f"Staff {self.staff_id}"
 
 
+from django.db import models
+
 class Customer(models.Model):
     customer_id = models.AutoField(primary_key=True)
     
@@ -74,7 +76,7 @@ class Customer(models.Model):
     def full_name(self):
         return f"{self.first_name} {self.middle_name or ''} {self.last_name} {self.suffix or ''}".strip()
     
-    
+
     def full_address(self):
         address_parts = [
             self.address_line_1,
@@ -88,6 +90,7 @@ class Customer(models.Model):
 
     def __str__(self):
         return self.full_address()
+
 
 
 class InquiryRecord(models.Model):
@@ -118,6 +121,9 @@ class Beneficiary(models.Model):
     first_beneficiary_name = models.CharField(max_length=255)
     second_beneficiary_name = models.CharField(max_length=45, blank=True, null=True)
     third_beneficiary_name = models.CharField(max_length=45, blank=True, null=True)
+    
+    # Add ForeignKey relationship
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="beneficiaries")
 
     def __str__(self):
         return self.first_beneficiary_name
