@@ -218,7 +218,8 @@ class RecordsDetailsView(TemplateView):
         
         context['customer'] = customer
         context['columbary_records'] = ColumbaryRecord.objects.filter(customer=customer)
-        context['beneficiary'] = Beneficiary.objects.filter(columbaryrecord__customer=customer).first()
+        context['beneficiary'] = Beneficiary.objects.filter(customer=customer).first()
+        
         return context
 
 

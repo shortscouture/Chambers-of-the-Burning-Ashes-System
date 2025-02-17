@@ -121,8 +121,13 @@ class Beneficiary(models.Model):
     second_beneficiary_name = models.CharField(max_length=45, blank=True, null=True)
     third_beneficiary_name = models.CharField(max_length=45, blank=True, null=True)
 
+    # Add ForeignKey with default value
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="beneficiaries", default=1)
+
     def __str__(self):
         return self.first_beneficiary_name
+
+
 
 
 
