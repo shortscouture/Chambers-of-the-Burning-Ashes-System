@@ -2,11 +2,60 @@
 from django import forms
 from .models import Customer, ColumbaryRecord, Beneficiary, Payment
 
+from django import forms
+from .models import Customer
+
+from django import forms
+from .models import Customer
 
 from django import forms
 from .models import Customer
 
 class CustomerForm(forms.ModelForm):
+    # Name Fields
+    first_name = forms.CharField(max_length=50, required=True, widget=forms.TextInput(attrs={
+        'placeholder': 'First Name',
+        'class': 'form-control'
+    }))
+    middle_name = forms.CharField(max_length=50, required=False, widget=forms.TextInput(attrs={
+        'placeholder': 'Middle Name (Optional)',
+        'class': 'form-control'
+    }))
+    last_name = forms.CharField(max_length=50, required=True, widget=forms.TextInput(attrs={
+        'placeholder': 'Last Name',
+        'class': 'form-control'
+    }))
+    suffix = forms.CharField(max_length=10, required=False, widget=forms.TextInput(attrs={
+        'placeholder': 'Suffix (e.g., Jr., Sr., III)',
+        'class': 'form-control'
+    }))
+
+    # Address Fields
+    country = forms.CharField(max_length=100, required=True, widget=forms.TextInput(attrs={
+        'placeholder': 'Country',
+        'class': 'form-control'
+    }))
+    address_line_1 = forms.CharField(max_length=255, required=True, widget=forms.TextInput(attrs={
+        'placeholder': 'Address Line 1',
+        'class': 'form-control'
+    }))
+    address_line_2 = forms.CharField(max_length=255, required=False, widget=forms.TextInput(attrs={
+        'placeholder': 'Address Line 2 (Optional)',
+        'class': 'form-control'
+    }))
+    city = forms.CharField(max_length=100, required=True, widget=forms.TextInput(attrs={
+        'placeholder': 'City',
+        'class': 'form-control'
+    }))
+    province_or_state = forms.CharField(max_length=100, required=True, widget=forms.TextInput(attrs={
+        'placeholder': 'Province/State',
+        'class': 'form-control'
+    }))
+    postal_code = forms.CharField(max_length=20, required=False, widget=forms.TextInput(attrs={
+        'placeholder': 'Postal Code',
+        'class': 'form-control'
+    }))
+
     class Meta:
         model = Customer
         fields = [
@@ -87,6 +136,7 @@ class CustomerForm(forms.ModelForm):
         }
 
 
+
 class EmailVerificationForm(forms.Form):
     email = forms.EmailField(
         widget=forms.EmailInput(attrs={
@@ -100,11 +150,6 @@ class ColumbaryRecordForm(forms.ModelForm):
     class Meta:
         model = ColumbaryRecord
         fields = ['vault_id', 'issuance_date', 'expiration_date', 'inurnment_date', 'issuing_parish_priest', 'urns_per_columbary']
-        widgets = {
-            'issuance_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'expiration_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'inurnment_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
-        }
 
 class BeneficiaryForm(forms.ModelForm):
     class Meta:
@@ -148,3 +193,4 @@ class PaymentForm(forms.Form):
     six_month_amount_5 = forms.DecimalField(label="Amount", required=False)
     six_month_receipt_6 = forms.CharField(label="Receipt #6", required=False)
     six_month_amount_6 = forms.DecimalField(label="Amount", required=False)
+

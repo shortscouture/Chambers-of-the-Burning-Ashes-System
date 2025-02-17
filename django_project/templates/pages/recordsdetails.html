@@ -31,6 +31,8 @@
                     <span class="label">Full Name:</span>
                     <span class="value">{{ customer.full_name }}</span>
                 </div>
+
+                <!-- Updated Address Section -->
                 <div class="row">
                     <span class="label">Main Address:</span>
                     <span class="value">{{ customer.address_line_1 }}</span>
@@ -38,7 +40,9 @@
                 <div class="row">
                     <span class="label">Second Address (Optional):</span>
                     <span class="value">{{ customer.address_line_2 }}</span>
+
                 </div>
+
                 <div class="row">
                     <span class="label">Landline:</span>
                     <span class="value">{{ customer.landline_number }}</span>
@@ -113,12 +117,9 @@
             <!-- Buttons Section -->
             <div class="back-button" style="display: flex; justify-content: center; margin-top: 20px;">
                 {% if customer %}
-                    <!-- Back to Records Button -->
                     <a href="{% url 'columbaryrecords' %}" style="margin-right: 10px;">
                         <button>Back to Records</button> 
                     </a>
-
-                    <!-- Edit Customer Button -->
                     <a href="{% url 'edit_customer' customer_id=customer.customer_id %}">
                         <button>Edit Customer</button> 
                     </a> 
