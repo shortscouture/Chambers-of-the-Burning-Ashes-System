@@ -353,7 +353,7 @@ class ChatbotAPIView(APIView):
 
         try:
             response = openai.chat.completions.create(
-                model="gpt-3.5-turbo",  # Using GPT-3.5 models
+                model="gpt-3.5-turbo",  # Using GPT-3.5 model
                 messages=[{"role": "user", "content": user_message}],
                 max_tokens=150
             )
