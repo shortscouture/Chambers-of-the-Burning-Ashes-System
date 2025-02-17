@@ -6,8 +6,8 @@ from django.conf import settings
 from django.contrib import messages
 from django.utils import timezone
 from datetime import datetime, timedelta
-from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm
-from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, InquiryRecord, ParishAdministrator, ParishStaff, ChatQuery
+from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm, PaymentForm
+from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, InquiryRecord, Payment, ChatQuery
 from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -391,21 +391,53 @@ def addnewrecord(request):
         customer_form = CustomerForm(request.POST)
         record_form = ColumbaryRecordForm(request.POST)
         beneficiary_form = BeneficiaryForm(request.POST)
+        payment_form = PaymentForm(request.POST)  # Add payment form
         
-        if all([customer_form.is_valid(), record_form.is_valid(), beneficiary_form.is_valid()]):
+        # Check if all forms are valid
+        if all([customer_form.is_valid(), record_form.is_valid(), beneficiary_form.is_valid(), payment_form.is_valid()]):
+            # Save the customer record
             customer = customer_form.save()
+
+            # Save the Columbary record
             record = record_form.save(commit=False)
-            record.customer = customer
+            record.customer = customer  # Associate the customer with the record
             record.save()
+
+            # Save the beneficiary record
             beneficiary_form.save()
+
+            # Handle payment data based on the payment mode
+            payment = payment_form.save(commit=False)
+            payment.customer = customer  # Associate the customer with the payment
+            if payment.mode_of_payment == 'Full Payment':
+                payment.save()  # Save full payment
+            elif payment.mode_of_payment == '6-Month Installment':
+                # If installment, save each installment receipt
+                for i in range(1, 7):  # 6 months
+                    receipt_field = f'six_month_receipt_{i}'
+                    amount_field = f'six_month_amount_{i}'
+                    receipt = payment_form.cleaned_data.get(receipt_field)
+                    amount = payment_form.cleaned_data.get(amount_field)
+                    if receipt and amount:
+                        Payment.objects.create(
+                            customer=customer,
+                            mode_of_payment='6-Month Installment',
+                            receipt_number=receipt,
+                            amount=amount,
+                            installment_month=i
+                        )
+
+            # Redirect after successful record and payment save
             return redirect('columbaryrecords')
     else:
         customer_form = CustomerForm()
         record_form = ColumbaryRecordForm()
         beneficiary_form = BeneficiaryForm()
-    
+        payment_form = PaymentForm()  # Initialize payment form
+
     return render(request, 'pages/addnewrecord.html', {
         'customer_form': customer_form,
         'record_form': record_form,
-        'beneficiary_form': beneficiary_form
+        'beneficiary_form': beneficiary_form,
+        'payment_form': payment_form  # Pass the payment form to the template
     })

@@ -1,6 +1,6 @@
 
 from django import forms
-from .models import Customer, ColumbaryRecord, Beneficiary
+from .models import Customer, ColumbaryRecord, Beneficiary, Payment
 
 
 from django import forms
@@ -115,3 +115,36 @@ class BeneficiaryForm(forms.ModelForm):
             'second_beneficiary_name': forms.TextInput(attrs={'placeholder': 'Second Beneficiary', 'class': 'form-control'}),
             'third_beneficiary_name': forms.TextInput(attrs={'placeholder': 'Third Beneficiary', 'class': 'form-control'})
         }
+
+from django import forms
+
+class PaymentForm(forms.Form):
+    # Payment Mode (Full Payment or Installments)
+    MODE_OF_PAYMENT_CHOICES = [
+        ('', 'Select Payment Mode'),
+        ('Full Payment', 'Full Payment'),
+        ('6-Month Installment', '6-Month Installment'),
+    ]
+    
+    mode_of_payment = forms.ChoiceField(
+        choices=MODE_OF_PAYMENT_CHOICES, 
+        widget=forms.Select(attrs={'onchange': 'togglePaymentFields()'})
+    )
+
+    # Full Payment fields
+    Full_payment_receipt_1 = forms.CharField(label="Full Payment Receipt #1", required=False)
+    Full_payment_amount_1 = forms.DecimalField(label="Full Payment Amount", required=False)
+
+    # 6-Month Installment fields
+    six_month_receipt_1 = forms.CharField(label="Receipt #1", required=False)
+    six_month_amount_1 = forms.DecimalField(label="Amount", required=False)
+    six_month_receipt_2 = forms.CharField(label="Receipt #2", required=False)
+    six_month_amount_2 = forms.DecimalField(label="Amount", required=False)
+    six_month_receipt_3 = forms.CharField(label="Receipt #3", required=False)
+    six_month_amount_3 = forms.DecimalField(label="Amount", required=False)
+    six_month_receipt_4 = forms.CharField(label="Receipt #4", required=False)
+    six_month_amount_4 = forms.DecimalField(label="Amount", required=False)
+    six_month_receipt_5 = forms.CharField(label="Receipt #5", required=False)
+    six_month_amount_5 = forms.DecimalField(label="Amount", required=False)
+    six_month_receipt_6 = forms.CharField(label="Receipt #6", required=False)
+    six_month_amount_6 = forms.DecimalField(label="Amount", required=False)
