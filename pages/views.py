@@ -17,7 +17,7 @@ from django.views.generic.base import TemplateView
 from .models import Customer, ColumbaryRecord, Beneficiary
 from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm
 from django.db import transaction
-
+import openai
 
 class SuccesView(TemplateView):
     template_name = "success.html"
