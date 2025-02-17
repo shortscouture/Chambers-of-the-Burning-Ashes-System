@@ -3,22 +3,67 @@ from django import forms
 from .models import Customer, ColumbaryRecord, Beneficiary
 
 
+from django import forms
+from .models import Customer
+
 class CustomerForm(forms.ModelForm):
     class Meta:
         model = Customer
-        fields = ['full_name', 'permanent_address', 'landline_number', 'mobile_number', 'email_address']
+        fields = [
+            'first_name', 'middle_name', 'last_name', 'suffix', 
+            'address_line_1', 'address_line_2', 'city', 'province_or_state', 'postal_code',
+            'country', 'landline_number', 'mobile_number', 'email_address', 'status'
+        ]
         widgets = {
-            'full_name': forms.TextInput(attrs={
-                'placeholder': 'Full Name',
+            'first_name': forms.TextInput(attrs={
+                'placeholder': 'First Name',
                 'required': True,
-                'id': 'fn',
+                'id': 'first_name',
                 'class': 'form-control'
             }),
-            'permanent_address': forms.Textarea(attrs={
-                'placeholder': 'Permanent Address',
+            'middle_name': forms.TextInput(attrs={
+                'placeholder': 'Middle Name',
+                'id': 'middle_name',
+                'class': 'form-control'
+            }),
+            'last_name': forms.TextInput(attrs={
+                'placeholder': 'Last Name',
                 'required': True,
-                'class': 'form-control',
-                'rows': 3
+                'id': 'last_name',
+                'class': 'form-control'
+            }),
+            'suffix': forms.TextInput(attrs={
+                'placeholder': 'Suffix (Optional)',
+                'id': 'suffix',
+                'class': 'form-control'
+            }),
+            'address_line_1': forms.TextInput(attrs={
+                'placeholder': 'Address Line 1',
+                'required': True,
+                'class': 'form-control'
+            }),
+            'address_line_2': forms.TextInput(attrs={
+                'placeholder': 'Address Line 2 (Optional)',
+                'class': 'form-control'
+            }),
+            'city': forms.TextInput(attrs={
+                'placeholder': 'City',
+                'required': True,
+                'class': 'form-control'
+            }),
+            'province_or_state': forms.TextInput(attrs={
+                'placeholder': 'Province/State',
+                'required': True,
+                'class': 'form-control'
+            }),
+            'postal_code': forms.TextInput(attrs={
+                'placeholder': 'Postal Code',
+                'class': 'form-control'
+            }),
+            'country': forms.TextInput(attrs={
+                'placeholder': 'Country',
+                'required': True,
+                'class': 'form-control'
             }),
             'landline_number': forms.TextInput(attrs={
                 'placeholder': 'Landline Number',
@@ -36,7 +81,11 @@ class CustomerForm(forms.ModelForm):
                 'required': True,
                 'class': 'form-control'
             }),
+            'status': forms.Select(attrs={
+                'class': 'form-control'
+            }),
         }
+
 
 class EmailVerificationForm(forms.Form):
     email = forms.EmailField(
