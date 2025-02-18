@@ -32,9 +32,6 @@ class ParishStaff(models.Model):
     def __str__(self):
         return f"Staff {self.staff_id}"
 
-
-from django.db import models
-
 class Customer(models.Model):
     customer_id = models.AutoField(primary_key=True)
     
