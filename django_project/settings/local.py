@@ -7,7 +7,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',  # Change to your DB engine (e.g., MySQL)
+        'ENGINE': 'django.db.backends.mysql',  # Change to your DB engine (e.g., MySQL)
         'NAME': env('DB_NAME'),
         'USER': env('DB_USER'),
         'PASSWORD': env('DB_PASSWORD'),
