@@ -5,7 +5,7 @@ from django.contrib.auth.admin import UserAdmin
 
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from .models import CustomUser
-from pages.models import ChatQuery #pages folder query views
+from pages.models import Customer, Account, ParishAdministrator, ParishStaff, InquiryRecord, HolderOfPrivilege, Beneficiary, Payment, ColumbaryRecord, TwoFactorAuth, ChatQuery #pages folder query views
 
 from allauth.account.models import EmailAddress
 
@@ -37,6 +37,18 @@ class CustomUserAdmin(UserAdmin):
 
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(ChatQuery)
+admin.site.register(Customer)
+admin.site.register(Account)
+admin.site.register(ParishAdministrator)
+admin.site.register(ParishStaff)
+admin.site.register(InquiryRecord)
+admin.site.register(HolderOfPrivilege)
+admin.site.register(Beneficiary)
+admin.site.register(Payment)
+admin.site.register(ColumbaryRecord)
+admin.site.register(TwoFactorAuth)
+
 #print("Unregistering EmailAddress from admin.")
 #unshows the email address tab.
 admin.site.unregister(EmailAddress)
+
