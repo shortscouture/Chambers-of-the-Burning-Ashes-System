@@ -23,6 +23,7 @@ EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
 ADMIN_EMAIL = env('ADMIN_EMAIL')
+
 # Local static and media file settings
 STATICFILES_DIRS = [BASE_DIR / 'static']
 from django.apps import AppConfig
