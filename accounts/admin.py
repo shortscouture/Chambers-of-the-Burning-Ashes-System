@@ -37,7 +37,6 @@ class CustomUserAdmin(UserAdmin):
 
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(ChatQuery)
-admin.site.register(Customer)
 admin.site.register(Account)
 admin.site.register(ParishAdministrator)
 admin.site.register(ParishStaff)
