@@ -10,7 +10,7 @@ from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVeri
 from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, InquiryRecord, Payment, ChatQuery, ParishAdministrator
 
 from django.urls import reverse_lazy
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -23,6 +23,7 @@ from rest_framework.response import Response
 from rest_framework import status
 import openai
 import environ
+import json
 
 
 class SuccesView(TemplateView):
@@ -400,3 +401,25 @@ class ChatbotAPIView(APIView):
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def get_data_from_db():
+        data = Customer.objects.all().values()  # Fetch all fields
+        return list(data)
+
+    def query_openai(data):
+        """Send database data to OpenAI and get a response."""
+        formatted_data = json.dumps(data, indent=2)
+        prompt = f"Here is the database data: {formatted_data}\nAnalyze it and provide insights."
+
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "system", "content": "You are an AI assistant."},
+                    {"role": "user", "content": prompt}]
+        )
+        return response["choices"][0]["message"]["content"]
+
+    def chatbot_view(request):
+        """Handle AJAX request and return chatbot response."""
+        db_data = get_data_from_db()
+        ai_response = query_openai(db_data)
+        return JsonResponse({"response": ai_response})
