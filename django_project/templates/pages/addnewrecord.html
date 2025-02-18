@@ -1,0 +1,247 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Columbary Record</title>
+    <link rel="stylesheet" href="{% static 'css/addnewrecord.css' %}">
+    <script type="text/javascript">
+        function togglePaymentFields() {
+            const paymentMode = document.getElementById("id_mode_of_payment").value;
+            const fullPaymentFields = document.getElementById("full_payment_fields");
+            const sixMonthFields = document.getElementById("six_month_fields");
+
+            if (paymentMode === "Full Payment") {
+                fullPaymentFields.style.display = "block";
+                sixMonthFields.style.display = "none";
+            } else if (paymentMode === "6-Month Installment") {
+                fullPaymentFields.style.display = "none";
+                sixMonthFields.style.display = "block";
+            } else {
+                fullPaymentFields.style.display = "none";
+                sixMonthFields.style.display = "none";
+            }
+        }
+
+        window.onload = function() {
+            togglePaymentFields();
+        }
+    </script>
+
+</head>
+<body>
+    <div class="container">
+        <h2>Add New Columbary Record</h2>
+        <form method="POST">
+            {% csrf_token %}
+
+            <!-- Customer Information -->
+            <fieldset>
+                <legend>Customer Information</legend>
+
+                <div>
+                    <label for="first_name">First Name</label>
+                    {{ customer_form.first_name }}
+                </div>
+
+                <div>
+                    <label for="middle_name">Middle Name (Optional)</label>
+                    {{ customer_form.middle_name }}
+                </div>
+              
+                <div>
+                    <label for="last_name">Last Name</label>
+                    {{ customer_form.last_name }}
+                </div>
+                <div>
+                    <label for="suffix">Suffix (e.g., Jr., Sr., III)</label>
+                    {{ customer_form.suffix }}
+                </div>
+
+                <!-- Address Fields -->
+                <div>
+                    <label for="country">Country</label>
+                    {{ customer_form.country }}
+                </div>
+
+                <div>
+                    <label for="address_line_1">Address Line 1</label>
+                    {{ customer_form.address_line_1 }}
+                </div>
+
+                <div>
+                    <label for="address_line_2">Address Line 2 (Optional)</label>
+                    {{ customer_form.address_line_2 }}
+                </div>
+
+                <div>
+                    <label for="city">City</label>
+                    {{ customer_form.city }}
+                </div>
+
+                <div>
+                    <label for="province_or_state">Province/State</label>
+                    {{ customer_form.province_or_state }}
+                </div>
+
+                <div>
+                    <label for="postal_code">Postal Code</label>
+                    {{ customer_form.postal_code }}
+                </div>
+
+                <!-- Contact Information -->
+                <div>
+                    <label for="landline_number">Landline Number</label>
+                    {{ customer_form.landline_number }}
+                </div>
+
+                <div>
+                    <label for="mobile_number">Mobile Number</label>
+                    {{ customer_form.mobile_number }}
+                </div>
+
+                <div>
+                    <label for="email_address">Email Address</label>
+                    {{ customer_form.email_address }}
+                </div>
+
+                <div>
+                    <label for="status">Status</label>
+                    {{ customer_form.status }}
+                </div>
+            </fieldset>
+
+            <!-- Columbary Record Information -->
+            <fieldset>
+                <legend>Columbary Record Information</legend>
+
+                <div>
+                    <label for="vault_id">Vault ID</label>
+                    {{ record_form.vault_id }}
+                </div>
+
+                <div>
+                    <label for="issuance_date">Issuance Date</label>
+                    <input type="date" id="issuance_date" name="issuance_date" value="{{ record_form.issuance_date.value|default:'' }}">
+                </div>
+
+                <div>
+                    <label for="expiration_date">Expiration Date</label>
+                    <input type="date" id="expiration_date" name="expiration_date" value="{{ record_form.expiration_date.value|default:'' }}">
+                </div>
+
+                <div>
+                    <label for="inurnment_date">Inurnment Date</label>
+                    <input type="date" id="inurnment_date" name="inurnment_date" value="{{ record_form.inurnment_date.value|default:'' }}">
+                </div>
+
+                <div>
+                    <label for="issuing_parish_priest">Issuing Parish Priest</label>
+                    {{ record_form.issuing_parish_priest }}
+                </div>
+
+                <div>
+                    <label for="urns_per_columbary">Urns per Columbary</label>
+                    {{ record_form.urns_per_columbary }}
+                </div>
+            </fieldset>
+
+            <!-- Beneficiary Information -->
+            <fieldset>
+                <legend>Beneficiary Information</legend>
+
+                <div>
+                    <label for="first_beneficiary_name">First Beneficiary Name</label>
+                    {{ beneficiary_form.first_beneficiary_name }}
+                </div>
+
+                <div>
+                    <label for="second_beneficiary_name">Second Beneficiary Name</label>
+                    {{ beneficiary_form.second_beneficiary_name }}
+                </div>
+
+                <div>
+                    <label for="third_beneficiary_name">Third Beneficiary Name</label>
+                    {{ beneficiary_form.third_beneficiary_name }}
+                </div>
+            </fieldset>
+
+            <!-- Payment Information -->
+            <fieldset>
+                <legend>Payment Information</legend>
+                <div>
+                    <label for="mode_of_payment">Mode of Payment</label>
+                    {{ payment_form.mode_of_payment }}
+                </div>
+
+                <div id="full_payment_fields" style="display: none;">
+                    <div>
+                        <label for="Full_payment_receipt_1">Full Payment Receipt #</label>
+                        {{ payment_form.Full_payment_receipt_1 }}
+                    </div>
+                    <div>
+                        <label for="Full_payment_amount_1">Full Payment Amount</label>
+                        {{ payment_form.Full_payment_amount_1 }}
+                    </div>
+                </div>
+
+                <div id="six_month_fields" style="display: none;">
+                    <div>
+                        <label for="six_month_receipt_1">Receipt #1</label>
+                        {{ payment_form.six_month_receipt_1 }}
+                    </div>
+                    <div>
+                        <label for="six_month_amount_1">Amount</label>
+                        {{ payment_form.six_month_amount_1 }}
+                    </div>
+                    <div>
+                        <label for="six_month_receipt_2">Receipt #2</label>
+                        {{ payment_form.six_month_receipt_2 }}
+                    </div>
+                    <div>
+                        <label for="six_month_amount_2">Amount</label>
+                        {{ payment_form.six_month_amount_2 }}
+                    </div>
+                    <div>
+                        <label for="six_month_receipt_3">Receipt #3</label>
+                        {{ payment_form.six_month_receipt_3 }}
+                    </div>
+                    <div>
+                        <label for="six_month_amount_3">Amount</label>
+                        {{ payment_form.six_month_amount_3 }}
+                    </div>
+                    <div>
+                        <label for="six_month_receipt_4">Receipt #4</label>
+                        {{ payment_form.six_month_receipt_4 }}
+                    </div>
+                    <div>
+                        <label for="six_month_amount_4">Amount</label>
+                        {{ payment_form.six_month_amount_4 }}
+                    </div>
+                    <div>
+                        <label for="six_month_receipt_5">Receipt #5</label>
+                        {{ payment_form.six_month_receipt_5 }}
+                    </div>
+                    <div>
+                        <label for="six_month_amount_5">Amount</label>
+                        {{ payment_form.six_month_amount_5 }}
+                    </div>
+                    <div>
+                        <label for="six_month_receipt_6">Receipt #6</label>
+                        {{ payment_form.six_month_receipt_6 }}
+                    </div>
+                    <div>
+                        <label for="six_month_amount_6">Amount</label>
+                        {{ payment_form.six_month_amount_6 }}
+                    </div>
+                </div>
+            </fieldset>
+
+
+            <button type="submit" class="submit-btn">Save Record</button>
+        </form>
+    </div>
+</body>
+</html>
+
