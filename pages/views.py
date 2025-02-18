@@ -95,7 +95,7 @@ class dashboardView(TemplateView):
         .annotate(total_earnings= Sum("payment__total_amount"))
         .order_by("issuance_date")
          )
-
+        
         earnings_labels = [entry["issuance_date"].strftime("%Y-%m-%d") for entry in earnings_by_date]
         earnings_data = [float(entry["total_earnings"]) for entry in earnings_by_date]    
 
