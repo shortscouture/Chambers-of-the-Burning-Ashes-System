@@ -411,7 +411,7 @@ class ChatbotAPIView(APIView):
         formatted_data = json.dumps(data, indent=2)
         prompt = f"Here is the database data: {formatted_data}\nAnalyze it and provide insights."
 
-        response = openai.ChatCompletion.create(
+        response = openai.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "system", "content": "You are an AI assistant."},
                     {"role": "user", "content": prompt}]
