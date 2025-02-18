@@ -58,6 +58,9 @@ INSTALLED_APPS = [
     # Local
     "accounts",
     "pages",
+    
+    "rest_framework",
+    "openai"
 ]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
@@ -97,20 +100,7 @@ TEMPLATES = [
     },
 ]
 
-# https://docs.djangoproject.com/en/dev/ref/settings/#databases
-# in local.py and production.py! all credentials in your local venv.
 
-# For Docker/PostgreSQL usage uncomment this and comment the DATABASES config above
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": "postgres",
-#         "USER": "postgres",
-#         "PASSWORD": "postgres",
-#         "HOST": "db",  # set in docker-compose.yml
-#         "PORT": 5432,  # default postgres port
-#     }
-# }
 
 # Password validation
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-password-validators
