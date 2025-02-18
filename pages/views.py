@@ -559,7 +559,7 @@ def upload_document(request):
         form = DocumentUploadForm()
     
     return render(request, 'ocr_app/upload.html', {'form': form})
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
