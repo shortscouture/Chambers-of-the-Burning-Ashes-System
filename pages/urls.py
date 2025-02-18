@@ -1,7 +1,5 @@
 from django.urls import path
 
-
-
 from .views import HomePageView,AboutPageView, MainDashView, ColumbaryRecordsView, CustomerHomeView, MemorialView, send_letter_of_intent, verify_otp, memorials_verification,accept_letter_of_intent, decline_letter_of_intent, RecordsDetailsView, CustomerEditView, SuccesView, ChatbotAPIView, dashboardView
 
 
