@@ -191,7 +191,9 @@ class ColumbaryRecord(models.Model):
     beneficiary = models.ForeignKey(Beneficiary, on_delete=models.SET_NULL, null=True, blank=True)
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, null=True, blank=True)
     holder_of_privilege = models.ForeignKey(HolderOfPrivilege, on_delete=models.SET_NULL, null=True, blank=True)
-
+    STATUS_CHOICES = [('Vacant', 'Vacant'), ('Occupied', 'Occupied')]
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Vacant')
+    
     def __str__(self):
         return f"Vault {self.vault_id}"
     def get_record_data(self):
