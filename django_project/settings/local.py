@@ -6,6 +6,7 @@ ALLOWED_HOSTS = [env('ALLOWED_HOSTS')]
 
 DATABASES = {
     'default': {
+        'NAME': env('DB_NAME'),
         'ENGINE': 'django.db.backends.mysql',  # Change to your DB engine (e.g., MySQL)
         'USER': env('DB_USER'),
         'PASSWORD': env('DB_PASSWORD'),
