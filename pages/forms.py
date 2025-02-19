@@ -2,15 +2,6 @@
 from django import forms
 from .models import Customer, ColumbaryRecord, Beneficiary, Payment
 
-from django import forms
-from .models import Customer
-
-from django import forms
-from .models import Customer
-
-from django import forms
-from .models import Customer
-
 class CustomerForm(forms.ModelForm):
     # Name Fields
     first_name = forms.CharField(max_length=50, required=True, widget=forms.TextInput(attrs={
