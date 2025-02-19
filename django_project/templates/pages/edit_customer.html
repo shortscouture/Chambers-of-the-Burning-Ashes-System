@@ -79,13 +79,78 @@
                 <!-- Payments Section -->
                 <div class="details-section">
                     <h2>Edit Payment</h2>
-                    {% for field in payment_form %}
+                    
+                    <!-- Mode of Payment -->
+                    <div>
+                        <label for="id_mode_of_payment">Mode of Payment:</label>
+                        {{ payment_form.mode_of_payment }}
+                    </div>
+
+                    <!-- Full Payment Fields -->
+                    <div id="full_payment_fields" style="display: none;">
+                        <h3>Full Payment Details</h3>
                         <div class="row">
-                            <span class="label">{{ field.label }}</span>
-                            <span class="value">{{ field }}</span>
+                            <span class="label">{{ payment_form.Full_payment_receipt_1.label }}</span>
+                            <span class="value">{{ payment_form.Full_payment_receipt_1 }}</span>
                         </div>
-                        <hr class="separator">
-                    {% endfor %}
+                        <div class="row">
+                            <span class="label">{{ payment_form.Full_payment_amount_1.label }}</span>
+                            <span class="value">{{ payment_form.Full_payment_amount_1 }}</span>
+                        </div>
+                    </div>
+
+                    <!-- 6-Month Installment Fields -->
+                    <div id="installment_payment_fields" style="display: none;">
+                        <h3>6-Month Installment Details</h3>
+                        <div class="row">
+                            <span class="label">{{ payment_form.six_month_receipt_1.label }}</span>
+                            <span class="value">{{ payment_form.six_month_receipt_1 }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">{{ payment_form.six_month_amount_1.label }}</span>
+                            <span class="value">{{ payment_form.six_month_amount_1 }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">{{ payment_form.six_month_receipt_2.label }}</span>
+                            <span class="value">{{ payment_form.six_month_receipt_2 }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">{{ payment_form.six_month_amount_2.label }}</span>
+                            <span class="value">{{ payment_form.six_month_amount_2 }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">{{ payment_form.six_month_receipt_3.label }}</span>
+                            <span class="value">{{ payment_form.six_month_receipt_3 }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">{{ payment_form.six_month_amount_3.label }}</span>
+                            <span class="value">{{ payment_form.six_month_amount_3 }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">{{ payment_form.six_month_receipt_4.label }}</span>
+                            <span class="value">{{ payment_form.six_month_receipt_4 }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">{{ payment_form.six_month_amount_4.label }}</span>
+                            <span class="value">{{ payment_form.six_month_amount_4 }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">{{ payment_form.six_month_receipt_5.label }}</span>
+                            <span class="value">{{ payment_form.six_month_receipt_5 }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">{{ payment_form.six_month_amount_5.label }}</span>
+                            <span class="value">{{ payment_form.six_month_amount_5 }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">{{ payment_form.six_month_receipt_6.label }}</span>
+                            <span class="value">{{ payment_form.six_month_receipt_6 }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">{{ payment_form.six_month_amount_6.label }}</span>
+                            <span class="value">{{ payment_form.six_month_amount_6 }}</span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Buttons Section -->
@@ -98,7 +163,6 @@
                 </div>
             </form>
 
-            <!-- Delete Form -->
             <form id="delete-form" method="POST" action="{% url 'delete_customer' customer_id=customer.customer_id %}" style="display: none;">
                 {% csrf_token %}
             </form>
@@ -112,5 +176,6 @@
             }
         }
     </script>
+    <script src="{% static 'js/editcustomer.js' %}"></script>
 </body>
 </html>
