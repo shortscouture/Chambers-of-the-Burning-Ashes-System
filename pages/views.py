@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import datetime, timedelta
 from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm, PaymentForm, HolderOfPrivilegeForm
-from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, InquiryRecord, Payment, ChatQuery, ParishAdministrator
+from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, InquiryRecord, Payment, ChatQuery, ParishAdministrator, HolderOfPrivilege
 
 from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect, JsonResponse
@@ -157,7 +157,9 @@ class RecordsDetailsView(TemplateView):
         
         context['customer'] = customer
         context['columbary_records'] = ColumbaryRecord.objects.filter(customer=customer)
-        context['beneficiary'] = Beneficiary.objects.filter(customer=customer).first()
+        context['holderofprivilege'] = HolderOfPrivilege.objects.filter(customer=customer)
+        context['beneficiaries'] = Beneficiary.objects.filter(customer=customer)
+        context['payments'] = Payment.objects.filter(customer=customer)
         
         return context
 
@@ -404,7 +406,7 @@ def addnewrecord(request):
             beneficiary.customer = customer
             beneficiary.save()
 
-            return redirect('success_page')  # Redirect to a success page
+            return redirect('columbaryrecords')  # Redirect to a success page
 
     else:
         customer_form = CustomerForm()

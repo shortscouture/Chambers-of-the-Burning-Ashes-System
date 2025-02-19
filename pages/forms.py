@@ -51,7 +51,7 @@ class CustomerForm(forms.ModelForm):
         fields = [
             'first_name', 'middle_name', 'last_name', 'suffix', 
             'address_line_1', 'address_line_2', 'city', 'province_or_state', 'postal_code',
-            'country', 'landline_number', 'mobile_number', 'email_address', 'status'
+            'country', 'landline_number', 'mobile_number', 'email_address'
         ]
         widgets = {
             'first_name': forms.TextInput(attrs={
@@ -118,9 +118,6 @@ class CustomerForm(forms.ModelForm):
             'email_address': forms.EmailInput(attrs={
                 'placeholder': 'Email Address',
                 'required': True,
-                'class': 'form-control'
-            }),
-            'status': forms.Select(attrs={
                 'class': 'form-control'
             }),
         }

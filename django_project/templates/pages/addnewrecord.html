@@ -27,9 +27,60 @@
                 {{ customer_form.as_p }}
             </div>
 
-            <h3>Payment Details</h3>
-            <div class="form-group">
-                {{ payment_form.as_p }}
+            <h3>Mode of Payment:</h3>
+            {{ payment_form.mode_of_payment }}
+            
+            <!-- Full Payment Fields -->
+            <div id="full_payment_fields" style="display: none;">
+                <h4>Full Payment Details</h4>
+                
+                <label for="id_Full_payment_receipt_1">Receipt #1:</label>
+                {{ payment_form.Full_payment_receipt_1 }}
+            
+                <label for="id_Full_payment_amount_1">Amount:</label>
+                {{ payment_form.Full_payment_amount_1 }}
+            </div>
+            
+            <!-- 6-Month Installment Fields -->
+            <div id="installment_payment_fields" style="display: none;">
+                <h4>6-Month Installment Details</h4>
+            
+                <div class="installment-group">
+                    <label for="id_six_month_receipt_1">Receipt #1:</label>
+                    {{ payment_form.six_month_receipt_1 }}
+                    <label for="id_six_month_amount_1">Amount:</label>
+                    {{ payment_form.six_month_amount_1 }}
+                </div>
+                <div class="installment-group">
+                    <label for="id_six_month_receipt_2">Receipt #2:</label>
+                    {{ payment_form.six_month_receipt_2 }}
+                    <label for="id_six_month_amount_2">Amount:</label>
+                    {{ payment_form.six_month_amount_2 }}
+                </div>
+                <div class="installment-group">
+                    <label for="id_six_month_receipt_3">Receipt #3:</label>
+                    {{ payment_form.six_month_receipt_3 }}
+                    <label for="id_six_month_amount_3">Amount:</label>
+                    {{ payment_form.six_month_amount_3 }}
+                </div>
+                <div class="installment-group">
+                    <label for="id_six_month_receipt_4">Receipt #4:</label>
+                    {{ payment_form.six_month_receipt_4 }}
+                    <label for="id_six_month_amount_4">Amount:</label>
+                    {{ payment_form.six_month_amount_4 }}
+                </div>
+                <div class="installment-group">
+                    <label for="id_six_month_receipt_5">Receipt #5:</label>
+                    {{ payment_form.six_month_receipt_5 }}
+                    <label for="id_six_month_amount_5">Amount:</label>
+                    {{ payment_form.six_month_amount_5 }}
+                </div>
+                <div class="installment-group">
+                    <label for="id_six_month_receipt_6">Receipt #6:</label>
+                    {{ payment_form.six_month_receipt_6 }}
+                    <label for="id_six_month_amount_6">Amount:</label>
+                    {{ payment_form.six_month_amount_6 }}
+                </div>
             </div>
 
             <h3>Columbary Record</h3>
@@ -51,5 +102,7 @@
         </form>
     </div>
 
+    <!-- Link to JavaScript File -->
+    <script src="{% static 'js/addnewrecord.js' %}"></script>
 </body>
 </html>
