@@ -118,8 +118,6 @@ class Beneficiary(models.Model):
     first_beneficiary_name = models.CharField(max_length=255)
     second_beneficiary_name = models.CharField(max_length=45, blank=True, null=True)
     third_beneficiary_name = models.CharField(max_length=45, blank=True, null=True)
-    
-    # Add ForeignKey relationship
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="beneficiaries")
 
     def __str__(self):
@@ -133,6 +131,7 @@ class Payment(models.Model):
     ]
     
     payment_id = models.AutoField(primary_key=True)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="payments")  # Added customer FK
     mode_of_payment = models.CharField(max_length=20, choices=PAYMENT_MODES, default="Full Payment")
 
     # Seven receipt fields

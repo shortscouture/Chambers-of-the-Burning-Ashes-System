@@ -15,8 +15,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic.base import TemplateView
-from .models import Customer, ColumbaryRecord, Beneficiary
-from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm
+from .models import Customer, ColumbaryRecord, Beneficiary, Payment
+from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, PaymentForm
 from django.db import transaction
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -314,61 +314,75 @@ class ChatbotAPIView(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.db import transaction
+from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, PaymentForm
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.db import transaction
+from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, PaymentForm
+
 def addnewrecord(request):
     if request.method == 'POST':
+        # Instantiate forms with POST data
         customer_form = CustomerForm(request.POST)
-        record_form = ColumbaryRecordForm(request.POST)
+        columbary_form = ColumbaryRecordForm(request.POST)
         beneficiary_form = BeneficiaryForm(request.POST)
-        payment_form = PaymentForm(request.POST)  # Add payment form
-        
+        payment_form = PaymentForm(request.POST)
+
         # Check if all forms are valid
-        if all([customer_form.is_valid(), record_form.is_valid(), beneficiary_form.is_valid(), payment_form.is_valid()]):
-            # Save the customer record
-            customer = customer_form.save()
+        if all([customer_form.is_valid(), columbary_form.is_valid(), beneficiary_form.is_valid(), payment_form.is_valid()]):
+            with transaction.atomic():  # Use a database transaction
+                # Save Customer and link ColumbaryRecord and Beneficiary
+                customer = customer_form.save()
 
-            # Save the Columbary record
-            record = record_form.save(commit=False)
-            record.customer = customer  # Associate the customer with the record
-            record.save()
+                # Save ColumbaryRecord and link it to the customer
+                columbary_record = columbary_form.save(commit=False)
+                columbary_record.customer = customer
+                columbary_record.save()
 
-            # Save the beneficiary record
-            beneficiary_form.save()
+                # Save Beneficiary and link it to the customer
+                beneficiary = beneficiary_form.save(commit=False)
+                beneficiary.customer = customer
+                beneficiary.save()
 
-            # Handle payment data based on the payment mode
-            payment = payment_form.save(commit=False)
-            payment.customer = customer  # Associate the customer with the payment
-            if payment.mode_of_payment == 'Full Payment':
-                payment.save()  # Save full payment
-            elif payment.mode_of_payment == '6-Month Installment':
-                # If installment, save each installment receipt
-                for i in range(1, 7):  # 6 months
-                    receipt_field = f'six_month_receipt_{i}'
-                    amount_field = f'six_month_amount_{i}'
-                    receipt = payment_form.cleaned_data.get(receipt_field)
-                    amount = payment_form.cleaned_data.get(amount_field)
-                    if receipt and amount:
-                        Payment.objects.create(
-                            customer=customer,
-                            mode_of_payment='6-Month Installment',
-                            receipt_number=receipt,
-                            amount=amount,
-                            installment_month=i
-                        )
+                # Save Payment and link it to the customer
+                payment = payment_form.save(commit=False)
+                payment.customer = customer
+                payment.save()
 
-            # Redirect after successful record and payment save
-            return redirect('columbaryrecords')
+            # Show success message
+            messages.success(request, "Record successfully added!")
+            return redirect('columbaryrecords')  # Ensure this matches your URLs
+
+        else:
+            # Debugging: Log form errors for easier debugging
+            print("Customer Form Errors:", customer_form.errors)
+            print("Columbary Form Errors:", columbary_form.errors)
+            print("Beneficiary Form Errors:", beneficiary_form.errors)
+            print("Payment Form Errors:", payment_form.errors)
+
+            messages.error(request, "There were errors in your form submission. Please check below.")
+
     else:
+        # Initialize empty forms for GET request
         customer_form = CustomerForm()
-        record_form = ColumbaryRecordForm()
+        columbary_form = ColumbaryRecordForm()
         beneficiary_form = BeneficiaryForm()
-        payment_form = PaymentForm()  # Initialize payment form
+        payment_form = PaymentForm()
 
     return render(request, 'pages/addnewrecord.html', {
         'customer_form': customer_form,
-        'record_form': record_form,
+        'columbary_form': columbary_form,
         'beneficiary_form': beneficiary_form,
-        'payment_form': payment_form  # Pass the payment form to the template
+        'payment_form': payment_form
     })
+
+
 
 env = environ.Env(
     DEBUG=(bool, False) #default value for DEBUG = False

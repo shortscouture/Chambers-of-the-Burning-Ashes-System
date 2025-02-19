@@ -161,9 +161,7 @@ class BeneficiaryForm(forms.ModelForm):
             'third_beneficiary_name': forms.TextInput(attrs={'placeholder': 'Third Beneficiary', 'class': 'form-control'})
         }
 
-from django import forms
-
-class PaymentForm(forms.Form):
+class PaymentForm(forms.ModelForm):
     # Payment Mode (Full Payment or Installments)
     MODE_OF_PAYMENT_CHOICES = [
         ('', 'Select Payment Mode'),
@@ -173,24 +171,128 @@ class PaymentForm(forms.Form):
     
     mode_of_payment = forms.ChoiceField(
         choices=MODE_OF_PAYMENT_CHOICES, 
-        widget=forms.Select(attrs={'onchange': 'togglePaymentFields()'})
+        widget=forms.Select(attrs={'onchange': 'togglePaymentFields()', 'class': 'form-control'})
     )
 
     # Full Payment fields
-    Full_payment_receipt_1 = forms.CharField(label="Full Payment Receipt #1", required=False)
-    Full_payment_amount_1 = forms.DecimalField(label="Full Payment Amount", required=False)
+    Full_payment_receipt_1 = forms.CharField(
+        label="Full Payment Receipt #1", 
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'Receipt #1 (Optional)', 'class': 'form-control'})
+    )
+    Full_payment_amount_1 = forms.DecimalField(
+        label="Full Payment Amount", 
+        required=False,
+        widget=forms.NumberInput(attrs={'placeholder': 'Amount', 'class': 'form-control'})
+    )
 
     # 6-Month Installment fields
-    six_month_receipt_1 = forms.CharField(label="Receipt #1", required=False)
-    six_month_amount_1 = forms.DecimalField(label="Amount", required=False)
-    six_month_receipt_2 = forms.CharField(label="Receipt #2", required=False)
-    six_month_amount_2 = forms.DecimalField(label="Amount", required=False)
-    six_month_receipt_3 = forms.CharField(label="Receipt #3", required=False)
-    six_month_amount_3 = forms.DecimalField(label="Amount", required=False)
-    six_month_receipt_4 = forms.CharField(label="Receipt #4", required=False)
-    six_month_amount_4 = forms.DecimalField(label="Amount", required=False)
-    six_month_receipt_5 = forms.CharField(label="Receipt #5", required=False)
-    six_month_amount_5 = forms.DecimalField(label="Amount", required=False)
-    six_month_receipt_6 = forms.CharField(label="Receipt #6", required=False)
-    six_month_amount_6 = forms.DecimalField(label="Amount", required=False)
+    six_month_receipt_1 = forms.CharField(
+        label="Receipt #1", 
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'Receipt #1 (Optional)', 'class': 'form-control'})
+    )
+    six_month_amount_1 = forms.DecimalField(
+        label="Amount", 
+        required=False,
+        widget=forms.NumberInput(attrs={'placeholder': 'Amount', 'class': 'form-control'})
+    )
+    six_month_receipt_2 = forms.CharField(
+        label="Receipt #2", 
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'Receipt #2 (Optional)', 'class': 'form-control'})
+    )
+    six_month_amount_2 = forms.DecimalField(
+        label="Amount", 
+        required=False,
+        widget=forms.NumberInput(attrs={'placeholder': 'Amount', 'class': 'form-control'})
+    )
+    six_month_receipt_3 = forms.CharField(
+        label="Receipt #3", 
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'Receipt #3 (Optional)', 'class': 'form-control'})
+    )
+    six_month_amount_3 = forms.DecimalField(
+        label="Amount", 
+        required=False,
+        widget=forms.NumberInput(attrs={'placeholder': 'Amount', 'class': 'form-control'})
+    )
+    six_month_receipt_4 = forms.CharField(
+        label="Receipt #4", 
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'Receipt #4 (Optional)', 'class': 'form-control'})
+    )
+    six_month_amount_4 = forms.DecimalField(
+        label="Amount", 
+        required=False,
+        widget=forms.NumberInput(attrs={'placeholder': 'Amount', 'class': 'form-control'})
+    )
+    six_month_receipt_5 = forms.CharField(
+        label="Receipt #5", 
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'Receipt #5 (Optional)', 'class': 'form-control'})
+    )
+    six_month_amount_5 = forms.DecimalField(
+        label="Amount", 
+        required=False,
+        widget=forms.NumberInput(attrs={'placeholder': 'Amount', 'class': 'form-control'})
+    )
+    six_month_receipt_6 = forms.CharField(
+        label="Receipt #6", 
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'Receipt #6 (Optional)', 'class': 'form-control'})
+    )
+    six_month_amount_6 = forms.DecimalField(
+        label="Amount", 
+        required=False,
+        widget=forms.NumberInput(attrs={'placeholder': 'Amount', 'class': 'form-control'})
+    )
 
+    class Meta:
+        model = Payment
+        fields = [
+            'mode_of_payment', 
+            'Full_payment_receipt_1', 'Full_payment_amount_1', 
+            'six_month_receipt_1', 'six_month_amount_1',
+            'six_month_receipt_2', 'six_month_amount_2',
+            'six_month_receipt_3', 'six_month_amount_3',
+            'six_month_receipt_4', 'six_month_amount_4',
+            'six_month_receipt_5', 'six_month_amount_5',
+            'six_month_receipt_6', 'six_month_amount_6'
+        ]
+        widgets = {
+            'mode_of_payment': forms.Select(attrs={'class': 'form-control'}),
+            'Full_payment_receipt_1': forms.TextInput(attrs={'placeholder': 'Receipt #1 (Optional)', 'class': 'form-control'}),
+            'Full_payment_amount_1': forms.NumberInput(attrs={'placeholder': 'Amount', 'class': 'form-control'}),
+            'six_month_receipt_1': forms.TextInput(attrs={'placeholder': 'Receipt #1 (Optional)', 'class': 'form-control'}),
+            'six_month_amount_1': forms.NumberInput(attrs={'placeholder': 'Amount', 'class': 'form-control'}),
+            'six_month_receipt_2': forms.TextInput(attrs={'placeholder': 'Receipt #2 (Optional)', 'class': 'form-control'}),
+            'six_month_amount_2': forms.NumberInput(attrs={'placeholder': 'Amount', 'class': 'form-control'}),
+            'six_month_receipt_3': forms.TextInput(attrs={'placeholder': 'Receipt #3 (Optional)', 'class': 'form-control'}),
+            'six_month_amount_3': forms.NumberInput(attrs={'placeholder': 'Amount', 'class': 'form-control'}),
+            'six_month_receipt_4': forms.TextInput(attrs={'placeholder': 'Receipt #4 (Optional)', 'class': 'form-control'}),
+            'six_month_amount_4': forms.NumberInput(attrs={'placeholder': 'Amount', 'class': 'form-control'}),
+            'six_month_receipt_5': forms.TextInput(attrs={'placeholder': 'Receipt #5 (Optional)', 'class': 'form-control'}),
+            'six_month_amount_5': forms.NumberInput(attrs={'placeholder': 'Amount', 'class': 'form-control'}),
+            'six_month_receipt_6': forms.TextInput(attrs={'placeholder': 'Receipt #6 (Optional)', 'class': 'form-control'}),
+            'six_month_amount_6': forms.NumberInput(attrs={'placeholder': 'Amount', 'class': 'form-control'})
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        # Handle empty fields: convert empty receipt and amount fields to None
+        receipt_fields = ['six_month_receipt_1', 'six_month_receipt_2', 'six_month_receipt_3', 
+                          'six_month_receipt_4', 'six_month_receipt_5', 'six_month_receipt_6']
+        amount_fields = ['six_month_amount_1', 'six_month_amount_2', 'six_month_amount_3', 
+                         'six_month_amount_4', 'six_month_amount_5', 'six_month_amount_6']
+
+        for receipt_field in receipt_fields:
+            if cleaned_data.get(receipt_field) == '':
+                cleaned_data[receipt_field] = None
+
+        for amount_field in amount_fields:
+            if cleaned_data.get(amount_field) == '':
+                cleaned_data[amount_field] = None
+
+        return cleaned_data
