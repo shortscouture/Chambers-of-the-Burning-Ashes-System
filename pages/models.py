@@ -33,26 +33,64 @@ class ParishStaff(models.Model):
         return f"Staff {self.staff_id}"
 
 
+from django.db import models
+
 class Customer(models.Model):
     customer_id = models.AutoField(primary_key=True)
+    
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('approved', 'Approved'),
         ('declined', 'Declined'),
     ]
-    full_name = models.CharField(max_length=45)
+    
+    # Name Fields
+    first_name = models.CharField(max_length=50, default="Unknown")
+    middle_name = models.CharField(max_length=50, blank=True, null=True)  
+    last_name = models.CharField(max_length=50, default="Unknown")
+    suffix = models.CharField(max_length=10, blank=True, null=True)  # Optional
 
-    permanent_address = models.TextField(max_length=255)
-    landline_number = models.CharField(max_length=15, blank=True)
-    mobile_number = models.CharField(max_length=11)
-    email_address = models.EmailField(max_length=45, default='no-email@example.com')
+    # Address Fields
+    country = models.CharField(max_length=100, default="Philippines")
+    address_line_1 = models.CharField(max_length=255, default="Unknown Address")
+    address_line_2 = models.CharField(max_length=255, blank=True, null=True)  # Optional
+    city = models.CharField(max_length=100, default="Unknown City")
+    province_or_state = models.CharField(max_length=100, default="Unknown Province")
+    postal_code = models.CharField(max_length=20, blank=True, null=True)
+
+    # Contact Fields
+    landline_number = models.CharField(max_length=15, blank=True, null=True)
+    mobile_number = models.CharField(max_length=11, blank=True, null=True)
+    email_address = models.EmailField(max_length=45, blank=True, null=True)
+
+    # Status
     status = models.CharField(
         max_length=10, 
         choices=STATUS_CHOICES, 
         default='pending'
-    )  # Add this field for status
+    )
+
     def __str__(self):
-        return self.full_name
+        return f"{self.first_name} {self.middle_name or ''} {self.last_name}"
+    
+    def full_name(self):
+        return f"{self.first_name} {self.middle_name or ''} {self.last_name} {self.suffix or ''}".strip()
+    
+
+    def full_address(self):
+        address_parts = [
+            self.address_line_1,
+            self.address_line_2 if self.address_line_2 else None,  # Only include if exists
+            self.city,
+            self.province_or_state,
+            self.postal_code if self.postal_code else None,  # Only include if exists
+            self.country
+        ]
+        return ", ".join(filter(None, address_parts))  # Join and remove None values
+
+    def __str__(self):
+        return self.full_address()
+
 
 
 class InquiryRecord(models.Model):
@@ -83,10 +121,12 @@ class Beneficiary(models.Model):
     first_beneficiary_name = models.CharField(max_length=255)
     second_beneficiary_name = models.CharField(max_length=45, blank=True, null=True)
     third_beneficiary_name = models.CharField(max_length=45, blank=True, null=True)
+    
+    # Add ForeignKey relationship
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="beneficiaries")
 
     def __str__(self):
         return self.first_beneficiary_name
-
 
 
 class Payment(models.Model):
@@ -151,29 +191,9 @@ class ColumbaryRecord(models.Model):
     beneficiary = models.ForeignKey(Beneficiary, on_delete=models.SET_NULL, null=True, blank=True)
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, null=True, blank=True)
     holder_of_privilege = models.ForeignKey(HolderOfPrivilege, on_delete=models.SET_NULL, null=True, blank=True)
-    
-    STATUS_CHOICES = [('Vacant', 'Vacant'), ('Occupied', 'Occupied')]
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Vacant')
-    
-
-    def update_status(self):
-        fields_to_check = [
-            self.issuance_date, self.expiration_date, self.inurnment_date,
-            self.issuing_parish_priest, self.urns_per_columbary,
-            self.customer, self.parish_staff, self.beneficiary, self.payment, self.holder_of_privilege
-        ]
-        if any(fields_to_check):  
-            self.status = "Occupied"  # If any field has a value, status is Occupied
-        elif not any(fields_to_check) and self.status == "Occupied":
-            self.status = "Vacant"
-
-    def save(self, *args, **kwargs):
-        self.update_status()  # Ensure status is updated before saving
-        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Vault {self.vault_id} - {self.status}"
-    
+        return f"Vault {self.vault_id}"
     def get_record_data(self):
         """Get formatted record data"""
         data = {
