@@ -14,29 +14,30 @@
     </div>
     <div class="content" id = '1'>
         <h1>Avail a Columbary now!</h1>
-        <button class="btn" onclick="openModal()">Avail Now!</button>
+        <button class="btn" onclick="window.location.href='{% url 'Columbary_Map' %}';">Avail Now!</button>
     </div>
     <div class="modal" id="modal">
         <div class="modal-content">
             <form method="post" action="{% url 'send_letter_of_intent' %}">
-                {% csrf_token %}
+
+                <!-- csrf_token %}
                 
-                <!-- Full Name -->
+                <!-- Full Name 
                 <input type="text" name="full_name" placeholder="Full Name" required id="fn" class="form-control">
                 
-                <!-- Permanent Address -->
+                <!-- Permanent Address 
                 <textarea name="permanent_address" placeholder="Permanent Address" required class="form-control" rows="3"></textarea>
                 
-                <!-- Landline Number -->
+                <!-- Landline Number 
                 <input type="tel" name="landline_number" placeholder="Landline Number" class="form-control">
                 
-                <!-- Mobile Number -->
+                <!-- Mobile Number 
                 <input type="tel" name="mobile_number" placeholder="Mobile Number" required class="form-control">
                 
-                <!-- Email Address -->
+                <!-- Email Address 
                 <input type="email" name="email_address" placeholder="Email Address" required class="form-control">
                 
-                <button type="submit" class="btn btn-primary">Send Letter of Intent</button>
+                <button type="submit" class="btn btn-primary">Send Letter of Intent</button>-->
             </form>
             
         </div>
