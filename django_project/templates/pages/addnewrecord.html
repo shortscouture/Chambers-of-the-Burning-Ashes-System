@@ -24,15 +24,104 @@
             }
         }
 
+        document.getElementById('processOCR').addEventListener('click', function() {
+            const fileInput = document.getElementById('ocrInput');
+            if (!fileInput.files.length) {
+                alert('Please select a file first');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('document', fileInput.files[0]);
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+            
+            
+            const button = this;
+            button.innerHTML = 'Processing...';
+            button.classList.add('ocr-processing');
+            button.disabled = true;
+            
+            fetch('/process-ocr/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    
+                    const nameparts = data.data.full_name.split(' ');
+                    if (nameparts.length > 0) {
+                        document.querySelector('[name="first_name"]').value = nameparts[0] || '';
+                        if (nameparts.length > 1) {
+                            document.querySelector('[name="last_name"]').value = nameparts[nameparts.length - 1] || '';
+                        }
+                        if (nameparts.length > 2) {
+                            document.querySelector('[name="middle_name"]').value = nameparts.slice(1, -1).join(' ') || '';
+                        }
+                    }
+                    
+                    
+                    const addressParts = data.data.permanent_address.split(',');
+                    if (addressParts.length > 0) {
+                        document.querySelector('[name="address_line_1"]').value = addressParts[0].trim() || '';
+                        if (addressParts.length > 1) {
+                            document.querySelector('[name="city"]').value = addressParts[1].trim() || '';
+                        }
+                        if (addressParts.length > 2) {
+                            document.querySelector('[name="province_or_state"]').value = addressParts[2].trim() || '';
+                        }
+                    }
+                    
+                    
+                    document.querySelector('[name="mobile_number"]').value = data.data.mobile_number || '';
+                    document.querySelector('[name="landline_number"]').value = data.data.landline_number || '';
+                    document.querySelector('[name="email_address"]').value = data.data.email_address || '';
+                    
+                    
+                    document.querySelector('[name="first_beneficiary_name"]').value = data.data.first_beneficiary_name || '';
+                    document.querySelector('[name="second_beneficiary_name"]').value = data.data.second_beneficiary_name || '';
+                    document.querySelector('[name="third_beneficiary_name"]').value = data.data.third_beneficiary_name || '';
+                    
+                    
+                    document.querySelector('[name="vault_id"]').value = data.data.vault_id || '';
+                    document.querySelector('[name="issuance_date"]').value = data.data.issuance_date || '';
+                    document.querySelector('[name="expiration_date"]').value = data.data.expiration_date || '';
+                    document.querySelector('[name="inurnment_date"]').value = data.data.inurnment_date || '';
+                    document.querySelector('[name="issuing_parish_priest"]').value = data.data.issuing_parish_priest || '';
+                    document.querySelector('[name="urns_per_columbary"]').value = data.data.urns_per_columbary || '';
+                    
+                } else {
+                    alert('Error processing document: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Error: ' + error);
+            })
+            .finally(() => {
+                
+                button.innerHTML = 'Process with OCR';
+                button.classList.remove('ocr-processing');
+                button.disabled = false;
+            });
+        });
+
         window.onload = function() {
             togglePaymentFields();
-        }
+        }        
     </script>
 
 </head>
 <body>
     <div class="container">
         <h2>Add New Columbary Record</h2>
+        <div class="ocr-section">
+            <h3>Upload Document for Auto-Fill</h3>
+            <div class="ocr-upload">
+                <input type="file" id="ocrInput" accept="image/*" class="ocr-input">
+                <button type="button" id="processOCR" class="ocr-button">Process with OCR</button>
+            </div>
+            <small class="ocr-help">Upload a clear image of the handwritten form to auto-fill fields</small>
+        </div>
         <form method="POST">
             {% csrf_token %}
 
