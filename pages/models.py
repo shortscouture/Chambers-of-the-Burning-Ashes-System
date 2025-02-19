@@ -74,7 +74,6 @@ class Customer(models.Model):
         """Returns the full address in a readable format"""
         address_parts = [
             self.address_line_1,
-            self.address_line_2,
             self.city,
             self.province_or_state,
             self.postal_code,
@@ -178,7 +177,7 @@ class ColumbaryRecord(models.Model):
     section = models.CharField(null= False, max_length=7)
     inurnment_date = models.DateField(blank=True, null=True)
     urns_per_columbary = models.CharField(max_length=1, null=True, choices=[('1', '1'), ('2', '2'), ('3', '3'), ('4', '4')])
-    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='columbary_records', db_column="customer_id", null=True)
     parish_staff = models.ForeignKey(ParishStaff, on_delete=models.SET_NULL, null=True, blank=True)
     beneficiary = models.ForeignKey(Beneficiary, on_delete=models.SET_NULL, null=True, blank=True)
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, null=True, blank=True)

@@ -166,63 +166,98 @@ class RecordsDetailsView(TemplateView):
 
 
 
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse_lazy
+from django.views.generic import TemplateView, DeleteView
+from django.forms import modelformset_factory
+from django.contrib import messages
+from .models import Customer, ColumbaryRecord, Beneficiary, Payment
+from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm
+
 class CustomerEditView(TemplateView):
     template_name = "pages/edit_customer.html"
 
     def get(self, request, *args, **kwargs):
-        customer_id = self.kwargs.get('customer_id')  # Retrieve customer_id from URL
-        customer = get_object_or_404(Customer, customer_id=customer_id)  # Use 'customer_id'
+        customer_id = self.kwargs.get('customer_id')
+        customer = get_object_or_404(Customer, customer_id=customer_id)
 
-        # Fetch the first columbary record related to the customer
+        # Get first columbary record for the customer, or none if not exists
         columbary_record = ColumbaryRecord.objects.filter(customer=customer).first()
-        
-        # Fetch the first beneficiary related to the customer
-        beneficiary = Beneficiary.objects.filter(customer=customer).first()
 
-        # Initialize forms with the customer, columbary record, and beneficiary data
+        # Get all beneficiaries for the customer
+        BeneficiaryFormSet = modelformset_factory(Beneficiary, form=BeneficiaryForm, extra=1)
+        beneficiaries = Beneficiary.objects.filter(customer=customer)
+        beneficiary_formset = BeneficiaryFormSet(queryset=beneficiaries)
+        
+        # Initialize forms
         customer_form = CustomerForm(instance=customer)
         columbary_record_form = ColumbaryRecordForm(instance=columbary_record) if columbary_record else ColumbaryRecordForm()
-        beneficiary_form = BeneficiaryForm(instance=beneficiary) if beneficiary else BeneficiaryForm()
 
         return self.render_to_response({
             'customer_form': customer_form,
             'columbary_record_form': columbary_record_form,
-            'beneficiary_form': beneficiary_form,
+            'beneficiary_formset': beneficiary_formset,
             'customer': customer
         })
 
     def post(self, request, *args, **kwargs):
-        customer_id = self.kwargs.get('customer_id')  # Retrieve customer_id from URL
-        customer = get_object_or_404(Customer, customer_id=customer_id)  # Use 'customer_id'
+        customer_id = self.kwargs.get('customer_id')
+        customer = get_object_or_404(Customer, customer_id=customer_id)
 
-        # Fetch the first columbary record related to the customer
+        # Get the first columbary record for the customer
         columbary_record = ColumbaryRecord.objects.filter(customer=customer).first()
-        
-        # Fetch the first beneficiary related to the customer
-        beneficiary = Beneficiary.objects.filter(customer=customer).first()
 
-        # Initialize forms with the POST data and instance
+        # Get all beneficiaries for the customer
+        BeneficiaryFormSet = modelformset_factory(Beneficiary, form=BeneficiaryForm, extra=1)
+        beneficiaries = Beneficiary.objects.filter(customer=customer)
+        beneficiary_formset = BeneficiaryFormSet(request.POST, queryset=beneficiaries)
+
+        # Process forms
         customer_form = CustomerForm(request.POST, instance=customer)
         columbary_record_form = ColumbaryRecordForm(request.POST, instance=columbary_record) if columbary_record else ColumbaryRecordForm(request.POST)
-        beneficiary_form = BeneficiaryForm(request.POST, instance=beneficiary) if beneficiary else BeneficiaryForm(request.POST)
 
-        if customer_form.is_valid() and columbary_record_form.is_valid() and beneficiary_form.is_valid():
+        if customer_form.is_valid() and columbary_record_form.is_valid() and beneficiary_formset.is_valid():
+            # Save Customer
             customer_form.save()
-            columbary_record_form.save()
-            beneficiary_form.save()
-            return HttpResponseRedirect(reverse_lazy('recordsdetails', kwargs={'customer_id': customer_id}))
+
+            # Save Columbary Record
+            columbary_record_obj = columbary_record_form.save(commit=False)
+            columbary_record_obj.customer = customer
+            columbary_record_obj.save()
+
+            # Save each Beneficiary
+            for form in beneficiary_formset:
+                beneficiary_obj = form.save(commit=False)
+                beneficiary_obj.customer = customer
+                beneficiary_obj.save()
+
+            messages.success(request, "Customer and related records updated successfully.")
+            return redirect('recordsdetails', customer_id=customer.customer_id)
         else:
-            # Debugging: Print form errors
-            print("Customer form errors:", customer_form.errors)
-            print("Columbary record form errors:", columbary_record_form.errors)
-            print("Beneficiary form errors:", beneficiary_form.errors)
+            messages.error(request, "There was an error updating the records. Please check the form data.")
 
         return self.render_to_response({
             'customer_form': customer_form,
             'columbary_record_form': columbary_record_form,
-            'beneficiary_form': beneficiary_form,
+            'beneficiary_formset': beneficiary_formset,
             'customer': customer
         })
+
+class CustomerDeleteView(DeleteView):
+    model = Customer
+    template_name = "pages/delete_customer.html"
+    success_url = reverse_lazy('columbaryrecords')
+
+    def get_object(self, queryset=None):
+        customer_id = self.kwargs.get('customer_id')
+        return get_object_or_404(Customer, customer_id=customer_id)
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.delete()
+        messages.success(request, "Customer and all related records deleted successfully.")
+        return redirect(self.success_url)
+
 
 
 

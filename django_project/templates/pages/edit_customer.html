@@ -25,7 +25,6 @@
         <div class="white-box">
             <h1 class="header">Edit Customer & Columbary Details</h1>
 
-            <!-- Customer Edit Form -->
             <form method="POST">
                 {% csrf_token %}
                 
@@ -55,40 +54,42 @@
 
                 <!-- Beneficiary Section -->
                 <div class="details-section">
-                    <h2>Edit Beneficiary</h2>
-                    {% for field in beneficiary_form %}
-                        <div class="row">
-                            <span class="label">{{ field.label }}</span>
-                            <span class="value">{{ field }}</span>
-                        </div>
+                    <h2>Edit Beneficiaries</h2>
+                    {{ beneficiary_formset.management_form }}
+                    {% for form in beneficiary_formset %}
+                        {% for field in form %}
+                            <div class="row">
+                                <span class="label">{{ field.label }}</span>
+                                <span class="value">{{ field }}</span>
+                            </div>
+                        {% endfor %}
                         <hr class="separator">
                     {% endfor %}
                 </div>
 
                 <!-- Buttons Section -->
                 <div class="back-button" style="display: flex; justify-content: center; align-items: center; margin-top: 20px;">
-                    <!-- Save Button -->
                     <button type="submit" style="margin-right: 10px;">Save Changes</button>
-
-                    <!-- Back Button -->
-                    {% if customer %}
-                        <a href="{% url 'recordsdetails' customer_id=customer.customer_id %}">
-                            <button type="button">Back to Records</button>
-                        </a>
-                    {% else %}
-                        <p class="no-records">Error: Customer not found.</p>
-                    {% endif %}
+                    <a href="{% url 'recordsdetails' customer_id=customer.customer_id %}">
+                        <button type="button">Back to Records</button>
+                    </a>
+                    <button type="button" style="background-color: red; color: white;" onclick="confirmDelete()">Delete Customer</button>
                 </div>
             </form>
 
-            <!-- Delete Customer Section -->
-            {% if customer %}
-                <form method="POST" action="{% url 'delete_customer' customer_id=customer.customer_id %}" style="margin-top: 20px;">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger" style="background-color: red; color: white;">Delete Customer</button>
-                </form>
-            {% endif %}
-        </div> <!-- End of white-box -->
-    </div> <!-- End of page-container -->
+            <!-- Delete Form -->
+            <form id="delete-form" method="POST" action="{% url 'delete_customer' customer_id=customer.customer_id %}" style="display: none;">
+                {% csrf_token %}
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function confirmDelete() {
+            if (confirm("Are you sure you want to delete this customer? This action cannot be undone.")) {
+                document.getElementById("delete-form").submit();
+            }
+        }
+    </script>
 </body>
 </html>
