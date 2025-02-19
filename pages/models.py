@@ -41,17 +41,17 @@ class Customer(models.Model):
     ]
 
     # Name Fields
-    first_name = models.CharField(max_length=50, blank=True, null=True)
-    middle_name = models.CharField(max_length=50, blank=True, null=True)  
-    last_name = models.CharField(max_length=50, blank=True, null=True)
+    first_name = models.CharField(max_length=50, blank=False, null=True)
+    middle_name = models.CharField(max_length=50, blank=False, null=True)  
+    last_name = models.CharField(max_length=50, blank=False, null=True)
     suffix = models.CharField(max_length=10, blank=True, null=True)
 
     # Address Fields
-    country = models.CharField(max_length=100, default="Philippines")
-    address_line_1 = models.CharField(max_length=255)
+    country = models.CharField(max_length=100, blank=True, default="Philippines")
+    address_line_1 = models.CharField(max_length=255, blank=True,null=True)
     address_line_2 = models.CharField(max_length=255, blank=True, null=True)
-    city = models.CharField(max_length=100)
-    province_or_state = models.CharField(max_length=100)
+    city = models.CharField(max_length=100, blank=True)
+    province_or_state = models.CharField(max_length=100, blank=True)
     postal_code = models.CharField(max_length=20, blank=True, null=True)
 
     # Contact Fields
@@ -101,8 +101,8 @@ class InquiryRecord(models.Model):
 
 class HolderOfPrivilege(models.Model):
     holder_of_privilege_id = models.AutoField(primary_key=True)
-    issuance_date = models.DateField(null=True)
-    expiration_date = models.DateField(null=True)
+    issuance_date = models.DateField(null=True, blank=True)
+    expiration_date = models.DateField(null=True, blank=True)
     issuing_parish_priest = models.CharField(max_length=45, blank=True, null=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="privileges", db_column="customer_id", null=True)
 
@@ -113,7 +113,7 @@ class HolderOfPrivilege(models.Model):
 
 class Beneficiary(models.Model):
     beneficiary_id = models.AutoField(primary_key=True)
-    first_beneficiary_name = models.CharField(max_length=255)
+    first_beneficiary_name = models.CharField(max_length=255, blank=True, null=True)
     second_beneficiary_name = models.CharField(max_length=45, blank=True, null=True)
     third_beneficiary_name = models.CharField(max_length=45, blank=True, null=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="beneficiaries")
@@ -130,7 +130,7 @@ class Payment(models.Model):
     
     payment_id = models.AutoField(primary_key=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="payments")  # Added customer FK
-    mode_of_payment = models.CharField(max_length=20, choices=PAYMENT_MODES, default="Full Payment")
+    mode_of_payment = models.CharField(max_length=20, choices=PAYMENT_MODES, blank=True, null=True)
 
     # Seven receipt fields
     Full_payment_receipt_1 = models.IntegerField(blank=True, null=True)
@@ -173,10 +173,10 @@ class Payment(models.Model):
 
 
 class ColumbaryRecord(models.Model):
-    vault_id = models.CharField(primary_key=True, max_length=8)
+    vault_id = models.CharField(primary_key=True, max_length=8, blank=False)
     section = models.CharField(null= False, max_length=7)
     inurnment_date = models.DateField(blank=True, null=True)
-    urns_per_columbary = models.CharField(max_length=1, null=True, choices=[('1', '1'), ('2', '2'), ('3', '3'), ('4', '4')])
+    urns_per_columbary = models.CharField(max_length=1, blank=True, null=True, choices=[('1', '1'), ('2', '2'), ('3', '3'), ('4', '4')])
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='columbary_records', db_column="customer_id", null=True)
     parish_staff = models.ForeignKey(ParishStaff, on_delete=models.SET_NULL, null=True, blank=True)
     beneficiary = models.ForeignKey(Beneficiary, on_delete=models.SET_NULL, null=True, blank=True)

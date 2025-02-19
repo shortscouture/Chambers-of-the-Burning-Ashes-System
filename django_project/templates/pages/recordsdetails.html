@@ -77,25 +77,64 @@
                 <p class="no-records">No Columbary Records found for this customer.</p>
             {% endif %}
 
-            <!-- Payment Details -->
-            <h3 class="sub-header">Payment Details</h3>
-            {% if payments %}
-                {% for payment in payments %}
-                    <div class="details-section">
-                        <div class="row">
-                            <span class="label">Mode of Payment:</span>
-                            <span class="value">{{ payment.mode_of_payment }}</span>
-                        </div>
-                        <div class="row">
-                            <span class="label">Total Amount:</span>
-                            <span class="value">{{ payment.total_amount }}</span>
-                        </div>
-                        <hr class="separator">
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p class="no-records">No Payment Records found for this customer.</p>
+                    <!-- Payment Details -->
+<h3 class="sub-header">Payment Details</h3>
+{% if payments %}
+    {% for payment in payments %}
+        <div class="details-section">
+            <div class="row">
+                <span class="label">Mode of Payment:</span>
+                <span class="value">{{ payment.mode_of_payment }}</span>
+            </div>
+            
+            <!-- Full Payment -->
+            {% if payment.mode_of_payment == "Full Payment" and payment.Full_payment_receipt_1 %}
+                <div class="row">
+                    <span class="label">Receipt #:</span>
+                    <span class="value">{{ payment.Full_payment_receipt_1 }}</span>
+                </div>
+                <div class="row">
+                    <span class="label">Amount:</span>
+                    <span class="value">{{ payment.Full_payment_amount_1 }}</span>
+                </div>
             {% endif %}
+            
+            <!-- 6-Month Installment -->
+            {% if payment.mode_of_payment == "6-Month Installment" %}
+                {% if payment.six_month_receipt_1 %}
+                    <div class="row"><span class="label">Installment 1 Receipt #:</span> <span class="value">{{ payment.six_month_receipt_1 }}</span></div>
+                    <div class="row"><span class="label">Installment 1 Amount:</span> <span class="value">{{ payment.six_month_amount_1 }}</span></div>
+                {% endif %}
+                {% if payment.six_month_receipt_2 %}
+                    <div class="row"><span class="label">Installment 2 Receipt #:</span> <span class="value">{{ payment.six_month_receipt_2 }}</span></div>
+                    <div class="row"><span class="label">Installment 2 Amount:</span> <span class="value">{{ payment.six_month_amount_2 }}</span></div>
+                {% endif %}
+                {% if payment.six_month_receipt_3 %}
+                    <div class="row"><span class="label">Installment 3 Receipt #:</span> <span class="value">{{ payment.six_month_receipt_3 }}</span></div>
+                    <div class="row"><span class="label">Installment 3 Amount:</span> <span class="value">{{ payment.six_month_amount_3 }}</span></div>
+                {% endif %}
+                {% if payment.six_month_receipt_4 %}
+                    <div class="row"><span class="label">Installment 4 Receipt #:</span> <span class="value">{{ payment.six_month_receipt_4 }}</span></div>
+                    <div class="row"><span class="label">Installment 4 Amount:</span> <span class="value">{{ payment.six_month_amount_4 }}</span></div>
+                {% endif %}
+                {% if payment.six_month_receipt_5 %}
+                    <div class="row"><span class="label">Installment 5 Receipt #:</span> <span class="value">{{ payment.six_month_receipt_5 }}</span></div>
+                    <div class="row"><span class="label">Installment 5 Amount:</span> <span class="value">{{ payment.six_month_amount_5 }}</span></div>
+                {% endif %}
+                {% if payment.six_month_receipt_6 %}
+                    <div class="row"><span class="label">Installment 6 Receipt #:</span> <span class="value">{{ payment.six_month_receipt_6 }}</span></div>
+                    <div class="row"><span class="label">Installment 6 Amount:</span> <span class="value">{{ payment.six_month_amount_6 }}</span></div>
+                {% endif %}
+            {% endif %}
+            
+            <hr class="separator">
+        </div>
+    {% endfor %}
+{% else %}
+    <p class="no-records">No Payment Records found for this customer.</p>
+{% endif %}
+
+
 
             <!-- Holder of Privilege Details -->
             <h3 class="sub-header">Holder of Privilege Details</h3>

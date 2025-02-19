@@ -27,7 +27,7 @@
 
             <form method="POST">
                 {% csrf_token %}
-                
+
                 <!-- Customer Section -->
                 <div class="details-section">
                     <h2>Edit Customer</h2>
@@ -52,17 +52,38 @@
                     {% endfor %}
                 </div>
 
+                <!-- Holder of Privilege Section -->
+                <div class="details-section">
+                    <h2>Edit Holder of Privilege</h2>
+                    {% for field in holder_of_privilege_form %}
+                        <div class="row">
+                            <span class="label">{{ field.label }}</span>
+                            <span class="value">{{ field }}</span>
+                        </div>
+                        <hr class="separator">
+                    {% endfor %}
+                </div>
+
                 <!-- Beneficiary Section -->
                 <div class="details-section">
-                    <h2>Edit Beneficiaries</h2>
-                    {{ beneficiary_formset.management_form }}
-                    {% for form in beneficiary_formset %}
-                        {% for field in form %}
-                            <div class="row">
-                                <span class="label">{{ field.label }}</span>
-                                <span class="value">{{ field }}</span>
-                            </div>
-                        {% endfor %}
+                    <h2>Edit Beneficiary</h2>
+                    {% for field in beneficiary_form %}
+                        <div class="row">
+                            <span class="label">{{ field.label }}</span>
+                            <span class="value">{{ field }}</span>
+                        </div>
+                        <hr class="separator">
+                    {% endfor %}
+                </div>
+
+                <!-- Payments Section -->
+                <div class="details-section">
+                    <h2>Edit Payment</h2>
+                    {% for field in payment_form %}
+                        <div class="row">
+                            <span class="label">{{ field.label }}</span>
+                            <span class="value">{{ field }}</span>
+                        </div>
                         <hr class="separator">
                     {% endfor %}
                 </div>

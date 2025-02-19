@@ -181,22 +181,25 @@ class CustomerEditView(TemplateView):
         customer_id = self.kwargs.get('customer_id')
         customer = get_object_or_404(Customer, customer_id=customer_id)
 
-        # Get first columbary record for the customer, or none if not exists
+        # Get existing records
         columbary_record = ColumbaryRecord.objects.filter(customer=customer).first()
+        holder_of_privilege = HolderOfPrivilege.objects.filter(customer=customer).first()
+        beneficiary = Beneficiary.objects.filter(customer=customer).first()
+        payment = Payment.objects.filter(customer=customer).first()
 
-        # Get all beneficiaries for the customer
-        BeneficiaryFormSet = modelformset_factory(Beneficiary, form=BeneficiaryForm, extra=1)
-        beneficiaries = Beneficiary.objects.filter(customer=customer)
-        beneficiary_formset = BeneficiaryFormSet(queryset=beneficiaries)
-        
         # Initialize forms
         customer_form = CustomerForm(instance=customer)
         columbary_record_form = ColumbaryRecordForm(instance=columbary_record) if columbary_record else ColumbaryRecordForm()
+        holder_of_privilege_form = HolderOfPrivilegeForm(instance=holder_of_privilege) if holder_of_privilege else HolderOfPrivilegeForm()
+        beneficiary_form = BeneficiaryForm(instance=beneficiary) if beneficiary else BeneficiaryForm()
+        payment_form = PaymentForm(instance=payment) if payment else PaymentForm()
 
         return self.render_to_response({
             'customer_form': customer_form,
             'columbary_record_form': columbary_record_form,
-            'beneficiary_formset': beneficiary_formset,
+            'holder_of_privilege_form': holder_of_privilege_form,
+            'beneficiary_form': beneficiary_form,
+            'payment_form': payment_form,
             'customer': customer
         })
 
@@ -204,32 +207,48 @@ class CustomerEditView(TemplateView):
         customer_id = self.kwargs.get('customer_id')
         customer = get_object_or_404(Customer, customer_id=customer_id)
 
-        # Get the first columbary record for the customer
+        # Get existing records
         columbary_record = ColumbaryRecord.objects.filter(customer=customer).first()
-
-        # Get all beneficiaries for the customer
-        BeneficiaryFormSet = modelformset_factory(Beneficiary, form=BeneficiaryForm, extra=1)
-        beneficiaries = Beneficiary.objects.filter(customer=customer)
-        beneficiary_formset = BeneficiaryFormSet(request.POST, queryset=beneficiaries)
+        holder_of_privilege = HolderOfPrivilege.objects.filter(customer=customer).first()
+        beneficiary = Beneficiary.objects.filter(customer=customer).first()
+        payment = Payment.objects.filter(customer=customer).first()
 
         # Process forms
         customer_form = CustomerForm(request.POST, instance=customer)
         columbary_record_form = ColumbaryRecordForm(request.POST, instance=columbary_record) if columbary_record else ColumbaryRecordForm(request.POST)
+        holder_of_privilege_form = HolderOfPrivilegeForm(request.POST, instance=holder_of_privilege) if holder_of_privilege else HolderOfPrivilegeForm(request.POST)
+        beneficiary_form = BeneficiaryForm(request.POST, instance=beneficiary) if beneficiary else BeneficiaryForm(request.POST)
+        payment_form = PaymentForm(request.POST, instance=payment) if payment else PaymentForm(request.POST)
 
-        if customer_form.is_valid() and columbary_record_form.is_valid() and beneficiary_formset.is_valid():
+        if (
+            customer_form.is_valid() and 
+            columbary_record_form.is_valid() and 
+            holder_of_privilege_form.is_valid() and 
+            beneficiary_form.is_valid() and 
+            payment_form.is_valid()
+        ):
             # Save Customer
-            customer_form.save()
+            customer = customer_form.save()
 
             # Save Columbary Record
             columbary_record_obj = columbary_record_form.save(commit=False)
             columbary_record_obj.customer = customer
             columbary_record_obj.save()
 
-            # Save each Beneficiary
-            for form in beneficiary_formset:
-                beneficiary_obj = form.save(commit=False)
-                beneficiary_obj.customer = customer
-                beneficiary_obj.save()
+            # Save Holder of Privilege
+            holder_of_privilege_obj = holder_of_privilege_form.save(commit=False)
+            holder_of_privilege_obj.customer = customer
+            holder_of_privilege_obj.save()
+
+            # Save Beneficiary
+            beneficiary_obj = beneficiary_form.save(commit=False)
+            beneficiary_obj.customer = customer
+            beneficiary_obj.save()
+
+            # Save Payment
+            payment_obj = payment_form.save(commit=False)
+            payment_obj.customer = customer
+            payment_obj.save()
 
             messages.success(request, "Customer and related records updated successfully.")
             return redirect('recordsdetails', customer_id=customer.customer_id)
@@ -239,9 +258,13 @@ class CustomerEditView(TemplateView):
         return self.render_to_response({
             'customer_form': customer_form,
             'columbary_record_form': columbary_record_form,
-            'beneficiary_formset': beneficiary_formset,
+            'holder_of_privilege_form': holder_of_privilege_form,
+            'beneficiary_form': beneficiary_form,
+            'payment_form': payment_form,
             'customer': customer
         })
+
+
 
 class CustomerDeleteView(DeleteView):
     model = Customer
