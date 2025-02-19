@@ -20,14 +20,15 @@ from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-
-
 import openai
 import environ
 
 
 class SuccesView(TemplateView):
     template_name = "success.html"
+
+class MapView(TemplateView):
+    template_name = "Columbary_Map.html"
 
 class HomePageView(TemplateView):
     template_name = "pages/home.html"
@@ -36,7 +37,9 @@ class HomePageView(TemplateView):
 class AboutPageView(TemplateView):
     template_name = "pages/about.html"
 
-
+class MapView(TemplateView):
+    template_name= "Columbary_Map.html"
+    
 class MainDashView(TemplateView):
     template_name = "pages/maindash.html"
 
@@ -364,3 +367,21 @@ class ChatbotAPIView(APIView):
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+def get_crypt_status(request, section):
+    # Get all vaults belonging to the given section
+    vaults = ColumbaryRecord.objects.filter(section=section)
+    
+    occupied_count = vaults.filter(status="Occupied").count()
+    total_count = vaults.count()
+    
+    # Determine color based on occupancy
+    if occupied_count == 0:
+        color = "green"   # All vacant
+    elif occupied_count < total_count:
+        color = "yellow"  # Partially occupied
+    else:
+        color = "red"     # All occupied
+
+    # Return JSON response with the color
+    return JsonResponse({"section": section, "color": color})
