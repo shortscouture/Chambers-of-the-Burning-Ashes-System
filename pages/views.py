@@ -26,7 +26,9 @@ import pytesseract
 from PIL import Image
 import re
 import openai
-import environ
+from django.db import transaction
+import json
+
 
 
 class SuccesView(TemplateView):
@@ -561,15 +563,6 @@ def upload_document(request):
     return render(request, 'ocr_app/upload.html', {'form': form})
 
 
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from .forms import CustomerForm
-from .models import Customer
-
-# views.py
-from django.shortcuts import render, redirect
-from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm
-
 def addnewrecord(request):
     if request.method == 'POST':
         customer_form = CustomerForm(request.POST)
@@ -625,3 +618,56 @@ def addnewrecord(request):
         'beneficiary_form': beneficiary_form,
         'payment_form': payment_form  # Pass the payment form to the template
     })
+
+env = environ.Env(
+    DEBUG=(bool, False) #default value for DEBUG = False
+)
+
+openai.api_key = env("OPEN_AI_API_KEY")
+class ChatbotAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        return Response({"message": "Chatbot API is running! Use POST to send messages."}, status=status.HTTP_200_OK)
+    
+    def post(self, request, *args, **kwargs):
+        user_message = request.data.get('message')
+
+        if not user_message:
+            return Response({'error': 'Message is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            response = openai.chat.completions.create(
+                model="gpt-3.5-turbo",  # Using GPT-3.5 models
+                messages=[{"role": "user", "content": user_message}],
+                max_tokens=150
+            )
+            bot_reply = response.choices[0].message.content.strip()  # Get the response from GPT-3.5
+            #save to database
+            ChatQuery.objects.create(user_message=user_message, bot_response=bot_reply)
+
+            return Response({'response': bot_reply}, status=status.HTTP_200_OK)
+
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def get_data_from_db():
+        data = Customer.objects.all().values()  # Fetch all fields
+        return list(data)
+
+    def query_openai(data):
+        """Send database data to OpenAI and get a response."""
+        formatted_data = json.dumps(data, indent=2)
+        prompt = f"Here is the database data: {formatted_data}\nAnalyze it and provide insights."
+
+        response = openai.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "system", "content": "You are an AI assistant."},
+                    {"role": "user", "content": prompt}]
+        )
+        return response["choices"][0]["message"]["content"]
+
+    def chatbot_view(request):
+        """Handle AJAX request and return chatbot response."""
+        db_data = get_data_from_db()
+        ai_response = query_openai(db_data)
+        return JsonResponse({"response": ai_response})

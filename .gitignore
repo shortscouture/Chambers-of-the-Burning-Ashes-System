@@ -18,3 +18,7 @@ venv
 .env
 .env.local
 .env.prod
+my.cnf
+
+.vscode
+settings.json

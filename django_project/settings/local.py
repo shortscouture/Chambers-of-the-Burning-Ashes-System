@@ -7,23 +7,22 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'columbary_db',  # Replace with your database name
-        'USER': 'root',              # Replace with your MySQL username
-        'PASSWORD': 'root',  # Replace with your MySQL password
-        'HOST': '127.0.0.1',          # Use '127.0.0.1' or your database host
-        'PORT': '3306',               # Default MySQL port
+        'ENGINE': 'django.db.backends.postgresql',  # Change to your DB engine (e.g., MySQL)
+        'NAME': env('DB_NAME'),
+        'USER': env('DB_USER'),
+        'PASSWORD': env('DB_PASSWORD'),
+        'HOST': env('DB_HOST'),  # Remote DB Host
+        'PORT': env('DB_PORT', default='5432'),
     }
 }
-
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
+EMAIL_BACKEND = env('EMAIL_BACKEND')
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_PORT = 587 #gmail port
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'stalphonsusmakati@gmail.com'
-EMAIL_HOST_PASSWORD = 'wcvy daru objs fgwi'
-DEFAULT_FROM_EMAIL = 'stalphonsusmakati@gmail.com'
-ADMIN_EMAIL = 'jamesnaldo376@gmail.com'
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
+ADMIN_EMAIL = env('ADMIN_EMAIL')
 
 # Local static and media file settings
 STATICFILES_DIRS = [BASE_DIR / 'static']
