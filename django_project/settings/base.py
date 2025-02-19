@@ -58,7 +58,7 @@ INSTALLED_APPS = [
     # Local
     "accounts",
     "pages",
-    
+    # LLM and API
     "rest_framework",
     "openai"
 ]
