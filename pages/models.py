@@ -33,31 +33,30 @@ class ParishStaff(models.Model):
         return f"Staff {self.staff_id}"
 
 class Customer(models.Model):
-    customer_id = models.AutoField(primary_key=True)
-    
+    customer_id = models.BigAutoField(primary_key=True)
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('approved', 'Approved'),
         ('declined', 'Declined'),
     ]
-    
+
     # Name Fields
-    first_name = models.CharField(max_length=50, default="Unknown")
+    first_name = models.CharField(max_length=50, blank=True, null=True)
     middle_name = models.CharField(max_length=50, blank=True, null=True)  
-    last_name = models.CharField(max_length=50, default="Unknown")
-    suffix = models.CharField(max_length=10, blank=True, null=True)  # Optional
+    last_name = models.CharField(max_length=50, blank=True, null=True)
+    suffix = models.CharField(max_length=10, blank=True, null=True)
 
     # Address Fields
     country = models.CharField(max_length=100, default="Philippines")
-    address_line_1 = models.CharField(max_length=255, default="Unknown Address")
-    address_line_2 = models.CharField(max_length=255, blank=True, null=True)  # Optional
-    city = models.CharField(max_length=100, default="Unknown City")
-    province_or_state = models.CharField(max_length=100, default="Unknown Province")
+    address_line_1 = models.CharField(max_length=255)
+    address_line_2 = models.CharField(max_length=255, blank=True, null=True)
+    city = models.CharField(max_length=100)
+    province_or_state = models.CharField(max_length=100)
     postal_code = models.CharField(max_length=20, blank=True, null=True)
 
     # Contact Fields
     landline_number = models.CharField(max_length=15, blank=True, null=True)
-    mobile_number = models.CharField(max_length=11, blank=True, null=True)
+    mobile_number = models.CharField(max_length=13, blank=True, null=True) 
     email_address = models.EmailField(max_length=45, blank=True, null=True)
 
     # Status
@@ -67,26 +66,26 @@ class Customer(models.Model):
         default='pending'
     )
 
-    def __str__(self):
-        return f"{self.first_name} {self.middle_name or ''} {self.last_name}"
-    
     def full_name(self):
-        return f"{self.first_name} {self.middle_name or ''} {self.last_name} {self.suffix or ''}".strip()
-    
+        """Returns the full name of the customer"""
+        return " ".join(filter(None, [self.first_name, self.middle_name, self.last_name, self.suffix])).strip()
 
     def full_address(self):
+        """Returns the full address in a readable format"""
         address_parts = [
             self.address_line_1,
-            self.address_line_2 if self.address_line_2 else None,  # Only include if exists
+            self.address_line_2,
             self.city,
             self.province_or_state,
-            self.postal_code if self.postal_code else None,  # Only include if exists
+            self.postal_code,
             self.country
         ]
-        return ", ".join(filter(None, address_parts))  # Join and remove None values
+        return ", ".join(filter(None, address_parts))
 
     def __str__(self):
-        return self.full_address()
+        """String representation of the customer"""
+        return self.full_name() or "Unnamed Customer"
+
 
 
 
@@ -103,14 +102,14 @@ class InquiryRecord(models.Model):
 
 class HolderOfPrivilege(models.Model):
     holder_of_privilege_id = models.AutoField(primary_key=True)
-    full_name = models.CharField(max_length=45)
-    email_address = models.EmailField(max_length=45, blank=True, null=True)
-    address = models.CharField(max_length=45, blank=True, null=True)
-    landline_number = models.IntegerField(blank=True, null=True)
-    mobile_number = models.IntegerField(blank=True, null=True)
+    issuance_date = models.DateField(null=True)
+    expiration_date = models.DateField(null=True)
+    issuing_parish_priest = models.CharField(max_length=45, blank=True, null=True)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="privileges", db_column="customer_id", null=True)
 
     def __str__(self):
-        return self.full_name
+        return f"{self.customer.full_name() if self.customer else 'No Customer'} - Privilege ID: {self.holder_of_privilege_id}"
+
 
 
 class Beneficiary(models.Model):
@@ -177,10 +176,7 @@ class Payment(models.Model):
 class ColumbaryRecord(models.Model):
     vault_id = models.CharField(primary_key=True, max_length=8)
     section = models.CharField(null= False, max_length=7)
-    issuance_date = models.DateField(null=True)
-    expiration_date = models.DateField(null=True)
     inurnment_date = models.DateField(blank=True, null=True)
-    issuing_parish_priest = models.CharField(max_length=45, blank=True, null=True)
     urns_per_columbary = models.CharField(max_length=1, null=True, choices=[('1', '1'), ('2', '2'), ('3', '3'), ('4', '4')])
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
     parish_staff = models.ForeignKey(ParishStaff, on_delete=models.SET_NULL, null=True, blank=True)

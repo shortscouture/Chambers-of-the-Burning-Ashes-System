@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.utils import timezone
 from datetime import datetime, timedelta
-from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm, PaymentForm
+from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm, PaymentForm, HolderOfPrivilegeForm
 from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, InquiryRecord, Payment, ChatQuery, ParishAdministrator
 
 from django.urls import reverse_lazy
@@ -319,6 +319,8 @@ env = environ.Env(
     DEBUG=(bool, False) #default value for DEBUG = False
 )
 
+
+
 openai.api_key = env("OPEN_AI_API_KEY")
 class ChatbotAPIView(APIView):
     def get(self, request, *args, **kwargs):
@@ -367,3 +369,54 @@ class ChatbotAPIView(APIView):
         db_data = get_data_from_db()
         ai_response = query_openai(db_data)
         return JsonResponse({"response": ai_response})
+
+
+def addnewrecord(request):
+    if request.method == 'POST':
+        customer_form = CustomerForm(request.POST)
+        payment_form = PaymentForm(request.POST)
+        columbary_form = ColumbaryRecordForm(request.POST)
+        holder_form = HolderOfPrivilegeForm(request.POST)
+        beneficiary_form = BeneficiaryForm(request.POST)
+
+        if all([customer_form.is_valid(), payment_form.is_valid(), columbary_form.is_valid(), holder_form.is_valid(), beneficiary_form.is_valid()]):
+            # Save customer first
+            customer = customer_form.save()
+
+            # Save payment linked to customer
+            payment = payment_form.save(commit=False)
+            payment.customer = customer
+            payment.save()
+
+            # Save columbary record linked to customer and payment
+            columbary_record = columbary_form.save(commit=False)
+            columbary_record.customer = customer
+            columbary_record.payment = payment
+            columbary_record.save()
+
+            # Save holder of privilege linked to customer
+            holder = holder_form.save(commit=False)
+            holder.customer = customer
+            holder.save()
+
+            # Save beneficiary linked to customer
+            beneficiary = beneficiary_form.save(commit=False)
+            beneficiary.customer = customer
+            beneficiary.save()
+
+            return redirect('success_page')  # Redirect to a success page
+
+    else:
+        customer_form = CustomerForm()
+        payment_form = PaymentForm()
+        columbary_form = ColumbaryRecordForm()
+        holder_form = HolderOfPrivilegeForm()
+        beneficiary_form = BeneficiaryForm()
+
+    return render(request, 'pages/addnewrecord.html', {
+        'customer_form': customer_form,
+        'payment_form': payment_form,
+        'columbary_form': columbary_form,
+        'holder_form': holder_form,
+        'beneficiary_form': beneficiary_form
+    })

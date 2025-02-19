@@ -1,6 +1,5 @@
-
 from django import forms
-from .models import Customer, ColumbaryRecord, Beneficiary, Payment
+from .models import Customer, ColumbaryRecord, Beneficiary, Payment, HolderOfPrivilege
 
 class CustomerForm(forms.ModelForm):
     # Name Fields
@@ -136,11 +135,26 @@ class EmailVerificationForm(forms.Form):
         })
     )
 
+class HolderOfPrivilegeForm(forms.ModelForm):
+    class Meta:
+        model = HolderOfPrivilege
+        fields = ['issuance_date', 'expiration_date', 'issuing_parish_priest']
+        widgets = {
+            'issuance_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'expiration_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'issuing_parish_priest': forms.TextInput(attrs={'class': 'form-control'}),
+        }
 
 class ColumbaryRecordForm(forms.ModelForm):
     class Meta:
         model = ColumbaryRecord
-        fields = ['vault_id', 'issuance_date', 'expiration_date', 'inurnment_date', 'issuing_parish_priest', 'urns_per_columbary']
+        fields = [
+            'vault_id', 'inurnment_date', 'urns_per_columbary']
+        widgets = {
+            'vault_id': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Vault ID'}),
+            'inurnment_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'urns_per_columbary': forms.Select(attrs={'class': 'form-control'}),
+        }
 
 class BeneficiaryForm(forms.ModelForm):
     class Meta:
