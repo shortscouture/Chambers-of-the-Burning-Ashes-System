@@ -173,6 +173,7 @@ class PaymentForm(forms.ModelForm):
     
     mode_of_payment = forms.ChoiceField(
         choices=MODE_OF_PAYMENT_CHOICES, 
+        required=True,
         widget=forms.Select(attrs={'onchange': 'togglePaymentFields()', 'class': 'form-control'})
     )
 
@@ -280,21 +281,15 @@ class PaymentForm(forms.ModelForm):
             'six_month_amount_6': forms.NumberInput(attrs={'placeholder': 'Amount', 'class': 'form-control'})
         }
 
-    def clean(self):
-        cleaned_data = super().clean()
+        def clean(self):
+            cleaned_data = super().clean()
 
-        # Handle empty fields: convert empty receipt and amount fields to None
-        receipt_fields = ['six_month_receipt_1', 'six_month_receipt_2', 'six_month_receipt_3', 
-                          'six_month_receipt_4', 'six_month_receipt_5', 'six_month_receipt_6']
-        amount_fields = ['six_month_amount_1', 'six_month_amount_2', 'six_month_amount_3', 
-                         'six_month_amount_4', 'six_month_amount_5', 'six_month_amount_6']
-
-        for receipt_field in receipt_fields:
-            if cleaned_data.get(receipt_field) == '':
-                cleaned_data[receipt_field] = None
-
-        for amount_field in amount_fields:
-            if cleaned_data.get(amount_field) == '':
-                cleaned_data[amount_field] = None
-
-        return cleaned_data
+            # Convert empty string to None for receipt fields
+            receipt_fields = ['Full_payment_receipt_1', 'six_month_receipt_1', 'six_month_receipt_2', 
+                            'six_month_receipt_3', 'six_month_receipt_4', 'six_month_receipt_5', 'six_month_receipt_6']
+            
+            for field in receipt_fields:
+                if cleaned_data.get(field) == '':
+                    cleaned_data[field] = None
+            
+            return cleaned_data
