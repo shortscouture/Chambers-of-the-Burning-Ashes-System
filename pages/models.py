@@ -35,8 +35,6 @@ class ParishStaff(models.Model):
 
 class Customer(models.Model):
     customer_id = models.AutoField(primary_key=True)
-    purchased_vault = models.ForeignKey("ColumbaryRecord", on_delete=models.SET_NULL, null=True, blank=True)
-    
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('approved', 'Approved'),

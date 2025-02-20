@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import datetime, timedelta
 from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm, PaymentForm, HolderOfPrivilegeForm
-from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, InquiryRecord, Payment, ChatQuery, ParishAdministrator, HolderOfPrivilege
+from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, Payment, ChatQuery, ParishAdministrator, HolderOfPrivilege
 
 from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect, JsonResponse
