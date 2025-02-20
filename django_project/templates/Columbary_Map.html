@@ -43125,4 +43125,24 @@
   </g>
 </svg>
 </div>
+
+<div class="overlay" id="overlay"></div>
+<div class="popup" id="popup">
+    <h2>Vault Details</h2>
+    <svg id="popup-svg" width="200" height="200">
+        <!-- Example Levels -->
+        {% include 'A-D_Vault.html' %}
+
+    </svg>
+    
+    <label for="level-select">Select Level:</label>
+    <select id="level-select">
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+    </select>
+
+    <br><br>
+    <button onclick="closePopup()">Close</button>
+</div>
 <script src="../../static/js/Map.js"></script>
