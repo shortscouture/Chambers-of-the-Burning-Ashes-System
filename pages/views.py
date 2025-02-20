@@ -425,6 +425,10 @@ def get_crypt_status(request, section):
     # Return JSON response with the color
     return JsonResponse({"section": section, "color": color})
 
+def get_section_details(request, section_id):
+    columbaries = ColumbaryRecord.objects.filter(section=section_id).values("level", "vault_id", "status")
+    return JsonResponse({"section": section_id, "columbaries": list(columbaries)})
+
 def get_data_from_db():
     data = Customer.objects.all().values()  # Fetch all fields
     return list(data)
