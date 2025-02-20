@@ -505,6 +505,7 @@ def query_openai(data):
 
 
 def addnewrecord(request):
+    
     if request.method == 'POST':
         customer_form = CustomerForm(request.POST)
         payment_form = PaymentForm(request.POST)
@@ -552,4 +553,65 @@ def addnewrecord(request):
         'columbary_form': columbary_form,
         'holder_form': holder_form,
         'beneficiary_form': beneficiary_form
+    })
+
+
+def addnewcustomer(request):
+    vault_id = request.GET.get('vault_id')  # Get vault_id from URL (if provided)
+    vault = None
+
+    if vault_id:
+        vault = get_object_or_404(ColumbaryRecord, vault_id=vault_id, customer__isnull=True)
+
+    if request.method == 'POST':
+        customer_form = CustomerForm(request.POST)
+        payment_form = PaymentForm(request.POST)
+        columbary_form = ColumbaryRecordForm(request.POST)
+        holder_form = HolderOfPrivilegeForm(request.POST)
+        beneficiary_form = BeneficiaryForm(request.POST)
+
+        if all([customer_form.is_valid(), payment_form.is_valid(), columbary_form.is_valid(), holder_form.is_valid(), beneficiary_form.is_valid()]):
+            customer = customer_form.save()
+
+            # Save payment linked to customer
+            payment = payment_form.save(commit=False)
+            payment.customer = customer
+            payment.save()
+
+            # Assign the provided vault_id to the new customer
+            columbary_record = columbary_form.save(commit=False)
+            columbary_record.customer = customer
+            columbary_record.payment = payment
+            if vault:
+                columbary_record.vault_id = vault.vault_id  # Auto-assign vault
+                vault.customer = customer  # Link vault to new customer
+                vault.save()
+            columbary_record.save()
+
+            # Save holder of privilege linked to customer
+            holder = holder_form.save(commit=False)
+            holder.customer = customer
+            holder.save()
+
+            # Save beneficiary linked to customer
+            beneficiary = beneficiary_form.save(commit=False)
+            beneficiary.customer = customer
+            beneficiary.save()
+
+            return redirect('columbaryrecords')  # Redirect after saving
+
+    else:
+        customer_form = CustomerForm()
+        payment_form = PaymentForm()
+        columbary_form = ColumbaryRecordForm()
+        holder_form = HolderOfPrivilegeForm()
+        beneficiary_form = BeneficiaryForm()
+
+    return render(request, 'pages/addcustomer.html', {
+        'customer_form': customer_form,
+        'payment_form': payment_form,
+        'columbary_form': columbary_form,
+        'holder_form': holder_form,
+        'beneficiary_form': beneficiary_form,
+        'vault_id': vault_id  # Pass vault_id to template
     })

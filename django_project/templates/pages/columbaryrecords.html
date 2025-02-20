@@ -87,9 +87,12 @@
                                             <button class="details-button">Details</button>
                                         </a>
                                     {% else %}
-                                        <button class="details-button" disabled>No Customer</button>
+                                        <a href="{% url 'addnewcustomer' %}?vault_id={{ data.vault_id }}">
+                                            <button class="add-button">Add Customer</button>
+                                        </a>
                                     {% endif %}
                                 </td>
+                                
                             </tr>
                         {% endfor %}
                     {% else %}
