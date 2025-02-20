@@ -7,6 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'css/columbaryrecords.css' %}">
+    <script src="{% static 'js/records.js' %}" defer></script>
     <title>Columbary Records</title>
     <style>
         body {
@@ -18,6 +19,19 @@
             margin: 0;
             height: 100%;
             width: 100%;
+        }
+
+        /* Style for sortable headers */
+        th.sortable {
+            cursor: pointer;
+            padding: 10px;
+            background-color: #f4f4f4;
+            transition: background-color 0.3s ease;
+            text-align: left;
+        }
+
+        th.sortable:hover {
+            background-color: #ddd;
         }
     </style>
 </head>
@@ -41,39 +55,51 @@
 
         <!-- Table Section -->
         <section class="table-container">
-            <table>
+            <table data-sort-order="asc">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Beneficiary</th>
-                        <th>Payment</th>
-                        <th>Holder of Privilege</th>
+                        <th class="sortable" onclick="sortTable(0)">Vault ID</th>
+                        <th class="sortable" onclick="sortTable(1)">Name</th>
+                        <th class="sortable" onclick="sortTable(2)">Beneficiary</th>
+                        <th class="sortable" onclick="sortTable(3)">Payment</th>
+                        <th class="sortable" onclick="sortTable(4)">Holder of Privilege</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% if customers_data %}
-                        {% for data in customers_data %}
+                    {% if records_data %}
+                        {% for data in records_data %}
                             <tr>
-                                <td>{{ data.customer.full_name }}</td>
-                                <td>{% if data.has_beneficiary %}Completed{% else %}Incomplete{% endif %}</td>
-                                <td>{% if data.has_payment %}Completed{% else %}Incomplete{% endif %}</td>
-                                <td>{% if data.has_holder_of_privilege %}Completed{% else %}Incomplete{% endif %}</td>
+                                <td>{{ data.vault_id }}</td>
+                                <td>{{ data.customer_name }}</td>
+                                <td class="{% if data.has_beneficiary %}status-completed{% else %}status-incomplete{% endif %}">
+                                    {% if data.has_beneficiary %}Completed{% else %}Incomplete{% endif %}
+                                </td>
+                                <td class="{% if data.has_payment %}status-completed{% else %}status-incomplete{% endif %}">
+                                    {% if data.has_payment %}Completed{% else %}Incomplete{% endif %}
+                                </td>
+                                <td class="{% if data.has_holder_of_privilege %}status-completed{% else %}status-incomplete{% endif %}">
+                                    {% if data.has_holder_of_privilege %}Completed{% else %}Incomplete{% endif %}
+                                </td>
                                 <td>
-                                    <a href="{% url 'recordsdetails' data.customer.customer_id %}">
-                                        <button class="details-button">Details</button>
-                                    </a>
+                                    {% if data.customer_id %}
+                                        <a href="{% url 'recordsdetails' data.customer_id %}">
+                                            <button class="details-button">Details</button>
+                                        </a>
+                                    {% else %}
+                                        <button class="details-button" disabled>No Customer</button>
+                                    {% endif %}
                                 </td>
                             </tr>
                         {% endfor %}
                     {% else %}
                         <tr>
-                            <td colspan="5" class="no-records">No Records Found</td>
+                            <td colspan="6" class="no-records">No Records Found</td>
                         </tr>
                     {% endif %}
                 </tbody>
+                
             </table>
-            
         </section>
 
     </div>

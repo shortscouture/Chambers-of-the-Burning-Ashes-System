@@ -1,34 +1,33 @@
-document.addEventListener("DOMContentLoaded", () => {
-    function sortTable(columnClass, isNumeric = false, isBoolean = false) {
-        const table = document.querySelector("tbody");
-        const rows = Array.from(table.querySelectorAll("tr"));
-        let ascending = true;
+document.addEventListener("DOMContentLoaded", function () {
+    const table = document.querySelector("table");
+    const headers = document.querySelectorAll("th.sortable");
 
-        return function () {
-            rows.sort((rowA, rowB) => {
-                let cellA = rowA.querySelector(`.${columnClass}`).textContent.trim();
-                let cellB = rowB.querySelector(`.${columnClass}`).textContent.trim();
+    headers.forEach((header, index) => {
+        header.addEventListener("click", function () {
+            sortTable(index);
+        });
+    });
 
-                if (isNumeric) {
-                    return ascending ? Number(cellA) - Number(cellB) : Number(cellB) - Number(cellA);
-                } else if (isBoolean) {
-                    return ascending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
-                } else {
-                    return ascending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
-                }
-            });
+    function sortTable(columnIndex) {
+        let tbody = table.querySelector("tbody");
+        let rows = Array.from(tbody.querySelectorAll("tr"));
+        let isAscending = table.dataset.sortOrder === "asc";
 
-            table.innerHTML = "";
-            rows.forEach(row => table.appendChild(row));
+        rows.sort((rowA, rowB) => {
+            let cellA = rowA.cells[columnIndex].textContent.trim();
+            let cellB = rowB.cells[columnIndex].textContent.trim();
 
-            ascending = !ascending;
-        };
+            // Convert to numbers if applicable
+            let a = isNaN(cellA) ? cellA.toLowerCase() : parseFloat(cellA);
+            let b = isNaN(cellB) ? cellB.toLowerCase() : parseFloat(cellB);
+
+            return isAscending ? (a > b ? 1 : -1) : (a < b ? 1 : -1);
+        });
+
+        // Toggle sorting order
+        table.dataset.sortOrder = isAscending ? "desc" : "asc";
+
+        // Reinsert sorted rows
+        tbody.append(...rows);
     }
-
-    document.getElementById("sort-vault").addEventListener("click", sortTable("vault-id", true));
-    document.getElementById("sort-customer").addEventListener("click", sortTable("check-customer", false, true));
-    document.getElementById("sort-beneficiary").addEventListener("click", sortTable("check-beneficiary", false, true));
-    document.getElementById("sort-record").addEventListener("click", sortTable("check-record", false, true));
-    document.getElementById("sort-payment").addEventListener("click", sortTable("check-payment", false, true));
-    document.getElementById("sort-privilege").addEventListener("click", sortTable("check-privilege", false, true));
 });
