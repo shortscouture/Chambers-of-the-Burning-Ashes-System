@@ -1,18 +1,17 @@
 from .base import *
-
 DEBUG = True #determines if local (dev) mode.
 
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = [env('ALLOWED_HOSTS')]
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',  # Change to your DB engine (e.g., MySQL)
         'NAME': env('DB_NAME'),
+        'ENGINE': 'django.db.backends.mysql',  # Change to your DB engine (e.g., MySQL)
         'USER': env('DB_USER'),
         'PASSWORD': env('DB_PASSWORD'),
         'HOST': env('DB_HOST'),  # Remote DB Host
-        'PORT': env('DB_PORT', default='3306'),
+        'PORT': env('DB_PORT'),
     }
 }
 EMAIL_BACKEND = env('EMAIL_BACKEND')
