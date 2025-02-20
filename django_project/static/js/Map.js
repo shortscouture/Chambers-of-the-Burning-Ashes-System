@@ -82,6 +82,8 @@ function updateCryptColor(section) {
             document.getElementById('level-A').setAttribute('fill', data.levels.A ? 'red' : 'green');
             document.getElementById('level-B').setAttribute('fill', data.levels.B ? 'red' : 'green');
             document.getElementById('level-C').setAttribute('fill', data.levels.C ? 'red' : 'green');
+            document.getElementById('level-D').setAttribute('fill', data.levels.D ? 'red' : 'green');
+            document.getElementById('level-E').setAttribute('fill', data.levels.E ? 'red' : 'green');
 
             // Populate dropdown
             let dropdown = document.getElementById('level-select');
