@@ -12,7 +12,7 @@ DATABASES = {
         'USER': env('DB_USER'),
         'PASSWORD': env('DB_PASSWORD'),
         'HOST': env('DB_HOST'),  # Remote DB Host
-        'PORT': env('DB_PORT', default='5432'),
+        'PORT': env('DB_PORT'),
     }
 }
 EMAIL_BACKEND = env('EMAIL_BACKEND')
