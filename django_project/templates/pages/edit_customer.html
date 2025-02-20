@@ -25,10 +25,9 @@
         <div class="white-box">
             <h1 class="header">Edit Customer & Columbary Details</h1>
 
-            <!-- Customer Edit Form -->
             <form method="POST">
                 {% csrf_token %}
-                
+
                 <!-- Customer Section -->
                 <div class="details-section">
                     <h2>Edit Customer</h2>
@@ -53,6 +52,18 @@
                     {% endfor %}
                 </div>
 
+                <!-- Holder of Privilege Section -->
+                <div class="details-section">
+                    <h2>Edit Holder of Privilege</h2>
+                    {% for field in holder_of_privilege_form %}
+                        <div class="row">
+                            <span class="label">{{ field.label }}</span>
+                            <span class="value">{{ field }}</span>
+                        </div>
+                        <hr class="separator">
+                    {% endfor %}
+                </div>
+
                 <!-- Beneficiary Section -->
                 <div class="details-section">
                     <h2>Edit Beneficiary</h2>
@@ -65,30 +76,106 @@
                     {% endfor %}
                 </div>
 
+                <!-- Payments Section -->
+                <div class="details-section">
+                    <h2>Edit Payment</h2>
+                    
+                    <!-- Mode of Payment -->
+                    <div>
+                        <label for="id_mode_of_payment">Mode of Payment:</label>
+                        {{ payment_form.mode_of_payment }}
+                    </div>
+
+                    <!-- Full Payment Fields -->
+                    <div id="full_payment_fields" style="display: none;">
+                        <h3>Full Payment Details</h3>
+                        <div class="row">
+                            <span class="label">{{ payment_form.Full_payment_receipt_1.label }}</span>
+                            <span class="value">{{ payment_form.Full_payment_receipt_1 }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">{{ payment_form.Full_payment_amount_1.label }}</span>
+                            <span class="value">{{ payment_form.Full_payment_amount_1 }}</span>
+                        </div>
+                    </div>
+
+                    <!-- 6-Month Installment Fields -->
+                    <div id="installment_payment_fields" style="display: none;">
+                        <h3>6-Month Installment Details</h3>
+                        <div class="row">
+                            <span class="label">{{ payment_form.six_month_receipt_1.label }}</span>
+                            <span class="value">{{ payment_form.six_month_receipt_1 }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">{{ payment_form.six_month_amount_1.label }}</span>
+                            <span class="value">{{ payment_form.six_month_amount_1 }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">{{ payment_form.six_month_receipt_2.label }}</span>
+                            <span class="value">{{ payment_form.six_month_receipt_2 }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">{{ payment_form.six_month_amount_2.label }}</span>
+                            <span class="value">{{ payment_form.six_month_amount_2 }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">{{ payment_form.six_month_receipt_3.label }}</span>
+                            <span class="value">{{ payment_form.six_month_receipt_3 }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">{{ payment_form.six_month_amount_3.label }}</span>
+                            <span class="value">{{ payment_form.six_month_amount_3 }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">{{ payment_form.six_month_receipt_4.label }}</span>
+                            <span class="value">{{ payment_form.six_month_receipt_4 }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">{{ payment_form.six_month_amount_4.label }}</span>
+                            <span class="value">{{ payment_form.six_month_amount_4 }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">{{ payment_form.six_month_receipt_5.label }}</span>
+                            <span class="value">{{ payment_form.six_month_receipt_5 }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">{{ payment_form.six_month_amount_5.label }}</span>
+                            <span class="value">{{ payment_form.six_month_amount_5 }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">{{ payment_form.six_month_receipt_6.label }}</span>
+                            <span class="value">{{ payment_form.six_month_receipt_6 }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">{{ payment_form.six_month_amount_6.label }}</span>
+                            <span class="value">{{ payment_form.six_month_amount_6 }}</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Buttons Section -->
                 <div class="back-button" style="display: flex; justify-content: center; align-items: center; margin-top: 20px;">
-                    <!-- Save Button -->
                     <button type="submit" style="margin-right: 10px;">Save Changes</button>
-
-                    <!-- Back Button -->
-                    {% if customer %}
-                        <a href="{% url 'recordsdetails' customer_id=customer.customer_id %}">
-                            <button type="button">Back to Records</button>
-                        </a>
-                    {% else %}
-                        <p class="no-records">Error: Customer not found.</p>
-                    {% endif %}
+                    <a href="{% url 'recordsdetails' customer_id=customer.customer_id %}">
+                        <button type="button">Back to Records</button>
+                    </a>
+                    <button type="button" style="background-color: red; color: white;" onclick="confirmDelete()">Delete Customer</button>
                 </div>
             </form>
 
-            <!-- Delete Customer Section -->
-            {% if customer %}
-                <form method="POST" action="{% url 'delete_customer' customer_id=customer.customer_id %}" style="margin-top: 20px;">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger" style="background-color: red; color: white;">Delete Customer</button>
-                </form>
-            {% endif %}
-        </div> <!-- End of white-box -->
-    </div> <!-- End of page-container -->
+            <form id="delete-form" method="POST" action="{% url 'delete_customer' customer_id=customer.customer_id %}" style="display: none;">
+                {% csrf_token %}
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function confirmDelete() {
+            if (confirm("Are you sure you want to delete this customer? This action cannot be undone.")) {
+                document.getElementById("delete-form").submit();
+            }
+        }
+    </script>
+    <script src="{% static 'js/editcustomer.js' %}"></script>
 </body>
 </html>
