@@ -169,7 +169,6 @@ class ColumbaryRecord(models.Model):
     level = models.CharField(null= False, max_length=1)
     issuance_date = models.DateField(null=True)
     expiration_date = models.DateField(null=True)
-
     inurnment_date = models.DateField(blank=True, null=True)
     urns_per_columbary = models.CharField(max_length=1, blank=True, null=True, choices=[('1', '1'), ('2', '2'), ('3', '3'), ('4', '4')])
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='columbary_records', db_column="customer_id", null=True)
