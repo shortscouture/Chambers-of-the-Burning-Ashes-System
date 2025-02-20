@@ -45,20 +45,22 @@
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Email Address</th>
-                        <th>Crypt #</th>
+                        <th>Beneficiary</th>
+                        <th>Payment</th>
+                        <th>Holder of Privilege</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% if customers %}
-                        {% for customer in customers %}
+                    {% if customers_data %}
+                        {% for data in customers_data %}
                             <tr>
-                                <td>{{ customer.full_name }}</td>
-                                <td>{{ customer.email_address }}</td>
-                                <td>{{ customer.customer_id }}</td>
+                                <td>{{ data.customer.full_name }}</td>
+                                <td>{% if data.has_beneficiary %}Completed{% else %}Incomplete{% endif %}</td>
+                                <td>{% if data.has_payment %}Completed{% else %}Incomplete{% endif %}</td>
+                                <td>{% if data.has_holder_of_privilege %}Completed{% else %}Incomplete{% endif %}</td>
                                 <td>
-                                    <a href="{% url 'recordsdetails' customer.customer_id %}">
+                                    <a href="{% url 'recordsdetails' data.customer.customer_id %}">
                                         <button class="details-button">Details</button>
                                     </a>
                                 </td>
@@ -66,11 +68,12 @@
                         {% endfor %}
                     {% else %}
                         <tr>
-                            <td colspan="4" class="no-records">No Records Found</td>
+                            <td colspan="5" class="no-records">No Records Found</td>
                         </tr>
                     {% endif %}
                 </tbody>
             </table>
+            
         </section>
 
     </div>

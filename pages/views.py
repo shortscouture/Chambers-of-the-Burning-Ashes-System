@@ -50,8 +50,34 @@ class ColumbaryRecordsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["customers"] = Customer.objects.all()
+        
+        customers_data = []
+        customers = Customer.objects.all()
+        
+        for customer in customers:
+            has_beneficiary = customer.beneficiaries.filter(
+                first_beneficiary_name__isnull=False
+            ).exists()
+            
+            has_payment = customer.payments.filter(
+                mode_of_payment__in=["Full Payment", "6-Month Installment"]
+            ).exists()
+            
+            has_holder_of_privilege = customer.privileges.filter(
+                issuance_date__isnull=False
+            ).exists()
+            
+            customers_data.append({
+                "customer": customer,
+                "has_beneficiary": has_beneficiary,
+                "has_payment": has_payment,
+                "has_holder_of_privilege": has_holder_of_privilege,
+            })
+        
+        context["customers_data"] = customers_data
         return context
+
+
 
 
 class MemorialView(TemplateView):
