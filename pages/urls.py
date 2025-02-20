@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
 
-from .views import get_crypt_status, MapView, HomePageView,AboutPageView, MainDashView, ColumbaryRecordsView, CustomerHomeView, MemorialView, send_letter_of_intent, verify_otp, memorials_verification,accept_letter_of_intent, decline_letter_of_intent, RecordsDetailsView, CustomerEditView, SuccesView, ChatbotAPIView,CustomerDeleteView #dashboardView
+from .views import get_crypt_status, MapView, HomePageView,AboutPageView, MainDashView,get_vault_data, ColumbaryRecordsView, CustomerHomeView, MemorialView, send_letter_of_intent, verify_otp, memorials_verification,accept_letter_of_intent, decline_letter_of_intent, RecordsDetailsView, CustomerEditView, SuccesView, ChatbotAPIView,CustomerDeleteView #dashboardView
 
 
 
@@ -27,4 +27,5 @@ urlpatterns = [
     path('columbaryrecords/', views.ColumbaryRecord, name='columbaryrecords'),  # Define this view for your records page
     path('addnewrecord/', views.addnewrecord, name='addnewrecord'),
     path('delete_customer/<int:customer_id>/', CustomerDeleteView.as_view(), name='delete_customer'),
+    path('get_vault_data/<str:section_id>/', get_vault_data, name='get_vault_data'),
 ]

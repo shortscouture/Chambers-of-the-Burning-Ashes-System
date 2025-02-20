@@ -8,7 +8,6 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm, PaymentForm, HolderOfPrivilegeForm
 from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, Payment, ChatQuery, ParishAdministrator, HolderOfPrivilege
-
 from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -507,3 +506,9 @@ def addnewrecord(request):
         'holder_form': holder_form,
         'beneficiary_form': beneficiary_form
     })
+
+def get_vault_data(request, section_id):
+    vaults = ColumbaryRecord.objects.filter(section=section_id)
+    levels = {vault.level: vault.status == "Occupied" for vault in vaults}
+    
+    return JsonResponse({'levels': levels})
