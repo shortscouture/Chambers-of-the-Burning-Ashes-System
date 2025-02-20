@@ -33,11 +33,9 @@ class ParishStaff(models.Model):
         return f"Staff {self.staff_id}"
 
 
-from django.db import models
-
 class Customer(models.Model):
     customer_id = models.AutoField(primary_key=True)
-    
+    purchased_vault = models.ForeignKey("ColumbaryRecord", on_delete=models.SET_NULL, null=True, blank=True)
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('approved', 'Approved'),
@@ -92,16 +90,6 @@ class Customer(models.Model):
         return self.full_address()
 
 
-
-class InquiryRecord(models.Model):
-    letter_of_intent_id = models.AutoField(primary_key=True)
-    columbary_vault = models.ForeignKey('ColumbaryRecord', on_delete=models.SET_NULL, null=True, blank=True)
-    parish_administrator = models.ForeignKey(ParishAdministrator, on_delete=models.SET_NULL, null=True, blank=True)
-    parish_staff = models.ForeignKey(ParishStaff, on_delete=models.SET_NULL, null=True, blank=True)
-    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
-
-    def __str__(self):
-        return f"Inquiry {self.letter_of_intent_id}"
 
 
 class HolderOfPrivilege(models.Model):
