@@ -16,7 +16,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic.base import TemplateView
 from django.db.models import Count, Sum
 from .models import Customer, ColumbaryRecord, Beneficiary, Payment
-from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, PaymentForm
+from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, PaymentForm, DocumentUploadForm
 from django.db import transaction
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -33,6 +33,9 @@ import json
 class SuccesView(TemplateView):
     template_name = "success.html"
 
+class MapView(TemplateView):
+    template_name = "Columbary_Map.html"
+
 class HomePageView(TemplateView):
     template_name = "pages/home.html"
 
@@ -40,7 +43,9 @@ class HomePageView(TemplateView):
 class AboutPageView(TemplateView):
     template_name = "pages/about.html"
 
-
+class MapView(TemplateView):
+    template_name= "Columbary_Map.html"
+    
 class MainDashView(TemplateView):
     template_name = "pages/maindash.html"
 
@@ -647,21 +652,43 @@ class ChatbotAPIView(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def get_data_from_db():
-        data = Customer.objects.all().values()  # Fetch all fields
-        return list(data)
+def get_crypt_status(request, section):
+    # Get all vaults belonging to the given section
+    vaults = ColumbaryRecord.objects.filter(section=section)
+    
+    occupied_count = vaults.filter(status="Occupied").count()
+    total_count = vaults.count()
+    
+    # Determine color based on occupancy
+    if occupied_count == 0:
+        color = "green"   # All vacant
+    elif occupied_count < total_count:
+        color = "yellow"  # Partially occupied
+    else:
+        color = "red"     # All occupied
 
-    def query_openai(data):
-        """Send database data to OpenAI and get a response."""
-        formatted_data = json.dumps(data, indent=2)
-        prompt = f"Here is the database data: {formatted_data}\nAnalyze it and provide insights."
+    # Return JSON response with the color
+    return JsonResponse({"section": section, "color": color})
 
-        response = openai.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "system", "content": "You are an AI assistant."},
-                    {"role": "user", "content": prompt}]
-        )
-        return response["choices"][0]["message"]["content"]
+def get_section_details(request, section_id):
+    columbaries = ColumbaryRecord.objects.filter(section=section_id).values("level", "vault_id", "status")
+    return JsonResponse({"section": section_id, "columbaries": list(columbaries)})
+
+def get_data_from_db():
+    data = Customer.objects.all().values()  # Fetch all fields
+    return list(data)
+
+def query_openai(data):
+    """Send database data to OpenAI and get a response."""
+    formatted_data = json.dumps(data, indent=2)
+    prompt = f"Here is the database data: {formatted_data}\nAnalyze it and provide insights."
+
+    response = openai.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "system", "content": "You are an AI assistant."},
+                {"role": "user", "content": prompt}]
+    )
+    return response["choices"][0]["message"]["content"]
 
     def chatbot_view(request):
         """Handle AJAX request and return chatbot response."""

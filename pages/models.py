@@ -32,8 +32,9 @@ class ParishStaff(models.Model):
     def __str__(self):
         return f"Staff {self.staff_id}"
 
+
 class Customer(models.Model):
-    customer_id = models.BigAutoField(primary_key=True)
+    customer_id = models.AutoField(primary_key=True)
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('approved', 'Approved'),
@@ -87,16 +88,6 @@ class Customer(models.Model):
 
 
 
-
-class InquiryRecord(models.Model):
-    letter_of_intent_id = models.AutoField(primary_key=True)
-    columbary_vault = models.ForeignKey('ColumbaryRecord', on_delete=models.SET_NULL, null=True, blank=True)
-    parish_administrator = models.ForeignKey(ParishAdministrator, on_delete=models.SET_NULL, null=True, blank=True)
-    parish_staff = models.ForeignKey(ParishStaff, on_delete=models.SET_NULL, null=True, blank=True)
-    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
-
-    def __str__(self):
-        return f"Inquiry {self.letter_of_intent_id}"
 
 
 class HolderOfPrivilege(models.Model):
@@ -175,6 +166,9 @@ class Payment(models.Model):
 class ColumbaryRecord(models.Model):
     vault_id = models.CharField(primary_key=True, max_length=8, blank=False)
     section = models.CharField(null= False, max_length=7)
+    level = models.CharField(null= False, max_length=1)
+    issuance_date = models.DateField(null=True)
+    expiration_date = models.DateField(null=True)
     inurnment_date = models.DateField(blank=True, null=True)
     urns_per_columbary = models.CharField(max_length=1, blank=True, null=True, choices=[('1', '1'), ('2', '2'), ('3', '3'), ('4', '4')])
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='columbary_records', db_column="customer_id", null=True)
@@ -182,7 +176,9 @@ class ColumbaryRecord(models.Model):
     beneficiary = models.ForeignKey(Beneficiary, on_delete=models.SET_NULL, null=True, blank=True)
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, null=True, blank=True)
     holder_of_privilege = models.ForeignKey(HolderOfPrivilege, on_delete=models.SET_NULL, null=True, blank=True)
-
+    STATUS_CHOICES = [('Vacant', 'Vacant'), ('Occupied', 'Occupied')]
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Vacant')
+    
     def __str__(self):
         return f"Vault {self.vault_id}"
     def get_record_data(self):
