@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import datetime, timedelta
 from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm, PaymentForm, HolderOfPrivilegeForm
-from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, InquiryRecord, Payment, ChatQuery, ParishAdministrator, HolderOfPrivilege
+from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, Payment, ChatQuery, ParishAdministrator, HolderOfPrivilege
 from django.views.generic import TemplateView, DeleteView
 from django.forms import modelformset_factory
 from django.urls import reverse_lazy
@@ -27,7 +27,7 @@ import re
 import openai
 from django.db import transaction
 import json
-
+import environ
 
 
 class SuccesView(TemplateView):
