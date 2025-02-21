@@ -556,73 +556,59 @@ def addnewrecord(request):
     })
 
 
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import ColumbaryRecord, Customer, Payment, HolderOfPrivilege, Beneficiary
+from .forms import CustomerForm, PaymentForm, ColumbaryRecordForm, HolderOfPrivilegeForm, BeneficiaryForm
+
 def addnewcustomer(request):
-    # Get vault_id from URL (if provided)
     vault_id = request.GET.get('vault_id')
     vault = None
-
+    
     if vault_id:
-        # Ensure we only assign a vault that's not already linked to a customer
         vault = get_object_or_404(ColumbaryRecord, vault_id=vault_id, customer__isnull=True)
-
+    
     if request.method == 'POST':
-        # Initialize forms with POST data
         customer_form = CustomerForm(request.POST)
         payment_form = PaymentForm(request.POST)
-        columbary_form = ColumbaryRecordForm(request.POST)
         holder_form = HolderOfPrivilegeForm(request.POST)
         beneficiary_form = BeneficiaryForm(request.POST)
-
-        # Check if all forms are valid
-        if all([customer_form.is_valid(), payment_form.is_valid(), columbary_form.is_valid(), holder_form.is_valid(), beneficiary_form.is_valid()]):
-            # Save the customer
+        columbary_form = ColumbaryRecordForm(request.P0ST)
+        
+        if customer_form.is_valid() and payment_form.is_valid() and holder_form.is_valid() and beneficiary_form.is_valid():
             customer = customer_form.save()
-
-            # Save payment linked to customer
+            
             payment = payment_form.save(commit=False)
             payment.customer = customer
             payment.save()
-
-            # Save the columbary record linked to customer
-            columbary_record = columbary_form.save(commit=False)
-            columbary_record.customer = customer
-            columbary_record.payment = payment
-
-            # If a vault_id is provided, link it
-            if vault:
-                columbary_record.vault_id = vault.vault_id  # Auto-assign vault
-                vault.customer = customer  # Link vault to new customer
-                vault.save()
-
-            columbary_record.save()
-
-            # Save holder of privilege linked to customer
+            
             holder = holder_form.save(commit=False)
             holder.customer = customer
             holder.save()
-
-            # Save beneficiaries linked to customer
+            
             beneficiary = beneficiary_form.save(commit=False)
             beneficiary.customer = customer
             beneficiary.save()
-
-            # Redirect after successful save
-            return redirect('success')  # Redirect to columbary records page after saving
-
+            
+            if vault:
+                vault.customer = customer
+                vault.payment = payment
+                vault.holder_of_privilege = holder
+                vault.beneficiary = beneficiary
+                vault.save()
+            
+            return redirect('columbaryrecords')
     else:
-        # Initialize empty forms if the method is GET (first time)
         customer_form = CustomerForm()
         payment_form = PaymentForm()
-        columbary_form = ColumbaryRecordForm()
         holder_form = HolderOfPrivilegeForm()
         beneficiary_form = BeneficiaryForm()
-
-    # Render the form with context, including vault_id if it's provided
+        columbary_form = ColumbaryRecordForm()
+    
     return render(request, 'pages/addcustomer.html', {
         'customer_form': customer_form,
         'payment_form': payment_form,
-        'columbary_form': columbary_form,
         'holder_form': holder_form,
         'beneficiary_form': beneficiary_form,
-        'vault_id': vault_id  # Pass vault_id to template to pre-fill the vault information
+        'vault_id': vault_id,
+        'columbary_form': columbary_form
     })
