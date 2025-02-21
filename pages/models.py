@@ -87,9 +87,6 @@ class Customer(models.Model):
         return self.full_name() or "Unnamed Customer"
 
 
-
-
-
 class HolderOfPrivilege(models.Model):
     holder_of_privilege_id = models.AutoField(primary_key=True)
     issuance_date = models.DateField(null=True, blank=True)

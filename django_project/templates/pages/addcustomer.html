@@ -26,12 +26,26 @@
             <div class="col-md-4">{{ customer_form.first_name.label_tag }} {{ customer_form.first_name }}</div>
             <div class="col-md-4">{{ customer_form.middle_name.label_tag }} {{ customer_form.middle_name }}</div>
             <div class="col-md-4">{{ customer_form.last_name.label_tag }} {{ customer_form.last_name }}</div>
+            <div class="col-md-4">{{ customer_form.suffix.label_tag }} {{ customer_form.suffix }}</div>
         </div>
 
         <h4>Address</h4>
         <div class="row">
             <div class="col-md-6">{{ customer_form.address_line_1.label_tag }} {{ customer_form.address_line_1 }}</div>
             <div class="col-md-6">{{ customer_form.address_line_2.label_tag }} {{ customer_form.address_line_2 }}</div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">{{ customer_form.city.label_tag }} {{ customer_form.city }}</div>
+            <div class="col-md-6">{{ customer_form.province_or_state.label_tag }} {{ customer_form.province_or_state }}</div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">{{ customer_form.postal_code.label_tag }} {{ customer_form.postal_code }}</div>
+            <div class="col-md-6">{{ customer_form.country.label_tag }} {{ customer_form.country }}</div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">{{ customer_form.landline_number.label_tag }} {{ customer_form.landline_number }}</div>
+            <div class="col-md-6">{{ customer_form.mobile_number.label_tag }} {{ customer_form.mobile_number }}</div>
         </div>
 
         <h4>Beneficiaries</h4>
@@ -85,6 +99,14 @@
             <div class="col-md-6">{{ holder_form.issuance_date.label_tag }} {{ holder_form.issuance_date }}</div>
             <div class="col-md-6">{{ holder_form.expiration_date.label_tag }} {{ holder_form.expiration_date }}</div>
         </div>
+
+        <h4>Columbary Record</h4>
+        <div class="row">
+            <div class="col-md-6">{{ columbary_form.inurnment_date.label_tag }} {{ columbary_form.inurnment_date }}</div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">{{ columbary_form.urns_per_columbary.label_tag }} {{ columbary_form.urns_per_columbary }}</div>
+        </div>        
 
         <div class="text-center mt-4">
             <button type="submit" class="btn btn-primary btn-lg">Add Customer</button>
