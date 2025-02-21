@@ -436,7 +436,7 @@ class ChatbotAPIView(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
-        
+       
 def preprocess_image(image):
     """
     Preprocess the image to improve OCR accuracy
@@ -445,12 +445,28 @@ def preprocess_image(image):
     img = img.point(lambda x: 0 if x < 128 else 255)
     return img
 
+@csrf_exempt
+def process_ocr(request):
+    if request.method == 'POST' and request.FILES.get('document'):
+        try:
+            # Extract text from the uploaded image
+            image = request.FILES['document']
+            extracted_text = extract_text(image)
+            
+            # Parse the extracted text into a dictionary
+            data = parse_text_to_dict(extracted_text)
+            
+            return JsonResponse({'success': True, 'data': data})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Invalid request'})
+
 def extract_text(image):
     """
     Extract text from image using pytesseract
     """
-    preprocessed_img = preprocess_image(image)
-    text = pytesseract.image_to_string(preprocessed_img)
+    img = Image.open(image).convert('L')  # Convert to grayscale
+    text = pytesseract.image_to_string(img)
     return text
 
 def parse_text_to_dict(text):
@@ -470,18 +486,6 @@ def parse_text_to_dict(text):
         'second_beneficiary_name': None,
         'third_beneficiary_name': None,
         
-        # HolderOfPrivilege fields
-        'holder_name': None,
-        'holder_email': None,
-        'holder_address': None,
-        'holder_landline': None,
-        'holder_mobile': None,
-        
-        # Payment fields
-        'full_contribution': False,
-        'six_month_installment': False,
-        'official_receipt': None,
-        
         # ColumbaryRecord fields
         'vault_id': None,
         'issuance_date': None,
@@ -491,56 +495,21 @@ def parse_text_to_dict(text):
         'urns_per_columbary': None,
     }
     
-    # Pattern matching for all fields
+    # Example patterns (adjust based on your document structure)
     patterns = {
-        # Customer patterns
-        'full_name': r'Name:[\s]*([^\n]*)',
-        'permanent_address': r'Address:[\s]*([^\n]*)',
-        'landline_number': r'Landline:[\s]*(\d+)',
-        'mobile_number': r'Mobile:[\s]*(\d{11})',
-        'email_address': r'Email:[\s]*([^\s@]+@[^\s@]+\.[^\s@]+)',
-        
-        # Beneficiary patterns
-        'first_beneficiary_name': r'First Beneficiary:[\s]*([^\n]*)',
-        'second_beneficiary_name': r'Second Beneficiary:[\s]*([^\n]*)',
-        'third_beneficiary_name': r'Third Beneficiary:[\s]*([^\n]*)',
-        
-        # HolderOfPrivilege patterns
-        'holder_name': r'Holder Name:[\s]*([^\n]*)',
-        'holder_email': r'Holder Email:[\s]*([^\s@]+@[^\s@]+\.[^\s@]+)',
-        'holder_address': r'Holder Address:[\s]*([^\n]*)',
-        'holder_landline': r'Holder Landline:[\s]*(\d+)',
-        'holder_mobile': r'Holder Mobile:[\s]*(\d+)',
-        
-        # ColumbaryRecord patterns
-        'vault_id': r'Vault ID:[\s]*([A-Za-z0-9-]+)',
-        'issuance_date': r'Issuance Date:[\s]*(\d{2}/\d{2}/\d{4})',
-        'expiration_date': r'Expiration Date:[\s]*(\d{2}/\d{2}/\d{4})',
-        'inurnment_date': r'Inurnment Date:[\s]*(\d{2}/\d{2}/\d{4})',
-        'issuing_parish_priest': r'Parish Priest:[\s]*([^\n]*)',
-        'urns_per_columbary': r'Urns:[\s]*([1-4])',
+        'full_name': r'Full name:[\s]*([^\n]*)',
+        'permanent_address': r'Permanent Address:[\s]*([^\n]*)',
+        'mobile_number': r'Mobile Number:[\s]*([^\n]*)',
+        'email_address': r'Email Address:[\s]*([^\n]*)',
+        'first_beneficiary_name': r'FIRST PRIORITY[\s]*Full name:[\s]*([^\n]*)',
+        'vault_id': r'Vault ID:[\s]*([^\n]*)',
+        'issuance_date': r'Issuance Date:[\s]*([^\n]*)',
     }
     
-    # Extract payment information
-    data['full_contribution'] = bool(re.search(r'Payment Type:[\s]*Full', text, re.IGNORECASE))
-    data['six_month_installment'] = bool(re.search(r'Payment Type:[\s]*Installment', text, re.IGNORECASE))
-    receipt_match = re.search(r'Receipt Number:[\s]*(\d+)', text)
-    if receipt_match:
-        data['official_receipt'] = int(receipt_match.group(1))
-    
-    # Extract all other fields using patterns
     for field, pattern in patterns.items():
         match = re.search(pattern, text)
         if match:
             data[field] = match.group(1).strip()
-            
-            # Convert dates to proper format
-            if 'date' in field and data[field]:
-                try:
-                    date_obj = datetime.strptime(data[field], '%d/%m/%Y')
-                    data[field] = date_obj.date()
-                except ValueError:
-                    data[field] = None
     
     return data
 
