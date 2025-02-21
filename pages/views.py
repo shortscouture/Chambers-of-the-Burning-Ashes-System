@@ -28,6 +28,7 @@ import openai
 from django.db import transaction
 import json
 import environ
+from django.views.decorators.csrf import csrf_exempt
 
 
 class SuccesView(TemplateView):
