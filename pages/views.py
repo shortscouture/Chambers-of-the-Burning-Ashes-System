@@ -690,11 +690,11 @@ def query_openai(data):
     )
     return response["choices"][0]["message"]["content"]
 
-    def chatbot_view(request):
-        """Handle AJAX request and return chatbot response."""
-        db_data = get_data_from_db()
-        ai_response = query_openai(db_data)
-        return JsonResponse({"response": ai_response})
+def chatbot_view(request):
+    """Handle AJAX request and return chatbot response."""
+    db_data = get_data_from_db()
+    ai_response = query_openai(db_data)
+    return JsonResponse({"response": ai_response})
 
 
 def addnewrecord(request):
