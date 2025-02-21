@@ -78,14 +78,21 @@ function updateCryptColor(section) {
     fetch(`/get_vault_data/${sectionId}/`)
         .then(response => response.json())
         .then(data => {
-            // Update colors dynamically based on data
-            document.getElementById('level-A').setAttribute('fill', data.levels.A ? 'red' : 'green');
-            document.getElementById('level-B').setAttribute('fill', data.levels.B ? 'red' : 'green');
-            document.getElementById('level-C').setAttribute('fill', data.levels.C ? 'red' : 'green');
-            document.getElementById('level-D').setAttribute('fill', data.levels.D ? 'red' : 'green');
-            document.getElementById('level-E').setAttribute('fill', data.levels.E ? 'red' : 'green');
+            // Loop through potential levels (A to E)
+            ['A', 'B', 'C', 'D', 'E'].forEach(level => {
+                let levelElement = document.getElementById(`level-${level}`);
+                if (levelElement) { // Ensure element exists
+                    if (data.levels.hasOwnProperty(level)) {
+                        // Set color if the level exists
+                        levelElement.setAttribute('fill', data.levels[level] ? 'red' : 'green');
+                    } else {
+                        // Remove the level from SVG if it doesn't exist
+                        levelElement.remove();
+                    }
+                }
+            });
 
-            // Populate dropdown
+            // Populate dropdown with available levels
             let dropdown = document.getElementById('level-select');
             dropdown.innerHTML = ''; // Clear previous options
             Object.keys(data.levels).forEach(level => {
@@ -101,6 +108,8 @@ function updateCryptColor(section) {
             document.getElementById('overlay').style.display = 'block';
         });
 }
+
+
 
 function closePopup() {
     document.getElementById('popup').style.display = 'none';
