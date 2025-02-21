@@ -7,7 +7,6 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 
 
-
 class Account(models.Model):
     account_id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=45, unique=True)
@@ -138,6 +137,9 @@ class Payment(models.Model):
     payment_id = models.AutoField(primary_key=True)
     mode_of_payment = models.CharField(max_length=20, choices=PAYMENT_MODES, default="Full Payment")
 
+    class Meta:
+        db_table = "payment"  # 🔥 Ensures Django uses the correct table
+
     # Seven receipt fields
     Full_payment_receipt_1 = models.IntegerField(blank=True, null=True)
     six_month_receipt_1 = models.IntegerField(blank=True, null=True)
@@ -179,13 +181,17 @@ class Payment(models.Model):
 
 
 class ColumbaryRecord(models.Model):
-    vault_id = models.CharField(primary_key=True, max_length=8)
-    section = models.CharField(null= False, max_length=7)
+    vault_id = models.CharField(primary_key=True, max_length=7)
     issuance_date = models.DateField(null=True)
     expiration_date = models.DateField(null=True)
     inurnment_date = models.DateField(blank=True, null=True)
     issuing_parish_priest = models.CharField(max_length=45, blank=True, null=True)
     urns_per_columbary = models.CharField(max_length=1, null=True, choices=[('1', '1'), ('2', '2'), ('3', '3'), ('4', '4')])
+    status = models.CharField(max_length=10, default="Vacant")
+
+    class Meta:
+        db_table = "columbaryrecord"  # 🔥 Ensures Django uses the correct table
+
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
     parish_staff = models.ForeignKey(ParishStaff, on_delete=models.SET_NULL, null=True, blank=True)
     beneficiary = models.ForeignKey(Beneficiary, on_delete=models.SET_NULL, null=True, blank=True)
@@ -193,7 +199,8 @@ class ColumbaryRecord(models.Model):
     holder_of_privilege = models.ForeignKey(HolderOfPrivilege, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return f"Vault {self.vault_id}"
+        return f"Vault {self.vault_id} - {self.status}"
+
     def get_record_data(self):
         """Get formatted record data"""
         data = {

@@ -12,7 +12,6 @@
     <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/Headers.css') }}">
     <style>
         body {
             margin: 0;
@@ -25,7 +24,7 @@
             left: 0;
             width: 100%;
             background-color: #fff;
-            z-index: 1000; 
+            z-index: 1000;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
@@ -52,6 +51,11 @@
 
 <body>
 
+    {{ occupied_columbary }}
+    {{ available_columbary }}
+    {{ unissued_columbary }}
+    {{ pending_letters }}
+
     {% include 'Staff_Headers.html' %}
 
     <h1>Dashboard</h1>
@@ -59,13 +63,13 @@
     <div class="dashboard-grid">
         <div class="info-box" onclick="toggleAvailableTable()">
             <h2>Available Columbaries</h2>
-            <p>{{ vacant_columbaries }}</p>
+            <p>{{ vacant_columbaries_count }}</p>
         </div>
         <div class="info-box" onclick="toggleOccupiedTable()">
             <h2>Occupied Columbaries</h2>
             <p>{{ occupied_columbaries_count }}</p>
         </div>
-        <div class="info-box">
+        <div class="info-box" onclick="toggleUnissuedTable()">
             <h2>Unissued Columbaries</h2>
             <p>{{ unissued_columbaries }}</p>
         </div>
@@ -143,13 +147,37 @@
                 </tr>
             </thead>
             <tbody>
-                {% for columbary in occupied_columbaries %}
+                {% for columbary in vacant_columbaries %}
                 <tr>
-                    <td>{{ columbary.name }}</td>
-                    <td>{{ columbary.location }}</td>
-                    <td>{{ columbary.capacity }}</td>
+                    <td>{{ columbary.vault_id }}</td>
+                    <td>{{ columbary.section }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Unissued Columbaries Table (Initially Hidden) -->
+    <div id="unissuedTableContainer" class="table-container hidden">
+        <h3>Unissued Columbaries</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Vault ID</th>
+                    <th>Issuance Date</th>
+                    <th>Customer</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for columbary in unissued_columbary_records %}
+                <tr>
+                    <td>{{ columbary.vault_id }}</td>
+                    <td>{{ columbary.issuance_date }}</td>
                     <td>{{ columbary.customer.full_name }}</td>
-                    <td>{{ columbary.status }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">No unissued columbaries found.</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -207,18 +235,22 @@
 
         // Columbary Records (Line Chart)
         // Total Inquiries (Bar Chart)
+        var earningsLabels = JSON.parse('{{ earnings_labels|default:"[]"|escapejs }}');
+        var earningsData = JSON.parse('{{ earnings_data|default:"[]"|escapejs }}');
+
         createChart(
             "earningsChart",
             "line",
-            JSON.parse('{{ earnings_labels|safe }}'), // Convert to JavaScript array
-            JSON.parse('{{ earnings_data|safe }}'),   // Convert to JavaScript array
+            earningsLabels,
+            earningsData,
             "Total Earnings"
         );
 
 
         // Payment Pie Chart
-        var fullPayment = JSON.parse('{{ full_payment_count|default:"0" }}');
-        var installment = JSON.parse('{{ installment_count|default:"0" }}');
+        var fullPayment = parseInt("{{ full_payment_count|default:"0" }}");
+        var installment = parseInt("{{ installment_count|default:"0" }}");
+
 
         var ctx = document.getElementById('paymentChart').getContext('2d');
         new Chart(ctx, {
@@ -255,6 +287,11 @@
             var occupiedTable = document.getElementById("occupiedTableContainer");
             occupiedTable.classList.toggle("hidden");
         }
+
+        function toggleUnissuedTable() {
+            var unissuedTable = document.getElementById("unissuedTableContainer");
+            unissuedTable.classList.toggle("hidden");
+    }
     </script>
 </body>
 

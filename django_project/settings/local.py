@@ -1,20 +1,26 @@
 from .base import *
+import environ
+
+env = environ.Env()
+environ.Env.read_env(BASE_DIR / ".env")  # Ensure your .env file is read
+
 
 DEBUG = True #determines if local (dev) mode.
 
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',  # Change to your DB engine (e.g., MySQL)
-        'NAME': env('DB_NAME'),
+        'ENGINE': 'django.db.backends.mysql',  
+        'NAME': env('DB_NAME', default='fallback_db_name'),
         'USER': env('DB_USER'),
         'PASSWORD': env('DB_PASSWORD'),
-        'HOST': env('DB_HOST'),  # Remote DB Host
-        'PORT': env('DB_PORT', default='5432'),
+        'HOST': env('DB_HOST'),
+        'PORT': env.int('DB_PORT', default=3306),  # Convert to integer
     }
 }
+
 EMAIL_BACKEND = env('EMAIL_BACKEND')
 EMAIL_HOST = env('EMAIL_HOST')
 EMAIL_PORT = 587 #gmail port
