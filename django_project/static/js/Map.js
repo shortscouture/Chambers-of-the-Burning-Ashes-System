@@ -83,11 +83,12 @@ function updateCryptColor(section) {
                 let levelElement = document.getElementById(`level-${level}`);
                 if (levelElement) { // Ensure element exists
                     if (data.levels.hasOwnProperty(level)) {
-                        // Set color if the level exists
+                        // Only show if the level actually exists in the data
+                        levelElement.style.display = ''; // Reset to default
                         levelElement.setAttribute('fill', data.levels[level] ? 'red' : 'green');
                     } else {
-                        // Remove the level from SVG if it doesn't exist
-                        levelElement.remove();
+                        // Hide the element if the level does not exist
+                        levelElement.style.display = 'none';
                     }
                 }
             });
@@ -108,6 +109,8 @@ function updateCryptColor(section) {
             document.getElementById('overlay').style.display = 'block';
         });
 }
+
+
 
 
 
