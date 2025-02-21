@@ -436,7 +436,7 @@ class ChatbotAPIView(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
-       
+@csrf_exempt       
 def preprocess_image(image):
     """
     Preprocess the image to improve OCR accuracy
@@ -445,7 +445,7 @@ def preprocess_image(image):
     img = img.point(lambda x: 0 if x < 128 else 255)
     return img
 
-@csrf_exempt
+
 def process_ocr(request):
     if request.method == 'POST' and request.FILES.get('document'):
         try:
