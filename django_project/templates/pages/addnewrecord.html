@@ -116,14 +116,29 @@
     <div class="container">
         <h2>Add New Columbary Record</h2>
         <div class="ocr-section">
-            <h3>Upload Document for Auto-Fill</h3>
-            <div class="ocr-upload">
-                <input type="file" id="ocrInput" accept="image/*" class="ocr-input">
-                <button type="button" id="processOCR" class="ocr-button">Process with OCR</button>
+            <h3>Document Capture</h3>
+            
+            <div class="capture-options">
+                <button type="button" class="capture-option" id="webcamOption">Use Webcam</button>
+                <button type="button" class="capture-option" id="uploadOption">Upload File</button>
             </div>
-            <small class="ocr-help">Upload a clear image of the handwritten form to auto-fill fields</small>
-        </div>
-        <form method="POST">
+
+            <!-- Webcam Interface -->
+            <div id="webcam-container">
+                <video id="webcam-view" autoplay playsinline></video>
+                <div id="capture-controls">
+                    <button type="button" class="camera-button" id="captureButton">Take Photo</button>
+                    <button type="button" class="camera-button" id="retakeButton" style="display: none;">Retake</button>
+                    <button type="button" class="camera-button" id="processWebcamButton" style="display: none;">Process Image</button>
+                </div>
+                <canvas id="captured-image"></canvas>
+            </div>
+
+            <!-- File Upload Interface -->
+            <div class="file-upload" id="fileUploadContainer">
+                <input type="file" id="ocrInput" accept="image/*" class="ocr-input">
+                <button type="button" id="processFileButton" class="capture-option">Process File</button>
+            </div>
 
         <!-- Display Form Errors -->
         {% if customer_form.errors or payment_form.errors or columbary_form.errors or holder_form.errors or beneficiary_form.errors %}
