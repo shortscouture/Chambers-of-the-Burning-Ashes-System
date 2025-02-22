@@ -1,4 +1,11 @@
 from .base import *
+import pytesseract
+
+# Set the Tesseract path
+# For Windows
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+
+
 DEBUG = True #determines if local (dev) mode.
 
 
