@@ -1,8 +1,14 @@
 from .base import *
+import pytesseract
+
+
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+
 import environ
 
 env = environ.Env()
 environ.Env.read_env(BASE_DIR / ".env")  # Ensure your .env file is read
+
 
 
 DEBUG = True #determines if local (dev) mode.
