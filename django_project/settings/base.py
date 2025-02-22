@@ -62,6 +62,8 @@ INSTALLED_APPS = [
     # Local
     "accounts",
     "pages",
+    #for parish staff chatbot
+    "parish_staff",
 ]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware

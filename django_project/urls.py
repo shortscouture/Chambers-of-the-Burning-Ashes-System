@@ -6,6 +6,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("allauth.urls")),
     path("", include("pages.urls")),
+    path("staff/", include("parish_chatbot.urls")),
+    # path('customer/', include('customer_chatbot.urls')) #soon(tm)
 ]
 
 if settings.DEBUG:
