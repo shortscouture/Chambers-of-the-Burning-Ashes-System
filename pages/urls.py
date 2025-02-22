@@ -4,7 +4,7 @@ from .views import (
     HomePageView, AboutPageView, MainDashView, ColumbaryRecordsView,
     CustomerHomeView, MemorialView, send_letter_of_intent, verify_otp,
     memorials_verification, accept_letter_of_intent, decline_letter_of_intent,
-    RecordsDetailsView, CustomerEditView, SuccesView, ChatbotAPIView, DashboardView
+    RecordsDetailsView, CustomerEditView, SuccesView, ChatbotAPIView, DashboardView, get_crypt_status, MapView, CustomerDeleteView
 )
 
 urlpatterns = [

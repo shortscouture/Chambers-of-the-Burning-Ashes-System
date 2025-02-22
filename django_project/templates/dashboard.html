@@ -123,9 +123,9 @@
             <tbody>
                 {% for columbary in available_columbaries %}
                 <tr>
-                    <td>{{ columbary.name }}</td>
-                    <td>{{ columbary.location }}</td>
-                    <td>{{ columbary.capacity }}</td>
+                    <td>{{ columbary.vault_id }}</td>
+                    <td>{{ columbary.section }}</td>
+                    <td>{{ columbary.urns_per_columbary }}</td>
                     <td>{{ columbary.status }}</td>
                 </tr>
                 {% endfor %}
@@ -147,10 +147,13 @@
                 </tr>
             </thead>
             <tbody>
-                {% for columbary in vacant_columbaries %}
+                {% for columbary in occupied_columbaries %}
                 <tr>
                     <td>{{ columbary.vault_id }}</td>
                     <td>{{ columbary.section }}</td>
+                    <td>{{ columbary.urns_per_columbary }}</td>
+                    <td>{{ columbary.customer.full_name }}</td>
+                    <td>{{ columbary.status }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

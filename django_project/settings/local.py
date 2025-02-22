@@ -16,8 +16,8 @@ DATABASES = {
         'NAME': env('DB_NAME', default='fallback_db_name'),
         'USER': env('DB_USER'),
         'PASSWORD': env('DB_PASSWORD'),
-        'HOST': env('DB_HOST'),  # Remote DB Host
-        'PORT': env('DB_PORT', default='5432'),
+        'HOST': env('DB_HOST'),
+        'PORT': env.int('DB_PORT', default=3306),  # Convert to integer
     }
 }
 

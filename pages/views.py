@@ -72,7 +72,7 @@ class DashboardView(TemplateView):
 
         # Fetch necessary data
         customer_status_counts = Customer.objects.values('status').annotate(count=Count('status'))
-        inquiry_counts = InquiryRecord.objects.count()
+        #inquiry_counts = InquiryRecord.objects.count()
         pending_counts = Customer.objects.filter(status="pending").count()
         vacant_columbaries = ColumbaryRecord.objects.filter(status="Vacant")
         occupied_columbaries = ColumbaryRecord.objects.filter(status="Occupied")
@@ -88,7 +88,10 @@ class DashboardView(TemplateView):
             .order_by("issuance_date")
         )
 
-        earnings_labels = [entry["issuance_date"].strftime("%Y-%m-%d") for entry in earnings_by_date]
+        earnings_labels = [
+            entry["issuance_date"].strftime("%Y-%m-%d") 
+            for entry in earnings_by_date if entry["issuance_date"] is not None
+        ]
         earnings_data = [float(entry["total_earnings"]) for entry in earnings_by_date]
 
         context.update({
@@ -99,7 +102,7 @@ class DashboardView(TemplateView):
         # Add data to context
         context.update({
             'customer_status_counts': customer_status_counts,
-            'inquiry_counts': inquiry_counts,
+            #'inquiry_counts': inquiry_counts,
             'pending_counts': Customer.objects.filter(status="pending").count(),
             'unissued_columbaries': ColumbaryRecord.objects.filter(issuance_date__isnull=True, customer__isnull=False).count(),
             'full_payment_count': full_payment_count,

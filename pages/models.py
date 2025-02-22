@@ -33,6 +33,8 @@ class ParishStaff(models.Model):
 
 
 class Customer(models.Model):
+    class Meta:
+        db_table = "customer" 
     customer_id = models.AutoField(primary_key=True)
     STATUS_CHOICES = [
         ('pending', 'Pending'),
