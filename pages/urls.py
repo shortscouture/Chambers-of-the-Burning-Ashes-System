@@ -26,6 +26,6 @@ urlpatterns = [
     path('columbaryrecords/', views.ColumbaryRecord, name='columbaryrecords'),  # Define this view for your records page
     path('addnewrecord/', views.addnewrecord, name='addnewrecord'),
     path('delete_customer/<int:customer_id>/', CustomerDeleteView.as_view(), name='delete_customer'),
-    path('process-ocr/', process_ocr, name='process_ocr'),
+    path('process-ocr/', views.process_ocr, name='process_ocr'),
 
 ]
