@@ -124,7 +124,7 @@ a:hover { color: #FF0; }
 
 .primary-button a {
   display: inline-block;
-  background-color: #ff7d27;
+  background-color: #2891d2;
   padding: 15px 24px;
   border-radius: 3px;
   text-transform: uppercase;
@@ -158,8 +158,18 @@ a:hover { color: #FF0; }
   margin-bottom: 0px;
 }
 
+.baner-content h1 em {
+  margin-top: 0px;
+  font-size: 128px;
+  color: #2891d2;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 0px;
+}
+
+
 .baner-content em {
-  color: #ff7d27;
+  color: #2891d2;
   font-weight: 600;
   font-style: normal;
 }
