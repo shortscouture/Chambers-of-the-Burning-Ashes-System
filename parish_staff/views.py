@@ -4,7 +4,7 @@ import environ
 from .models import ChatLog
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, permissions
 
 
 env = environ.Env(
@@ -14,8 +14,14 @@ env = environ.Env(
 
 openai.api_key = env("OPEN_AI_API_KEY")
 
+class isParishStaff(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.CustomUser.is_authenticated and request.CustomUser.role == "parish_staff"
 
-class ChatbotAPIView(APIView):
+class chatbotAPIView(APIView):
+    
+    permission_classes = [isParishStaff]
+    
     def get(self, request, *args, **kwargs):
         return Response({"message": "Chatbot API is running! Use POST to send messages."}, status=status.HTTP_200_OK)
     
