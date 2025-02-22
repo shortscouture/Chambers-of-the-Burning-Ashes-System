@@ -594,6 +594,8 @@ def get_data_from_db():
     data = Customer.objects.all().values()  # Fetch all fields
     return list(data)
 
+#Open AI Views
+
 def query_openai(data):
     """Send database data to OpenAI and get a response."""
     formatted_data = json.dumps(data, indent=2)
