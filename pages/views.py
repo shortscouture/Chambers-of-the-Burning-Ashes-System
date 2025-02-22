@@ -5,6 +5,8 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
 from django.utils import timezone
+from django.utils.safestring import mark_safe
+from django.db.models import Count, Sum
 from datetime import datetime, timedelta
 from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm, PaymentForm, HolderOfPrivilegeForm
 from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, Payment, ChatQuery, ParishAdministrator, HolderOfPrivilege
@@ -62,7 +64,62 @@ class ColumbaryRecordsView(TemplateView):
 class MemorialView(TemplateView):
     template_name = "pages/Memorials.html"
 
+class DashboardView(TemplateView):
+    template_name = "dashboard.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Fetch necessary data
+        customer_status_counts = Customer.objects.values('status').annotate(count=Count('status'))
+        #inquiry_counts = InquiryRecord.objects.count()
+        pending_counts = Customer.objects.filter(status="pending").count()
+        vacant_columbaries = ColumbaryRecord.objects.filter(status="Vacant")
+        occupied_columbaries = ColumbaryRecord.objects.filter(status="Occupied")
+        unissued_columbaries = ColumbaryRecord.objects.filter(issuance_date__isnull=True, customer__isnull=False).count()
+        full_payment_count = Payment.objects.filter(mode_of_payment="Full Payment").count()
+        installment_count = Payment.objects.filter(mode_of_payment="6-Month Installment").count()
+        unissued_columbary_records = ColumbaryRecord.objects.filter(issuance_date__isnull=True, customer__isnull=False)
+
+        earnings_by_date = (
+            ColumbaryRecord.objects.filter(payment__isnull=False)
+            .values("issuance_date")
+            .annotate(total_earnings=Sum("payment__total_amount"))
+            .order_by("issuance_date")
+        )
+
+        earnings_labels = [
+            entry["issuance_date"].strftime("%Y-%m-%d") 
+            for entry in earnings_by_date if entry["issuance_date"] is not None
+        ]
+        earnings_data = [float(entry["total_earnings"]) for entry in earnings_by_date]
+
+        context.update({
+            "earnings_labels": mark_safe(json.dumps(earnings_labels)),  # Converts to JSON
+            "earnings_data": mark_safe(json.dumps(earnings_data)),  # Converts to JSON
+        })
+
+        # Add data to context
+        context.update({
+            'customer_status_counts': customer_status_counts,
+            #'inquiry_counts': inquiry_counts,
+            'pending_counts': Customer.objects.filter(status="pending").count(),
+            'pending_customers': Customer.objects.filter(status="pending"),
+            'unissued_columbaries': ColumbaryRecord.objects.filter(issuance_date__isnull=True, customer__isnull=False).count(),
+            'full_payment_count': full_payment_count,
+            'installment_count': installment_count,
+            'earnings_labels': earnings_labels,
+            'earnings_data': earnings_data,
+            'vacant_columbaries': ColumbaryRecord.objects.filter(status="Vacant"),
+            'vacant_columbaries_count': ColumbaryRecord.objects.filter(status="Vacant").count(),  # Returns an int
+            'occupied_columbaries': ColumbaryRecord.objects.filter(status="Occupied"),
+            'occupied_columbaries_count': ColumbaryRecord.objects.filter(status="Occupied").count(),
+            'unissued_columbary_records' : unissued_columbary_records
+        })
+
+        return context
+
+            
 def send_letter_of_intent(request):
     if request.method == 'POST':
 
