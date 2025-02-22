@@ -7,13 +7,18 @@ from rest_framework.response import Response
 from rest_framework import status, permissions
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
-from rest_framework.permissions import IsAuthenticated
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 env = environ.Env(
     DEBUG=(bool, False) #default value for DEBUG = False
 )
 
-@login_required
+
+
+
 def chatbot_view(request):
     return render(request, "parish_staff/chatbot.html")
 openai.api_key = env("OPEN_AI_API_KEY")
@@ -23,9 +28,9 @@ class isParishStaff(permissions.BasePermission):
         return request.user.is_authenticated and request.user.role == "Parish Staff"
 
 
-
+@method_decorator(csrf_exempt, name='dispatch')
 class chatbotAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = []
     
     def get(self, request, *args, **kwargs):
         return Response({"message": "Chatbot API is running! Use POST to send messages."}, status=status.HTTP_200_OK)
