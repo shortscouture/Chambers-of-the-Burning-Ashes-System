@@ -1,24 +1,37 @@
+// Debugging: Check if the JavaScript file is loaded
+console.log('addnewrecord.js loaded!');
+
 // Function to toggle payment fields based on selected payment mode
 function togglePaymentFields() {
-    var paymentMode = document.getElementById("id_mode_of_payment").value;
-    var fullPaymentFields = document.getElementById("full_payment_fields");
-    var installmentFields = document.getElementById("installment_payment_fields");
+    console.log('Toggling payment fields...');
+    const paymentMode = document.getElementById('id_mode_of_payment').value;
+    const fullPaymentFields = document.getElementById('full_payment_fields');
+    const installmentFields = document.getElementById('installment_payment_fields');
 
-    if (paymentMode === "Full Payment") {
-        fullPaymentFields.style.display = "block";
-        installmentFields.style.display = "none";
-    } else if (paymentMode === "6-Month Installment") {
-        fullPaymentFields.style.display = "none";
-        installmentFields.style.display = "block";
+    if (paymentMode === 'Full Payment') {
+        fullPaymentFields.style.display = 'block';
+        installmentFields.style.display = 'none';
+    } else if (paymentMode === '6-Month Installment') {
+        fullPaymentFields.style.display = 'none';
+        installmentFields.style.display = 'block';
     } else {
-        fullPaymentFields.style.display = "none";
-        installmentFields.style.display = "none";
+        fullPaymentFields.style.display = 'none';
+        installmentFields.style.display = 'none';
     }
 }
 
 // Initialize payment fields on page load
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener('DOMContentLoaded', function () {
+    console.log('DOM fully loaded and parsed');
     togglePaymentFields();
+
+    // Add event listener for payment mode change
+    const paymentModeSelect = document.getElementById('id_mode_of_payment');
+    if (paymentModeSelect) {
+        paymentModeSelect.addEventListener('change', togglePaymentFields);
+    } else {
+        console.error('Payment mode select element not found!');
+    }
 });
 
 // Webcam and OCR variables
@@ -27,12 +40,14 @@ let capturedImage = null;
 
 // Toggle between webcam and file upload
 document.getElementById('webcamOption').addEventListener('click', function () {
+    console.log('Webcam option clicked');
     document.getElementById('webcam-container').style.display = 'block';
     document.getElementById('fileUploadContainer').style.display = 'none';
     initializeWebcam();
 });
 
 document.getElementById('uploadOption').addEventListener('click', function () {
+    console.log('Upload option clicked');
     document.getElementById('webcam-container').style.display = 'none';
     document.getElementById('fileUploadContainer').style.display = 'block';
     stopWebcam();
@@ -40,6 +55,7 @@ document.getElementById('uploadOption').addEventListener('click', function () {
 
 // Initialize webcam
 async function initializeWebcam() {
+    console.log('Initializing webcam...');
     try {
         stream = await navigator.mediaDevices.getUserMedia({
             video: {
@@ -57,6 +73,7 @@ async function initializeWebcam() {
 
 // Stop webcam
 function stopWebcam() {
+    console.log('Stopping webcam...');
     if (stream) {
         stream.getTracks().forEach(track => track.stop());
         stream = null;
@@ -65,6 +82,7 @@ function stopWebcam() {
 
 // Capture image from webcam
 document.getElementById('captureButton').addEventListener('click', function () {
+    console.log('Capture button clicked');
     const video = document.getElementById('webcam-view');
     const canvas = document.getElementById('captured-image');
     const context = canvas.getContext('2d');
@@ -85,12 +103,12 @@ document.getElementById('captureButton').addEventListener('click', function () {
     document.getElementById('retakeButton').style.display = 'inline-block';
     document.getElementById('processWebcamButton').style.display = 'inline-block';
 
-    // Store captured image as base64
     capturedImage = canvas.toDataURL('image/jpeg');
 });
 
 // Retake photo
 document.getElementById('retakeButton').addEventListener('click', function () {
+    console.log('Retake button clicked');
     const video = document.getElementById('webcam-view');
     const canvas = document.getElementById('captured-image');
 
@@ -108,6 +126,7 @@ document.getElementById('retakeButton').addEventListener('click', function () {
 
 // Process captured image from webcam
 document.getElementById('processWebcamButton').addEventListener('click', function () {
+    console.log('Process webcam button clicked');
     if (!capturedImage) return;
 
     // Convert base64 to blob
@@ -119,7 +138,8 @@ document.getElementById('processWebcamButton').addEventListener('click', functio
 });
 
 // Process uploaded file
-document.getElementById('processFileButton').addEventListener('click', function () {
+document.getElementById('processOCR').addEventListener('click', function () {
+    console.log('Process OCR button clicked');
     const fileInput = document.getElementById('ocrInput');
     if (!fileInput.files.length) {
         alert('Please select a file first');
@@ -131,6 +151,7 @@ document.getElementById('processFileButton').addEventListener('click', function 
 
 // Common image processing function
 function processImage(imageBlob) {
+    console.log('Processing image...');
     const formData = new FormData();
     formData.append('document', imageBlob);
     formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
@@ -142,51 +163,43 @@ function processImage(imageBlob) {
         method: 'POST',
         body: formData
     })
-        .then(response => response.json())
+        .then(response => {
+            console.log('Received response:', response);
+            return response.json();
+        })
         .then(data => {
+            console.log('Parsed data:', data);
             if (data.success) {
                 // Populate form fields with extracted data
-                const nameParts = data.data.full_name.split(' ');
-                if (nameParts.length > 0) {
-                    document.querySelector('[name="first_name"]').value = nameParts[0] || '';
-                    if (nameParts.length > 1) {
-                        document.querySelector('[name="last_name"]').value = nameParts[nameParts.length - 1] || '';
-                    }
-                    if (nameParts.length > 2) {
-                        document.querySelector('[name="middle_name"]').value = nameParts.slice(1, -1).join(' ') || '';
-                    }
-                }
-
-                const addressParts = data.data.permanent_address.split(',');
-                if (addressParts.length > 0) {
-                    document.querySelector('[name="address_line_1"]').value = addressParts[0].trim() || '';
-                    if (addressParts.length > 1) {
-                        document.querySelector('[name="city"]').value = addressParts[1].trim() || '';
-                    }
-                    if (addressParts.length > 2) {
-                        document.querySelector('[name="province_or_state"]').value = addressParts[2].trim() || '';
-                    }
-                }
-
-                document.querySelector('[name="mobile_number"]').value = data.data.mobile_number || '';
+                document.querySelector('[name="first_name"]').value = data.data.first_name || '';
+                document.querySelector('[name="middle_name"]').value = data.data.middle_name || '';
+                document.querySelector('[name="last_name"]').value = data.data.last_name || '';
+                document.querySelector('[name="suffix"]').value = data.data.suffix || '';
+                document.querySelector('[name="country"]').value = data.data.country || 'Philippines';
+                document.querySelector('[name="address_line_1"]').value = data.data.address_line_1 || '';
+                document.querySelector('[name="address_line_2"]').value = data.data.address_line_2 || '';
+                document.querySelector('[name="city"]').value = data.data.city || '';
+                document.querySelector('[name="province_or_state"]').value = data.data.province_or_state || '';
+                document.querySelector('[name="postal_code"]').value = data.data.postal_code || '';
                 document.querySelector('[name="landline_number"]').value = data.data.landline_number || '';
+                document.querySelector('[name="mobile_number"]').value = data.data.mobile_number || '';
                 document.querySelector('[name="email_address"]').value = data.data.email_address || '';
-
+                
+                // Populate Beneficiary fields
                 document.querySelector('[name="first_beneficiary_name"]').value = data.data.first_beneficiary_name || '';
                 document.querySelector('[name="second_beneficiary_name"]').value = data.data.second_beneficiary_name || '';
                 document.querySelector('[name="third_beneficiary_name"]').value = data.data.third_beneficiary_name || '';
-
+                
+                // Populate ColumbaryRecord fields
                 document.querySelector('[name="vault_id"]').value = data.data.vault_id || '';
-                document.querySelector('[name="issuance_date"]').value = data.data.issuance_date || '';
-                document.querySelector('[name="expiration_date"]').value = data.data.expiration_date || '';
                 document.querySelector('[name="inurnment_date"]').value = data.data.inurnment_date || '';
-                document.querySelector('[name="issuing_parish_priest"]').value = data.data.issuing_parish_priest || '';
                 document.querySelector('[name="urns_per_columbary"]').value = data.data.urns_per_columbary || '';
             } else {
                 alert('Error processing document: ' + data.error);
             }
         })
         .catch(error => {
+            console.error('Fetch error:', error);
             alert('Error: ' + error);
         })
         .finally(() => {
