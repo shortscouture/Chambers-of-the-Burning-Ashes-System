@@ -25,7 +25,10 @@ urlpatterns = [
     path('edit_customer/<int:customer_id>/', CustomerEditView.as_view(), name='edit_customer'),
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
     path('chatbot/', ChatbotAPIView.as_view(), name='chatbot'),
-
+    path('get_crypt_status/<str:section>/', get_crypt_status, name='get_crypt_status'),
+    path("Columbary_Map/    ", MapView.as_view(), name="Columbary_Map"),    
     path('columbaryrecords/', views.ColumbaryRecord, name='columbaryrecords'),  # Define this view for your records page
     path('addnewrecord/', views.addnewrecord, name='addnewrecord'),
+    path('delete_customer/<int:customer_id>/', CustomerDeleteView.as_view(), name='delete_customer'),
+
 ]
