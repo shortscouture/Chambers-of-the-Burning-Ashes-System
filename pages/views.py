@@ -494,11 +494,6 @@ def parse_text_to_dict(text):
         'second_beneficiary_name': None,
         'third_beneficiary_name': None,
         
-        # HolderOfPrivilege fields
-        'issuance_date': None,
-        'expiration_date': None,
-        'issuing_parish_priest': None,
-        
         # ColumbaryRecord fields
         'vault_id': None,
         'inurnment_date': None,
