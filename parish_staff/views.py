@@ -42,7 +42,7 @@ class chatbotAPIView(APIView):
             bot_reply = response.choices[0].message.content.strip()  
             #save to database
             ChatLog.objects.create(
-                user=request.CustomUser if request.CustomUser.is_authenticated else None, #saves user if logged in 
+                user=request.CustomUser, #saves user if logged in 
                 message=user_message, 
                 bot_response=bot_reply)
 
