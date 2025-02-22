@@ -14,7 +14,7 @@ class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=11, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
-    
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='customer')
 
     def __str__(self):
         return self.username #can greet people in methods by calling this
