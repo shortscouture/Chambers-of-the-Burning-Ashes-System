@@ -16,7 +16,7 @@ openai.api_key = env("OPEN_AI_API_KEY")
 
 class isParishStaff(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.CustomUser.is_authenticated and request.CustomUser.role == "parish_staff"
+        return request.user.is_authenticated and request.user.role == "parish_staff"
 
 class chatbotAPIView(APIView):
     
@@ -42,7 +42,7 @@ class chatbotAPIView(APIView):
             bot_reply = response.choices[0].message.content.strip()  
             #save to database
             ChatLog.objects.create(
-                user=request.CustomUser, #saves user if logged in 
+                user=request.user, #saves user if logged in 
                 message=user_message, 
                 bot_response=bot_reply)
 
@@ -53,10 +53,10 @@ class chatbotAPIView(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     def parish_chatbot_history(self, request):
-        if not request.CustomUser.is_authenticated:
+        if not request.user.is_authenticated:
             return Response({'error': 'Authentication REQUIRED.'}, status=status.HTTP_401_UNAUTHORIZED)
         
-        chats = ChatLog.objects.filter(user=request.CustomUser).order_by("-timestamp")[:10]
+        chats = ChatLog.objects.filter(user=request.user).order_by("-timestamp")[:10]
         
         chat_history = [
             {"message": chat.message, "response": chat.response, "timestamp": chat.timestamp}
