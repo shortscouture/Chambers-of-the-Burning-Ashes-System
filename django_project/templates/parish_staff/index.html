@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parish Staff Chatbot</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        #chatbox { width: 100%; height: 300px; border: 1px solid #ccc; padding: 10px; overflow-y: scroll; }
+        input, button { margin-top: 10px; padding: 8px; }
+    </style>
+</head>
+<body>
+
+    <h2>Parish Staff Chatbot</h2>
+
+    <div>
+        <h3>Login</h3>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <p id="login-status"></p>
+    </div>
+
+    <div id="chat-section" style="display: none;">
+        <h3>Chat</h3>
+        <div id="chatbox"></div>
+        <input type="text" id="message" placeholder="Type a message...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        let csrfToken = '';
+
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const response = await fetch('http://127.0.0.1:8000/accounts/login/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            if (response.ok) {
+                document.getElementById('login-status').innerText = "Login successful!";
+                document.getElementById('chat-section').style.display = "block";
+                getCsrfToken(); // Get CSRF token after login
+            } else {
+                document.getElementById('login-status').innerText = "Login failed!";
+            }
+        }
+
+        async function getCsrfToken() {
+            const response = await fetch('http://127.0.0.1:8000/parish_staff/chatbot/', {
+                method: 'GET',
+                credentials: 'include' // Ensures cookies are sent
+            });
+
+            csrfToken = document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1] || '';
+        }
+
+        async function sendMessage() {
+            const message = document.getElementById('message').value;
+            if (!message) return;
+
+            const chatbox = document.getElementById('chatbox');
+            chatbox.innerHTML += `<p><strong>You:</strong> ${message}</p>`;
+
+            const response = await fetch('http://127.0.0.1:8000/parish_staff/chatbot/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                credentials: 'include',
+                body: JSON.stringify({ message })
+            });
+
+            const data = await response.json();
+            chatbox.innerHTML += `<p><strong>Bot:</strong> ${data.response || data.error}</p>`;
+            document.getElementById('message').value = '';
+        }
+    </script>
+
+</body>
+</html>
