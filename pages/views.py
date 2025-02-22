@@ -104,6 +104,7 @@ class DashboardView(TemplateView):
             'customer_status_counts': customer_status_counts,
             #'inquiry_counts': inquiry_counts,
             'pending_counts': Customer.objects.filter(status="pending").count(),
+            'pending_customers': Customer.objects.filter(status="pending"),
             'unissued_columbaries': ColumbaryRecord.objects.filter(issuance_date__isnull=True, customer__isnull=False).count(),
             'full_payment_count': full_payment_count,
             'installment_count': installment_count,
