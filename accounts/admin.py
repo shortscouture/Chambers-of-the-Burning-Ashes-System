@@ -36,7 +36,6 @@ class CustomUserAdmin(UserAdmin):
 
 
 admin.site.register(CustomUser, CustomUserAdmin)
-admin.site.register(ChatLog)
 #print("Unregistering EmailAddress from admin.")
 #unshows the email address tab.
 admin.site.unregister(EmailAddress)

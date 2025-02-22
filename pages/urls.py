@@ -5,7 +5,7 @@ from .views import (
     HomePageView, AboutPageView, MainDashView, ColumbaryRecordsView,
     CustomerHomeView, MemorialView, send_letter_of_intent, verify_otp,
     memorials_verification, accept_letter_of_intent, decline_letter_of_intent,
-    RecordsDetailsView, CustomerEditView, SuccesView, ChatbotAPIView, DashboardView, get_crypt_status, MapView, CustomerDeleteView,
+    RecordsDetailsView, CustomerEditView, SuccesView, DashboardView, get_crypt_status, MapView, CustomerDeleteView,
     process_ocr
 )
 
@@ -25,7 +25,6 @@ urlpatterns = [
     path('recordsdetails/<int:customer_id>/', RecordsDetailsView.as_view(), name='recordsdetails'),
     path('edit_customer/<int:customer_id>/', CustomerEditView.as_view(), name='edit_customer'),
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
-    path('chatbot/', ChatbotAPIView.as_view(), name='chatbot'),
     path('get_crypt_status/<str:section>/', get_crypt_status, name='get_crypt_status'),
     path("Columbary_Map/    ", MapView.as_view(), name="Columbary_Map"),    
     path('columbaryrecords/', views.ColumbaryRecord, name='columbaryrecords'),  # Define this view for your records page
