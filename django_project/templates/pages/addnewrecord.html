@@ -4,89 +4,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Columbary Record</title>
+    <title>Add New Columbary Record</title>
+    <!-- Link to your CSS file -->
     <link rel="stylesheet" href="{% static 'css/addnewrecord.css' %}">
-    <script type="text/javascript">
-        function togglePaymentFields() {
-            const paymentMode = document.getElementById("id_mode_of_payment").value;
-            const fullPaymentFields = document.getElementById("full_payment_fields");
-            const sixMonthFields = document.getElementById("six_month_fields");
-
-            if (paymentMode === "Full Payment") {
-                fullPaymentFields.style.display = "block";
-                sixMonthFields.style.display = "none";
-            } else if (paymentMode === "6-Month Installment") {
-                fullPaymentFields.style.display = "none";
-                sixMonthFields.style.display = "block";
-            } else {
-                fullPaymentFields.style.display = "none";
-                sixMonthFields.style.display = "none";
-            }
-        }
-
-        document.getElementById('processOCR').addEventListener('click', function() {
-    const fileInput = document.getElementById('ocrInput');
-    if (!fileInput.files.length) {
-        alert('Please select a file first');
-        return;
-    }
-    
-    const formData = new FormData();
-    formData.append('document', fileInput.files[0]);
-    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
-    
-    fetch('/process-ocr/', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Populate form fields with extracted data
-            document.querySelector('[name="first_name"]').value = data.data.full_name || '';
-            document.querySelector('[name="permanent_address"]').value = data.data.permanent_address || '';
-            document.querySelector('[name="mobile_number"]').value = data.data.mobile_number || '';
-            document.querySelector('[name="email_address"]').value = data.data.email_address || '';
-            document.querySelector('[name="first_beneficiary_name"]').value = data.data.first_beneficiary_name || '';
-            document.querySelector('[name="vault_id"]').value = data.data.vault_id || '';
-        } else {
-            alert('Error processing document: ' + data.error);
-        }
-    })
-    .catch(error => {
-        alert('Error: ' + error);
-    });
-});
-        window.onload = function() {
-            togglePaymentFields();
-        }        
-    </script>
-
+    <!-- Add favicon -->
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
 </head>
 <body>
-
     <div class="container">
         <h2>Add New Columbary Record</h2>
         <div class="ocr-section">
             <h3>Document Capture</h3>
+            
             <div class="capture-options">
-                <button type="button" id="webcamOption">Use Webcam</button>
-                <button type="button" id="uploadOption">Upload File</button>
+                <button type="button" class="capture-option" id="webcamOption">Use Webcam</button>
+                <button type="button" class="capture-option" id="uploadOption">Upload File</button>
             </div>
-        
+
             <!-- Webcam Interface -->
             <div id="webcam-container" style="display: none;">
                 <video id="webcam-view" autoplay playsinline></video>
-                <button type="button" id="captureButton">Capture</button>
-                <canvas id="captured-image" style="display: none;"></canvas>
-            </div>
-        
-            <!-- File Upload Interface -->
-            <div id="fileUploadContainer">
-                <input type="file" id="ocrInput" accept="image/*">
-                <button type="button" id="processOCR">Process with OCR</button>
+                <div id="capture-controls">
+                    <button type="button" class="camera-button" id="captureButton">Take Photo</button>
+                    <button type="button" class="camera-button" id="retakeButton" style="display: none;">Retake</button>
+                    <button type="button" class="camera-button" id="processWebcamButton" style="display: none;">Process Image</button>
+                </div>
+                <canvas id="captured-image"></canvas>
             </div>
 
+            <!-- File Upload Interface -->
+            <div class="file-upload" id="fileUploadContainer">
+                <input type="file" id="ocrInput" accept="image/*" class="ocr-input">
+                <button type="button" id="processOCR" class="capture-option">Process File</button>
+            </div>
+        </div>
+
+        <div id="processingOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000;">
+            <div style="background: white; padding: 20px; border-radius: 8px; text-align: center;">
+                <p>Processing image...</p>
+            </div>
+        </div>
+        
         <!-- Display Form Errors -->
         {% if customer_form.errors or payment_form.errors or columbary_form.errors or holder_form.errors or beneficiary_form.errors %}
         <div class="alert alert-danger">
@@ -99,78 +57,73 @@
             
             <h3>Customer Information</h3>
             <div class="form-group">
-                {{ customer_form.as_p }}
-            </div>
-
-            <h3>Mode of Payment:</h3>
-            {{ payment_form.mode_of_payment }}
-            
-            <!-- Full Payment Fields -->
-            <div id="full_payment_fields" style="display: none;">
-                <h4>Full Payment Details</h4>
+                <label for="id_first_name">First Name:</label>
+                <input type="text" name="first_name" id="id_first_name" placeholder="First Name" class="form-control">
                 
-                <label for="id_Full_payment_receipt_1">Receipt #1:</label>
-                {{ payment_form.Full_payment_receipt_1 }}
-            
-                <label for="id_Full_payment_amount_1">Amount:</label>
-                {{ payment_form.Full_payment_amount_1 }}
-            </div>
-            
-            <!-- 6-Month Installment Fields -->
-            <div id="installment_payment_fields" style="display: none;">
-                <h4>6-Month Installment Details</h4>
-            
-                <div class="installment-group">
-                    <label for="id_six_month_receipt_1">Receipt #1:</label>
-                    {{ payment_form.six_month_receipt_1 }}
-                    <label for="id_six_month_amount_1">Amount:</label>
-                    {{ payment_form.six_month_amount_1 }}
-                </div>
-                <div class="installment-group">
-                    <label for="id_six_month_receipt_2">Receipt #2:</label>
-                    {{ payment_form.six_month_receipt_2 }}
-                    <label for="id_six_month_amount_2">Amount:</label>
-                    {{ payment_form.six_month_amount_2 }}
-                </div>
-                <div class="installment-group">
-                    <label for="id_six_month_receipt_3">Receipt #3:</label>
-                    {{ payment_form.six_month_receipt_3 }}
-                    <label for="id_six_month_amount_3">Amount:</label>
-                    {{ payment_form.six_month_amount_3 }}
-                </div>
-                <div class="installment-group">
-                    <label for="id_six_month_receipt_4">Receipt #4:</label>
-                    {{ payment_form.six_month_receipt_4 }}
-                    <label for="id_six_month_amount_4">Amount:</label>
-                    {{ payment_form.six_month_amount_4 }}
-                </div>
-                <div class="installment-group">
-                    <label for="id_six_month_receipt_5">Receipt #5:</label>
-                    {{ payment_form.six_month_receipt_5 }}
-                    <label for="id_six_month_amount_5">Amount:</label>
-                    {{ payment_form.six_month_amount_5 }}
-                </div>
-                <div class="installment-group">
-                    <label for="id_six_month_receipt_6">Receipt #6:</label>
-                    {{ payment_form.six_month_receipt_6 }}
-                    <label for="id_six_month_amount_6">Amount:</label>
-                    {{ payment_form.six_month_amount_6 }}
-                </div>
-            </div>
-
-            <h3>Columbary Record</h3>
-            <div class="form-group">
-                {{ columbary_form.as_p }}
-            </div>
-
-            <h3>Holder of Privilege</h3>
-            <div class="form-group">
-                {{ holder_form.as_p }}
+                <label for="id_middle_name">Middle Name:</label>
+                <input type="text" name="middle_name" id="id_middle_name" placeholder="Middle Name" class="form-control">
+                
+                <label for="id_last_name">Last Name:</label>
+                <input type="text" name="last_name" id="id_last_name" placeholder="Last Name" class="form-control">
+                
+                <label for="id_suffix">Suffix:</label>
+                <input type="text" name="suffix" id="id_suffix" placeholder="Suffix (e.g., Jr., Sr.)" class="form-control">
+                
+                <label for="id_country">Country:</label>
+                <input type="text" name="country" id="id_country" placeholder="Country" value="Philippines" class="form-control">
+                
+                <label for="id_address_line_1">Address Line 1:</label>
+                <input type="text" name="address_line_1" id="id_address_line_1" placeholder="Address Line 1" class="form-control">
+                
+                <label for="id_address_line_2">Address Line 2:</label>
+                <input type="text" name="address_line_2" id="id_address_line_2" placeholder="Address Line 2" class="form-control">
+                
+                <label for="id_city">City:</label>
+                <input type="text" name="city" id="id_city" placeholder="City" class="form-control">
+                
+                <label for="id_province_or_state">Province/State:</label>
+                <input type="text" name="province_or_state" id="id_province_or_state" placeholder="Province/State" class="form-control">
+                
+                <label for="id_postal_code">Postal Code:</label>
+                <input type="text" name="postal_code" id="id_postal_code" placeholder="Postal Code" class="form-control">
+                
+                <label for="id_landline_number">Landline Number:</label>
+                <input type="text" name="landline_number" id="id_landline_number" placeholder="Landline Number" class="form-control">
+                
+                <label for="id_mobile_number">Mobile Number:</label>
+                <input type="text" name="mobile_number" id="id_mobile_number" placeholder="Mobile Number" class="form-control">
+                
+                <label for="id_email_address">Email Address:</label>
+                <input type="email" name="email_address" id="id_email_address" placeholder="Email Address" class="form-control">
             </div>
 
             <h3>Beneficiaries</h3>
             <div class="form-group">
-                {{ beneficiary_form.as_p }}
+                <label for="id_first_beneficiary_name">First Beneficiary Name:</label>
+                <input type="text" name="first_beneficiary_name" id="id_first_beneficiary_name" placeholder="First Beneficiary Name" class="form-control">
+                
+                <label for="id_second_beneficiary_name">Second Beneficiary Name:</label>
+                <input type="text" name="second_beneficiary_name" id="id_second_beneficiary_name" placeholder="Second Beneficiary Name" class="form-control">
+                
+                <label for="id_third_beneficiary_name">Third Beneficiary Name:</label>
+                <input type="text" name="third_beneficiary_name" id="id_third_beneficiary_name" placeholder="Third Beneficiary Name" class="form-control">
+            </div>
+
+            <h3>Columbary Record</h3>
+            <div class="form-group">
+                <label for="id_vault_id">Vault ID:</label>
+                <input type="text" name="vault_id" id="id_vault_id" placeholder="Vault ID" class="form-control">
+                
+                <label for="id_inurnment_date">Inurnment Date:</label>
+                <input type="date" name="inurnment_date" id="id_inurnment_date" placeholder="Inurnment Date" class="form-control">
+                
+                <label for="id_urns_per_columbary">Urns Per Columbary:</label>
+                <select name="urns_per_columbary" id="id_urns_per_columbary" class="form-control">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
             </div>
 
             <button type="submit" class="btn btn-primary">Submit Record</button>
@@ -180,7 +133,7 @@
         </form>
     </div>
 
-    <!-- Link to JavaScript File -->
+    <!-- Include the JavaScript file -->
     <script src="{% static 'js/addnewrecord.js' %}"></script>
 </body>
 </html>
