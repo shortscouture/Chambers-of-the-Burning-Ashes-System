@@ -1,0 +1,169 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    background: url("/static/images/cloud.png") no-repeat center center fixed;
+    background-size: cover;
+    color: #333;
+}
+
+h1 {
+    color: #ffffff;
+    font-family: Impact, sans-serif;
+    font-size: 50px;
+    background: url("/static/images/BGM.jpg") no-repeat center center fixed;
+    background-size: 100% 75%;
+    margin-top: 10px; /* Add space under the fixed header */
+    padding-top: 200px;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding-top: 80px;
+    /* Adjust based on header height */
+    background: rgba(255, 255, 255, 0.8);
+    /* Add slight transparency for readability */
+    border-radius: 10px;
+}
+
+/* Info Boxes */
+.info-box h2 {
+    font-size: 16px;
+    /* Make title smaller */
+    font-weight: normal;
+    color: #505050;
+    margin-bottom: 5px;
+}
+
+.info-box p {
+    font-size: 50px;
+    /* Make number larger */
+    font-weight: bold;
+    font-family: 'Impact', sans-serif;
+    /* Change font */
+    color: #505050;
+    /* Make the number stand out */
+    margin: 0;
+}
+
+.info-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: 120px;
+    /* Ensure consistent size */
+}
+
+.info-box:hover {
+    background-color: #d1ecff;
+    transform: scale(1.02);
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    align-items: start;
+}
+
+.chart-container canvas {
+    max-width: 400px;
+    height: 250px;
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        /* Stack items on smaller screens */
+    }
+}
+
+.table-container {
+    width: 98.5%;
+    margin-top: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.hidden {
+    display: none;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+
+th {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-accept {
+    background-color: green;
+    color: white;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.btn-decline {
+    background-color: red;
+    color: white;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.info-box {
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.info-box:hover {
+    background-color: #d1ecff;
+}
+
+/* Chart Containers */
+.chart-container {
+    margin: 30px 0;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.chart-container h2 {
+    color: #007bff;
+}
+
+canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+    }
+}
