@@ -9,7 +9,7 @@ from django.utils.safestring import mark_safe
 from django.db.models import Count, Sum
 from datetime import datetime, timedelta
 from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm, PaymentForm, HolderOfPrivilegeForm
-from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, Payment, ChatQuery, ParishAdministrator, HolderOfPrivilege
+from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, Payment, ParishAdministrator, HolderOfPrivilege
 from django.views.generic import TemplateView, DeleteView
 from django.forms import modelformset_factory
 from django.urls import reverse_lazy
@@ -20,9 +20,6 @@ from django.db.models import Count, Sum
 from .models import Customer, ColumbaryRecord, Beneficiary, Payment
 from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, PaymentForm, DocumentUploadForm
 from django.db import transaction
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
 import pytesseract
 from PIL import Image
 import re
@@ -404,33 +401,6 @@ def verify_otp(request):
 def success(request):
     return render(request, 'pages/success.html')
 
-#chatbot env
-env = environ.Env(
-    DEBUG=(bool, False) #default value for DEBUG = False
-)
-
-openai.api_key = env("OPEN_AI_API_KEY")
-class ChatbotAPIView(APIView):
-    def get(self, request, *args, **kwargs):
-        return Response({"message": "Chatbot API is running! Use POST to send messages."}, status=status.HTTP_200_OK)
-    
-    def post(self, request, *args, **kwargs):
-        user_message = request.data.get('message')
-
-        if not user_message:
-            return Response({'error': 'Message is required'}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            response = openai.chat.completions.create(
-                model="gpt-3.5-turbo",  # Using GPT-3.5 model
-                messages=[{"role": "user", "content": user_message}],
-                max_tokens=150
-            )
-            bot_reply = response.choices[0].message.content.strip()  # Get the response from GPT-3.5
-            return Response({'response': bot_reply}, status=status.HTTP_200_OK)
-
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
       
@@ -535,38 +505,8 @@ def parse_text_to_dict(text):
     return data
 
 
-env = environ.Env(
-    DEBUG=(bool, False) #default value for DEBUG = False
-)
 
-
-
-openai.api_key = env("OPEN_AI_API_KEY")
-class ChatbotAPIView(APIView):
-    def get(self, request, *args, **kwargs):
-        return Response({"message": "Chatbot API is running! Use POST to send messages."}, status=status.HTTP_200_OK)
-    
-    def post(self, request, *args, **kwargs):
-        user_message = request.data.get('message')
-
-        if not user_message:
-            return Response({'error': 'Message is required'}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            response = openai.chat.completions.create(
-                model="gpt-3.5-turbo",  # Using GPT-3.5 models
-                messages=[{"role": "user", "content": user_message}],
-                max_tokens=150
-            )
-            bot_reply = response.choices[0].message.content.strip()  # Get the response from GPT-3.5
-            #save to database
-            ChatQuery.objects.create(user_message=user_message, bot_response=bot_reply)
-
-            return Response({'response': bot_reply}, status=status.HTTP_200_OK)
-
-
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 
 def get_crypt_status(request, section):
     # Get all vaults belonging to the given section

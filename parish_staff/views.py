@@ -1,10 +1,11 @@
 from django.shortcuts import render
 import openai
 import environ
-from .models import ChatQuery
+from .models import ChatLog
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+
 
 env = environ.Env(
     DEBUG=(bool, False) #default value for DEBUG = False
@@ -23,16 +24,21 @@ class ChatbotAPIView(APIView):
 
         if not user_message:
             return Response({'error': 'Message is required'}, status=status.HTTP_400_BAD_REQUEST)
-
+        return self.process_message(user_message)
+    
+    def process_message(self, request, user_message):
         try:
             response = openai.chat.completions.create(
-                model="gpt-3.5-turbo",  # Using GPT-3.5 models
+                model="gpt-3.5-turbo",  
                 messages=[{"role": "user", "content": user_message}],
                 max_tokens=150
             )
-            bot_reply = response.choices[0].message.content.strip()  # Get the response from GPT-3.5
+            bot_reply = response.choices[0].message.content.strip()  
             #save to database
-            ChatQuery.objects.create(user_message=user_message, bot_response=bot_reply)
+            ChatLog.objects.create(
+                user=request.CustomUser if request.CustomUser.is_authenticated else None, #saves user if logged in 
+                message=user_message, 
+                bot_response=bot_reply)
 
             return Response({'response': bot_reply}, status=status.HTTP_200_OK)
 
@@ -40,3 +46,15 @@ class ChatbotAPIView(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+    def parish_chatbot_history(self, request):
+        if not request.CustomUser.is_authenticated:
+            return Response({'error': 'Authentication REQUIRED.'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        chats = ChatLog.objects.filter(user=request.CustomUser).order_by("-timestamp")[:10]
+        
+        chat_history = [
+            {"message": chat.message, "response": chat.response, "timestamp": chat.timestamp}
+            for chat in chats
+        ]
+        
+        return Response({"history": chat_history}, status=status.HTTP_200_OK)
