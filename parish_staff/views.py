@@ -5,7 +5,8 @@ from .models import ChatLog
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
-
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
 
 env = environ.Env(
     DEBUG=(bool, False) #default value for DEBUG = False
@@ -16,10 +17,11 @@ openai.api_key = env("OPEN_AI_API_KEY")
 
 class isParishStaff(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == "parish_staff"
+        return request.user.is_authenticated and request.user.role == "Parish Staff"
+
+
 
 class chatbotAPIView(APIView):
-    
     permission_classes = [isParishStaff]
     
     def get(self, request, *args, **kwargs):
