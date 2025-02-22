@@ -4,6 +4,12 @@ from django.db import models
 class CustomUser(AbstractUser):
      # Add your custom fields here
      # account in web app
+     
+    ROLE_CHOICES = (     
+        ('parish_staff', 'Parish Staff'),
+        ('customer', 'Customer'),
+        ('admin', 'Admin'),
+    )
     username = models.CharField(max_length=16, unique=True)
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=11, blank=True, null=True)
