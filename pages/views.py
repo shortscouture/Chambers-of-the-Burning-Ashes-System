@@ -471,12 +471,20 @@ def extract_text(image):
 
 def parse_text_to_dict(text):
     """
-    Parse extracted text into a dictionary matching model fields
+    Parse extracted text into a dictionary matching model fields.
     """
     data = {
         # Customer fields
-        'full_name': None,
-        'permanent_address': None,
+        'first_name': None,
+        'middle_name': None,
+        'last_name': None,
+        'suffix': None,
+        'country': 'Philippines',  # Default value
+        'address_line_1': None,
+        'address_line_2': None,
+        'city': None,
+        'province_or_state': None,
+        'postal_code': None,
         'landline_number': None,
         'mobile_number': None,
         'email_address': None,
@@ -486,107 +494,53 @@ def parse_text_to_dict(text):
         'second_beneficiary_name': None,
         'third_beneficiary_name': None,
         
-        # ColumbaryRecord fields
-        'vault_id': None,
+        # HolderOfPrivilege fields
         'issuance_date': None,
         'expiration_date': None,
-        'inurnment_date': None,
         'issuing_parish_priest': None,
+        
+        # ColumbaryRecord fields
+        'vault_id': None,
+        'inurnment_date': None,
         'urns_per_columbary': None,
     }
-    
+
     # Example patterns (adjust based on your document structure)
     patterns = {
+        # Customer patterns
         'full_name': r'Full name:[\s]*([^\n]*)',
         'permanent_address': r'Permanent Address:[\s]*([^\n]*)',
         'mobile_number': r'Mobile Number:[\s]*([^\n]*)',
         'email_address': r'Email Address:[\s]*([^\n]*)',
+        
+        # Beneficiary patterns
         'first_beneficiary_name': r'FIRST PRIORITY[\s]*Full name:[\s]*([^\n]*)',
+        'second_beneficiary_name': r'SECOND PRIORITY[\s]*Full name:[\s]*([^\n]*)',
+        'third_beneficiary_name': r'THIRD PRIORITY[\s]*Full name:[\s]*([^\n]*)',
+        
+        # ColumbaryRecord patterns
         'vault_id': r'Vault ID:[\s]*([^\n]*)',
-        'issuance_date': r'Issuance Date:[\s]*([^\n]*)',
+        'inurnment_date': r'Inurnment Date:[\s]*([^\n]*)',
+        'urns_per_columbary': r'Urns Per Columbary:[\s]*([^\n]*)',
     }
-    
+
+    # Extract all fields using patterns
     for field, pattern in patterns.items():
         match = re.search(pattern, text)
         if match:
             data[field] = match.group(1).strip()
-    
-    return data
 
-def upload_document(request):
-    if request.method == 'POST':
-        form = DocumentUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            image = request.FILES['document']
-            
-            try:
-                # Extract and parse text
-                extracted_text = extract_text(image)
-                data = parse_text_to_dict(extracted_text)
-                
-                # Create Customer
-                customer = Customer.objects.create(
-                    full_name=data['full_name'],
-                    permanent_address=data['permanent_address'],
-                    landline_number=data['landline_number'],
-                    mobile_number=data['mobile_number'],
-                    email_address=data['email_address']
-                )
-                
-                # Create Beneficiary
-                beneficiary = None
-                if data['first_beneficiary_name']:
-                    beneficiary = Beneficiary.objects.create(
-                        first_beneficiary_name=data['first_beneficiary_name'],
-                        second_beneficiary_name=data['second_beneficiary_name'],
-                        third_beneficiary_name=data['third_beneficiary_name']
-                    )
-                
-                # Create HolderOfPrivilege
-                holder = None
-                if data['holder_name']:
-                    holder = HolderOfPrivilege.objects.create(
-                        full_name=data['holder_name'],
-                        email_address=data['holder_email'],
-                        address=data['holder_address'],
-                        landline_number=data['holder_landline'],
-                        mobile_number=data['holder_mobile']
-                    )
-                
-                # Create Payment
-                payment = None
-                if data['full_contribution'] or data['six_month_installment']:
-                    payment = Payment.objects.create(
-                        full_contribution=data['full_contribution'],
-                        six_month_installment=data['six_month_installment'],
-                        official_receipt=data['official_receipt']
-                    )
-                
-                # Create ColumbaryRecord
-                if data['vault_id']:
-                    columbary = ColumbaryRecord.objects.create(
-                        vault_id=data['vault_id'],
-                        issuance_date=data['issuance_date'],
-                        expiration_date=data['expiration_date'],
-                        inurnment_date=data['inurnment_date'],
-                        issuing_parish_priest=data['issuing_parish_priest'],
-                        urns_per_columbary=data['urns_per_columbary'],
-                        customer=customer,
-                        beneficiary=beneficiary,
-                        payment=payment,
-                        holder_of_privilege=holder
-                    )
-                
-                messages.success(request, 'Document processed successfully!')
-                return redirect('success_url')
-                
-            except Exception as e:
-                messages.error(request, f'Error processing document: {str(e)}')
-                return redirect('upload_document')
-    else:
-        form = DocumentUploadForm()
-    
-    return render(request, 'ocr_app/upload.html', {'form': form})
+    # Split full name into first, middle, and last names
+    if data.get('full_name'):
+        name_parts = data['full_name'].split()
+        if len(name_parts) >= 1:
+            data['first_name'] = name_parts[0]
+        if len(name_parts) >= 2:
+            data['last_name'] = name_parts[-1]
+        if len(name_parts) > 2:
+            data['middle_name'] = ' '.join(name_parts[1:-1])
+
+    return data
 
 
 env = environ.Env(
