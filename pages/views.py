@@ -463,6 +463,127 @@ def preprocess_image(image):
     
     return Image.fromarray(contrast)
 
+def extract_name_components(full_name):
+    """
+    Extract first, middle, and last name from full name string
+    """
+    parts = full_name.strip().split()
+    
+    # Handle special cases like "Jr", "Sr", "III"
+    suffix = ""
+    if parts[-1].lower() in ['jr', 'sr', 'ii', 'iii', 'iv']:
+        suffix = parts.pop()
+    
+    if len(parts) >= 3:
+        first_name = parts[0]
+        last_name = parts[-1]
+        middle_name = ' '.join(parts[1:-1])
+    elif len(parts) == 2:
+        first_name = parts[0]
+        last_name = parts[1]
+        middle_name = ''
+    else:
+        first_name = parts[0] if parts else ''
+        middle_name = ''
+        last_name = ''
+    
+    return {
+        'first_name': first_name,
+        'middle_name': middle_name,
+        'last_name': last_name,
+        'suffix': suffix
+    }
+
+def parse_text_to_form_data(text):
+    """
+    Enhanced parsing function specifically matched to your form structure
+    """
+    data = {
+        'first_name': '',
+        'middle_name': '',
+        'last_name': '',
+        'suffix': '',
+        'country': 'Philippines',
+        'address_line_1': '',
+        'address_line_2': '',
+        'city': '',
+        'province_or_state': '',
+        'postal_code': '',
+        'landline_number': '',
+        'mobile_number': '',
+        'email_address': '',
+        'first_beneficiary_name': '',
+        'second_beneficiary_name': '',
+        'third_beneficiary_name': '',
+        'vault_id': '',
+        'inurnment_date': None,
+        'urns_per_columbary': '1'
+    }
+
+    # Define detailed patterns for each field
+    patterns = {
+        'full_name': r'Full\s*name:?\s*([^\n]*)',
+        'permanent_address': r'Permanent\s*Address:?\s*([^\n]*)',
+        'current_address': r'Current\s*Address:?\s*([^\n]*)',
+        'email': r'Email\s*Address:?\s*([^\n]*)',
+        'landline': r'Landline\s*Number:?\s*([^\n]*)',
+        'mobile': r'Mobile\s*Number:?\s*([^\n]*)',
+        'first_priority': r'FIRST\s*PRIORITY\s*Full\s*name:?\s*([^\n]*)',
+        'second_priority': r'SECOND\s*PRIORITY\s*Full\s*name:?\s*([^\n]*)',
+        'third_priority': r'THIRD\s*PRIORITY\s*Full\s*name:?\s*([^\n]*)',
+    }
+
+    # Extract and process main name
+    main_name_match = re.search(patterns['full_name'], text, re.IGNORECASE)
+    if main_name_match:
+        name_components = extract_name_components(main_name_match.group(1))
+        data.update(name_components)
+
+    # Process address
+    address_match = re.search(patterns['permanent_address'], text, re.IGNORECASE)
+    if address_match:
+        address = address_match.group(1).strip()
+        # Split address into components
+        address_parts = address.split(',')
+        data['address_line_1'] = address_parts[0].strip()
+        if len(address_parts) > 1:
+            data['address_line_2'] = address_parts[1].strip()
+        if len(address_parts) > 2:
+            data['city'] = address_parts[2].strip()
+        if len(address_parts) > 3:
+            data['province_or_state'] = address_parts[3].strip()
+
+    # Extract email
+    email_match = re.search(patterns['email'], text, re.IGNORECASE)
+    if email_match:
+        data['email_address'] = email_match.group(1).strip().lower()
+
+    # Extract phone numbers
+    landline_match = re.search(patterns['landline'], text, re.IGNORECASE)
+    if landline_match:
+        data['landline_number'] = ''.join(filter(str.isdigit, landline_match.group(1)))
+
+    mobile_match = re.search(patterns['mobile'], text, re.IGNORECASE)
+    if mobile_match:
+        mobile = mobile_match.group(1)
+        # Handle multiple mobile numbers
+        numbers = mobile.split('or')
+        data['mobile_number'] = ''.join(filter(str.isdigit, numbers[0]))
+
+    # Process beneficiaries
+    for priority in ['first_priority', 'second_priority', 'third_priority']:
+        match = re.search(patterns[priority], text, re.IGNORECASE)
+        if match:
+            beneficiary_name = match.group(1).strip()
+            if priority == 'first_priority':
+                data['first_beneficiary_name'] = beneficiary_name
+            elif priority == 'second_priority':
+                data['second_beneficiary_name'] = beneficiary_name
+            elif priority == 'third_priority':
+                data['third_beneficiary_name'] = beneficiary_name
+
+    return data
+
 @csrf_exempt 
 def process_ocr(request):
     if request.method == 'POST' and request.FILES.get('document'):
