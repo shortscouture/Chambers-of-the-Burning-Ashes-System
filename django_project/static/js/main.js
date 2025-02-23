@@ -59,17 +59,3 @@ function hideInfoBox(event) {
     document.removeEventListener('click', hideInfoBox);
   }
 }
-
-function showMap(event) {
-  event.stopPropagation();
-  document.getElementById('Map').style.display = 'block';
-  document.addEventListener('click', hideInfoBox);
-}
-
-function hideInfoBox(event) {
-  const infobox = document.getElementById('Map');
-  if (!infobox.contains(event.target)) {
-    infobox.style.display = 'none';
-    document.removeEventListener('click', hideInfoBox);
-  }
-}
