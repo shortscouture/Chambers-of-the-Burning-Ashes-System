@@ -545,14 +545,14 @@ class ChatbotAPIView(APIView):
         return "I'm not sure about that. Please check with the parish office or refer to the official guidelines."
         
     def post(self, request, *args, **kwargs):
-        user_query = request.data.get("message", "")
-        context_data = self.get_relevant_info(user_query)
-        logger.info(f"User query: {user_query}")
+        #user_query = request.data.get("message", "")
+        context_data = self.get_relevant_info(self.query_openai)
+        logger.info(f"User query: {self.query_openai}")
         
         messages = [
             {"role": "system", "content": "You are a knowledgeable assistant helping parish staff."},
-            {"role": "assistant", "content": f"Relevant Data from Database: {context_data}"},
-            {"role": "user", "content": f"{user_query}"},  # Include user query in OpenAI request
+            {"role": "assistant", "content": f"Relevant Data from Database: {self.query_openai}"},
+            {"role": "user", "content": f"{self.query_openai}"},  # Include user query in OpenAI request
         ]
         response = openai.chat.completions.create(
             model="gpt-3.5-turbo",
@@ -561,15 +561,36 @@ class ChatbotAPIView(APIView):
            )
 
         return JsonResponse({
-            "query": user_query,  
+            "query": self.query_openai,  
             "context": context_data,  
             "response": response.choices[0].message.content  
         })
-def chatbot_view(request):
-    """Handle AJAX request and return chatbot response."""
-    db_data = get_data_from_db()
-    ai_response = query_openai(db_data)
-    return JsonResponse({"response": ai_response})
+   # def chatbot_view(request):
+       # """Handle AJAX request and return chatbot response."""
+       # db_data = get_data_from_db()
+        #ai_response = query_openai(db_data)
+      #  return JsonResponse({"response": ai_response})
+    
+    def query_openai(data):
+        try:
+            formatted_data = json.dumps(data, indent=2)
+        except (TypeError, ValueError) as e:
+            return f"Error formatting data: {str(e)}"
+
+        prompt = (
+            "You are an AI assistant analyzing parish data. "
+            "Here is the structured database information:\n\n"
+            f"{formatted_data}\n\n"
+            "Please provide insights, trends, and any important observations."
+        )
+
+        response = openai.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "system", "content": "You are an AI assistant."},
+                    {"role": "user", "content": prompt}]
+        )
+        return response.choices[0].message.content
+
 
 def get_crypt_status(request, section):
     # Get all vaults belonging to the given section
@@ -596,18 +617,6 @@ def get_section_details(request, section_id):
 def get_data_from_db():
     data = Customer.objects.all().values()  # Fetch all fields
     return list(data)
-
-def query_openai(data):
-    """Send database data to OpenAI and get a response."""
-    formatted_data = json.dumps(data, indent=2)
-    prompt = f"Here is the database data: {formatted_data}\nAnalyze it and provide insights."
-
-    response = openai.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "system", "content": "You are an AI assistant."},
-                {"role": "user", "content": prompt}]
-    )
-    return response["choices"][0]["message"]["content"]
 
 
 def addnewrecord(request):
