@@ -1,13 +1,17 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/Headers.css') }}">
     <style>
         body {
             margin: 0;
@@ -20,72 +24,278 @@
             left: 0;
             width: 100%;
             background-color: #fff;
-            z-index: 1000; 
+            z-index: 1000;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        .dashboard-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding-top: 100px;
-            height: calc(100vh - 140px);
-            background-color: #ADD8E6; 
-            margin-top: 100px;
+        .container {
+            width: 80%;
+            margin: auto;
         }
 
-        .headname {
-            display: flex;
-            list-style: none;
-            padding: 0;
-            margin: 0;
+        .chart-container {
+            margin: 20px 0;
         }
 
-        .headname li {
-            margin: 0 10px;
-        }
-
-        .headname li a {
-            text-decoration: none;
-            color: #333;
-        }
-
-        .headname li a:hover {
-            color: #007BFF;
+        .info-box {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
     </style>
 </head>
-<body>
-    <header>
-        <div id="header">
-            <div class="container">
-                <nav>
-                    <img src="{{ url_for('static', filename='images/logohead.png') }}" alt="logoheader" class="logohead">
-                    <ul class="headname">
-                        <li><a href="{{ url_for('home') }}">Home</a></li>
-                        <li><a href="{{ url_for('columbary_records') }}">Records</a></li>
-                        <li><a href="{{ url_for('columbary') }}">Columbary</a></li>
-                        <li><a id="logoutBtn" href="{{ url_for('logout') }}" class="custom-signup-btn mb-2">Log Out</a></li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-    </header>
 
-    <div class="dashboard-container">
-        <div id="dashboard"></div>
+<body>
+
+    {{ occupied_columbary }}
+    {{ available_columbary }}
+    {{ unissued_columbary }}
+    {{ pending_letters }}
+
+    {% include 'Staff_Headers.html' %}
+
+    <h1>Dashboard</h1>
+
+    <div class="dashboard-grid">
+        <div class="info-box" onclick="toggleAvailableTable()">
+            <h2>Available Columbaries</h2>
+            <p>{{ vacant_columbaries_count }}</p>
+        </div>
+        <div class="info-box" onclick="toggleOccupiedTable()">
+            <h2>Occupied Columbaries</h2>
+            <p>{{ occupied_columbaries_count }}</p>
+        </div>
+        <div class="info-box" onclick="toggleUnissuedTable()">
+            <h2>Unissued Columbaries</h2>
+            <p>{{ unissued_columbaries }}</p>
+        </div>
+        <div class="info-box" onclick="toggleTable()">
+            <h2>Pending Letter of Intents</h2>
+            <p>{{ pending_counts }}</p>
+        </div>
+    </div>
+
+    <!-- Pending Letter of Intent Table (Initially Hidden) -->
+    <div id="pendingTableContainer" class="table-container hidden">
+        <h3>Pending Letter of Intents</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Mobile</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for customer in pending_customers %}
+                <tr>
+                    <td>{{ customer.full_name }}</td>
+                    <td>{{ customer.email_address }}</td>
+                    <td>{{ customer.mobile_number }}</td>
+                    <td>
+                        <a href="{% url 'accept_letter_of_intent' customer.customer_id %}" class="btn-accept">Accept</a>
+                        <a href="{% url 'decline_letter_of_intent' customer.customer_id %}"
+                            class="btn-decline">Decline</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Available Columbaries Table (Initially Hidden) -->
+    <div id="availableTableContainer" class="table-container hidden">
+        <h3>Available Columbaries</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Columbary Name</th>
+                    <th>Location</th>
+                    <th>Capacity</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for columbary in vacant_columbaries %}
+                <tr>
+                    <td>{{ columbary.vault_id }}</td>
+                    <td>{{ columbary.section }}</td>
+                    <td>{{ columbary.urns_per_columbary }}</td>
+                    <td>{{ columbary.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Occupied Columbaries Table (Initially Hidden) -->
+    <div id="occupiedTableContainer" class="table-container hidden">
+        <h3>Occupied Columbaries</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Columbary Name</th>
+                    <th>Location</th>
+                    <th>Capacity</th>
+                    <th>Occupied By</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for columbary in occupied_columbaries %}
+                <tr>
+                    <td>{{ columbary.vault_id }}</td>
+                    <td>{{ columbary.section }}</td>
+                    <td>{{ columbary.urns_per_columbary }}</td>
+                    <td>{{ columbary.customer.full_name }}</td>
+                    <td>{{ columbary.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Unissued Columbaries Table (Initially Hidden) -->
+    <div id="unissuedTableContainer" class="table-container hidden">
+        <h3>Unissued Columbaries</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Vault ID</th>
+                    <th>Issuance Date</th>
+                    <th>Customer</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for columbary in unissued_columbary_records %}
+                <tr>
+                    <td>{{ columbary.vault_id }}</td>
+                    <td>{{ columbary.issuance_date }}</td>
+                    <td>{{ columbary.customer.full_name }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">No unissued columbaries found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+    <div class="dashboard-grid">
+        <div class="chart-container">
+            <h2>Payment Distribution</h2>
+            <canvas id="paymentChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h2>Total Earnings Over Time</h2>
+            <canvas id="earningsChart"></canvas>
+        </div>
     </div>
 
     <script>
-        fetch('/dashboard')
-            .then(response => response.json())
-            .then(chartSpec => {
-                chartSpec.config = {
-                    legend: { orient: "right" }
-                };
-                vegaEmbed('#dashboard', chartSpec, { renderer: "canvas" }).catch(console.error);
+        function createChart(canvasId, type, labels, data, labelText) {
+            const ctx = document.getElementById(canvasId).getContext("2d");
+            new Chart(ctx, {
+                type: type,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: labelText,
+                        data: data,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 2,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: "Issuance Date"
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: "Total Earnings (PHP)"
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
             });
+        }
+
+        // Columbary Records (Line Chart)
+        // Total Inquiries (Bar Chart)
+        var earningsLabels = JSON.parse('{{ earnings_labels|default:"[]"|escapejs }}');
+        var earningsData = JSON.parse('{{ earnings_data|default:"[]"|escapejs }}');
+
+        createChart(
+            "earningsChart",
+            "line",
+            earningsLabels,
+            earningsData,
+            "Total Earnings"
+        );
+
+
+        // Payment Pie Chart
+        var fullPayment = parseInt("{{ full_payment_count|default:"0" }}");
+        var installment = parseInt("{{ installment_count|default:"0" }}");
+
+
+        var ctx = document.getElementById('paymentChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Full Payment', '6-Month Installment'],
+                datasets: [{
+                    data: [fullPayment, installment],
+                    backgroundColor: ['#36A2EB', '#FF6384'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        function toggleTable() {
+            var tableContainer = document.getElementById("pendingTableContainer");
+            tableContainer.classList.toggle("hidden");
+        }
+
+        function toggleAvailableTable() {
+            var availableTable = document.getElementById("availableTableContainer");
+            availableTable.classList.toggle("hidden");
+        }
+
+        function toggleOccupiedTable() {
+            var occupiedTable = document.getElementById("occupiedTableContainer");
+            occupiedTable.classList.toggle("hidden");
+        }
+
+        function toggleUnissuedTable() {
+            var unissuedTable = document.getElementById("unissuedTableContainer");
+            unissuedTable.classList.toggle("hidden");
+    }
     </script>
 </body>
+
 </html>
