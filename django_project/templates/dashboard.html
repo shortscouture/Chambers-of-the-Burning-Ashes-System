@@ -185,99 +185,115 @@
             </table>
         </div>
 
-
         <div class="dashboard-grid">
             <div class="chart-container">
                 <h2>PAYMENT DISTRIBUTION</h2>
-                <canvas id="paymentChart"></canvas>
+                <canvas id="paymentChart" width="300" height="300"></canvas>
             </div>
             <div class="chart-container">
                 <h2>TOTAL EARNINGS OVER TIME</h2>
                 <canvas id="earningsChart"></canvas>
             </div>
         </div>
-    </div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
     <script>
-        function createChart(canvasId, type, labels, data, labelText) {
-            const ctx = document.getElementById(canvasId).getContext("2d");
-            new Chart(ctx, {
-                type: type,
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: labelText,
-                        data: data,
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 2,
-                        fill: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: "Issuance Date"
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: "Total Earnings (PHP)"
-                            },
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        }
-
-        // Columbary Records (Line Chart)
-        // Total Inquiries (Bar Chart)
-        var earningsLabels = JSON.parse('{{ earnings_labels|default:"[]"|escapejs }}');
-        var earningsData = JSON.parse('{{ earnings_data|default:"[]"|escapejs }}');
-
-        createChart(
-            "earningsChart",
-            "line",
-            earningsLabels,
-            earningsData,
-            "Total Earnings"
-        );
-
-
-        // Payment Pie Chart
         document.addEventListener("DOMContentLoaded", function () {
-            var fullPayment = Number("{{ full_payment_count|default:0 }}");
-            var installment = Number("{{ installment_count|default:0 }}");
+            var ctx = document.getElementById("paymentChart").getContext("2d");
 
-            var ctx = document.getElementById('paymentChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'pie',
+            var paymentChart = new Chart(ctx, {
+                type: "doughnut",
                 data: {
-                    labels: ['Full Payment', '6-Month Installment'],
-                    datasets: [{
-                        data: [fullPayment, installment],
-                        backgroundColor: ['#36A2EB', '#FF6384'],
-                        borderWidth: 1
-                    }]
+                    labels: {{ payment_labels| safe }},
+            datasets: [{
+                data: {{ payment_data| safe }},
+            backgroundColor: ["#36A2EB", "#FFCE56"],
+            }]
+        },
+            options: {
+            responsive: true,
+            maintainAspectRatio: true, // Keep aspect ratio
+            aspectRatio: 1, // Ensure it's square
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        color: "#ffffff",
+                        font: { size: 16 }
+                    }
                 },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
+                datalabels: {  // Enable the plugin for showing percentages
+                    formatter: (value, ctx) => {
+                        let sum = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                        let percentage = ((value / sum) * 100).toFixed(2) + "%";
+                        return percentage;
+                    },
+                    color: "#ffffff", // Percentage text color
+                    font: { size: 30, weight: 'normal', family: 'Impact' }
+                }
+            }
+        },
+            plugins: [ChartDataLabels] // Activate the plugin
+    });
+});
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var earningsCtx = document.getElementById("earningsChart").getContext("2d");
+
+            var earningsChart = new Chart(earningsCtx, {
+                type: "line",
+                data: {
+                    labels: {{ earnings_labels| safe }},
+            datasets: [{
+                label: "Earnings",
+                data: {{ earnings_data| safe }},
+            borderColor: "#36A2EB",  // Line color (blue)
+            backgroundColor: "rgba(54, 162, 235, 0.2)",  // Light blue fill
+            borderWidth: 2,
+            pointRadius: 5,
+            pointBackgroundColor: "#36A2EB"
+                }]
+            },
+            options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: "#ffffff"  // White text for readability
+                    },
+                    title: {
+                        display: false  // Hide the Y-axis title
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: "#ffffff"  // White text for readability
+                    },
+                    title: {
+                        display: false  // Hide the X-axis title
                     }
                 }
-            });
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        color: "#ffffff",
+                        font: { size: 16 }
+                    }
+                },
+                title: {
+                    display: false // This will remove the chart title
+                }
+            }
+        }
         });
-
+    });
 
         function toggleTable() {
             var tableContainer = document.getElementById("pendingTableContainer");

@@ -31,6 +31,8 @@ from django.db import transaction
 import json
 import environ
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models.functions import TruncMonth
+
 
 
 class SuccesView(TemplateView):
@@ -94,16 +96,24 @@ class DashboardView(TemplateView):
             .order_by("issuance_date")
         )
 
-        earnings_labels = [
-            entry["issuance_date"].strftime("%Y-%m-%d") 
-            for entry in earnings_by_date if entry["issuance_date"] is not None
-        ]
-        earnings_data = [float(entry["total_earnings"]) for entry in earnings_by_date]
+        # Convert data to JSON for Chart.js
+        payment_labels = ["Full Payment", "Installment"]
+        payment_data = [full_payment_count, installment_count]
 
-        context.update({
-            "earnings_labels": mark_safe(json.dumps(earnings_labels)),  # Converts to JSON
-            "earnings_data": mark_safe(json.dumps(earnings_data)),  # Converts to JSON
-        })
+         # Get earnings per month
+        earnings_by_month = (
+            ColumbaryRecord.objects.filter(payment__isnull=False)
+            .annotate(month=TruncMonth("issuance_date"))
+            .values("month")
+            .annotate(total_earnings=Sum("payment__total_amount"))
+            .order_by("month")
+        )
+
+        # Convert data for Chart.js
+        earnings_labels = [
+            entry["month"].strftime("%b %Y") for entry in earnings_by_month if entry["month"] is not None
+        ]
+        earnings_data = [float(entry["total_earnings"]) for entry in earnings_by_month]
 
         # Add data to context
         context.update({
@@ -112,15 +122,16 @@ class DashboardView(TemplateView):
             'pending_counts': Customer.objects.filter(status="pending").count(),
             'pending_customers': Customer.objects.filter(status="pending"),
             'unissued_columbaries': ColumbaryRecord.objects.filter(issuance_date__isnull=True, customer__isnull=False).count(),
-            'full_payment_count': full_payment_count,
-            'installment_count': installment_count,
-            'earnings_labels': earnings_labels,
-            'earnings_data': earnings_data,
             'vacant_columbaries': ColumbaryRecord.objects.filter(status="Vacant"),
             'vacant_columbaries_count': ColumbaryRecord.objects.filter(status="Vacant").count(),  # Returns an int
             'occupied_columbaries': ColumbaryRecord.objects.filter(status="Occupied"),
             'occupied_columbaries_count': ColumbaryRecord.objects.filter(status="Occupied").count(),
-            'unissued_columbary_records' : unissued_columbary_records
+            'unissued_columbary_records' : unissued_columbary_records,
+            "payment_labels": mark_safe(json.dumps(payment_labels)),
+            "payment_data": mark_safe(json.dumps(payment_data)),
+            "earnings_labels": mark_safe(json.dumps(earnings_labels)),  # Labels (months)
+            "earnings_data": mark_safe(json.dumps(earnings_data)),  # Earnings
+
         })
 
         return context
