@@ -1,28 +1,38 @@
 from django.views.generic import TemplateView
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404,  HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
 from django.utils import timezone
+from django.utils.safestring import mark_safe
+from django.db.models import Count, Sum
 from datetime import datetime, timedelta
 from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm, PaymentForm, HolderOfPrivilegeForm
 from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, Payment, ChatQuery, ParishAdministrator, HolderOfPrivilege
+from django.views.generic import TemplateView, DeleteView
+from django.forms import modelformset_factory
 from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, HttpResponseRedirect
-from django.urls import reverse_lazy
 from django.views.generic.base import TemplateView
+from django.db.models import Count, Sum
 from .models import Customer, ColumbaryRecord, Beneficiary, Payment
-from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, PaymentForm
+from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, PaymentForm, DocumentUploadForm
 from django.db import transaction
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+import pytesseract
+from PIL import Image
+import re
 import openai
-import environ
+from django.db import transaction
 import json
+import environ
+from django.views.decorators.csrf import csrf_exempt
+from django.db.models.functions import TruncMonth
+
 
 
 class SuccesView(TemplateView):
@@ -62,6 +72,71 @@ class MemorialView(TemplateView):
     template_name = "pages/Memorials.html"
 
 
+class DashboardView(TemplateView):
+    template_name = "dashboard.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Fetch necessary data
+        customer_status_counts = Customer.objects.values('status').annotate(count=Count('status'))
+        #inquiry_counts = InquiryRecord.objects.count()
+        pending_counts = Customer.objects.filter(status="pending").count()
+        vacant_columbaries = ColumbaryRecord.objects.filter(status="Vacant")
+        occupied_columbaries = ColumbaryRecord.objects.filter(status="Occupied")
+        unissued_columbaries = ColumbaryRecord.objects.filter(issuance_date__isnull=True, customer__isnull=False).count()
+        full_payment_count = Payment.objects.filter(mode_of_payment="Full Payment").count()
+        installment_count = Payment.objects.filter(mode_of_payment="6-Month Installment").count()
+        unissued_columbary_records = ColumbaryRecord.objects.filter(issuance_date__isnull=True, customer__isnull=False)
+
+        earnings_by_date = (
+            ColumbaryRecord.objects.filter(payment__isnull=False)
+            .values("issuance_date")
+            .annotate(total_earnings=Sum("payment__total_amount"))
+            .order_by("issuance_date")
+        )
+
+        # Convert data to JSON for Chart.js
+        payment_labels = ["Full Payment", "Installment"]
+        payment_data = [full_payment_count, installment_count]
+
+         # Get earnings per month
+        earnings_by_month = (
+            ColumbaryRecord.objects.filter(payment__isnull=False)
+            .annotate(month=TruncMonth("issuance_date"))
+            .values("month")
+            .annotate(total_earnings=Sum("payment__total_amount"))
+            .order_by("month")
+        )
+
+        # Convert data for Chart.js
+        earnings_labels = [
+            entry["month"].strftime("%b %Y") for entry in earnings_by_month if entry["month"] is not None
+        ]
+        earnings_data = [float(entry["total_earnings"]) for entry in earnings_by_month]
+
+        # Add data to context
+        context.update({
+            'customer_status_counts': customer_status_counts,
+            #'inquiry_counts': inquiry_counts,
+            'pending_counts': Customer.objects.filter(status="pending").count(),
+            'pending_customers': Customer.objects.filter(status="pending"),
+            'unissued_columbaries': ColumbaryRecord.objects.filter(issuance_date__isnull=True, customer__isnull=False).count(),
+            'vacant_columbaries': ColumbaryRecord.objects.filter(status="Vacant"),
+            'vacant_columbaries_count': ColumbaryRecord.objects.filter(status="Vacant").count(),  # Returns an int
+            'occupied_columbaries': ColumbaryRecord.objects.filter(status="Occupied"),
+            'occupied_columbaries_count': ColumbaryRecord.objects.filter(status="Occupied").count(),
+            'unissued_columbary_records' : unissued_columbary_records,
+            "payment_labels": mark_safe(json.dumps(payment_labels)),
+            "payment_data": mark_safe(json.dumps(payment_data)),
+            "earnings_labels": mark_safe(json.dumps(earnings_labels)),  # Labels (months)
+            "earnings_data": mark_safe(json.dumps(earnings_data)),  # Earnings
+
+        })
+
+        return context
+
+            
 def send_letter_of_intent(request):
     if request.method == 'POST':
 
@@ -167,16 +242,6 @@ class RecordsDetailsView(TemplateView):
         
         return context
 
-
-
-
-from django.shortcuts import get_object_or_404, redirect
-from django.urls import reverse_lazy
-from django.views.generic import TemplateView, DeleteView
-from django.forms import modelformset_factory
-from django.contrib import messages
-from .models import Customer, ColumbaryRecord, Beneficiary, Payment
-from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm
 
 class CustomerEditView(TemplateView):
     template_name = "pages/edit_customer.html"
@@ -368,16 +433,118 @@ class ChatbotAPIView(APIView):
 
         try:
             response = openai.chat.completions.create(
-                model="gpt-3.5-turbo",  # Using GPT-3.5 models
+                model="gpt-3.5-turbo",  # Using GPT-3.5 model
                 messages=[{"role": "user", "content": user_message}],
                 max_tokens=150
             )
             bot_reply = response.choices[0].message.content.strip()  # Get the response from GPT-3.5
             return Response({'response': bot_reply}, status=status.HTTP_200_OK)
 
-
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+      
+def preprocess_image(image):
+    """
+    Preprocess the image to improve OCR accuracy
+    """
+    img = Image.open(image).convert('L')
+    img = img.point(lambda x: 0 if x < 128 else 255)
+    return img
+
+@csrf_exempt 
+def process_ocr(request):
+    if request.method == 'POST' and request.FILES.get('document'):
+        try:
+            # Extract text from the uploaded image
+            image = request.FILES['document']
+            extracted_text = extract_text(image)
+            
+            # Parse the extracted text into a dictionary
+            data = parse_text_to_dict(extracted_text)
+            
+            return JsonResponse({'success': True, 'data': data})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Invalid request'})
+
+def extract_text(image):
+    """
+    Extract text from image using pytesseract
+    """
+    img = Image.open(image).convert('L')  # Convert to grayscale
+    text = pytesseract.image_to_string(img)
+    return text
+
+def parse_text_to_dict(text):
+    """
+    Parse extracted text into a dictionary matching model fields.
+    """
+    data = {
+        # Customer fields
+        'first_name': None,
+        'middle_name': None,
+        'last_name': None,
+        'suffix': None,
+        'country': 'Philippines',  # Default value
+        'address_line_1': None,
+        'address_line_2': None,
+        'city': None,
+        'province_or_state': None,
+        'postal_code': None,
+        'landline_number': None,
+        'mobile_number': None,
+        'email_address': None,
+        
+        # Beneficiary fields
+        'first_beneficiary_name': None,
+        'second_beneficiary_name': None,
+        'third_beneficiary_name': None,
+        
+        # ColumbaryRecord fields
+        'vault_id': None,
+        'inurnment_date': None,
+        'urns_per_columbary': None,
+    }
+
+    # Example patterns (adjust based on your document structure)
+    patterns = {
+        # Customer patterns
+        'full_name': r'Full name:[\s]*([^\n]*)',
+        'permanent_address': r'Permanent Address:[\s]*([^\n]*)',
+        'mobile_number': r'Mobile Number:[\s]*([^\n]*)',
+        'email_address': r'Email Address:[\s]*([^\n]*)',
+        
+        # Beneficiary patterns
+        'first_beneficiary_name': r'FIRST PRIORITY[\s]*Full name:[\s]*([^\n]*)',
+        'second_beneficiary_name': r'SECOND PRIORITY[\s]*Full name:[\s]*([^\n]*)',
+        'third_beneficiary_name': r'THIRD PRIORITY[\s]*Full name:[\s]*([^\n]*)',
+        
+        # ColumbaryRecord patterns
+        'vault_id': r'Vault ID:[\s]*([^\n]*)',
+        'inurnment_date': r'Inurnment Date:[\s]*([^\n]*)',
+        'urns_per_columbary': r'Urns Per Columbary:[\s]*([^\n]*)',
+    }
+
+    # Extract all fields using patterns
+    for field, pattern in patterns.items():
+        match = re.search(pattern, text)
+        if match:
+            data[field] = match.group(1).strip()
+
+    # Split full name into first, middle, and last names
+    if data.get('full_name'):
+        name_parts = data['full_name'].split()
+        if len(name_parts) >= 1:
+            data['first_name'] = name_parts[0]
+        if len(name_parts) >= 2:
+            data['last_name'] = name_parts[-1]
+        if len(name_parts) > 2:
+            data['middle_name'] = ' '.join(name_parts[1:-1])
+
+    return data
+
 
 env = environ.Env(
     DEBUG=(bool, False) #default value for DEBUG = False
@@ -451,10 +618,10 @@ def query_openai(data):
     return response["choices"][0]["message"]["content"]
 
 def chatbot_view(request):
-        """Handle AJAX request and return chatbot response."""
-        db_data = get_data_from_db()
-        ai_response = query_openai(db_data)
-        return JsonResponse({"response": ai_response})
+    """Handle AJAX request and return chatbot response."""
+    db_data = get_data_from_db()
+    ai_response = query_openai(db_data)
+    return JsonResponse({"response": ai_response})
 
 
 def addnewrecord(request):
