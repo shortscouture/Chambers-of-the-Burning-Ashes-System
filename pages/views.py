@@ -418,35 +418,6 @@ def verify_otp(request):
 def success(request):
     return render(request, 'pages/success.html')
 
-#chatbot env
-env = environ.Env(
-    DEBUG=(bool, False) #default value for DEBUG = False
-)
-
-openai.api_key = env("OPEN_AI_API_KEY")
-class ChatbotAPIView(APIView):
-    def get(self, request, *args, **kwargs):
-        return Response({"message": "Chatbot API is running! Use POST to send messages."}, status=status.HTTP_200_OK)
-    
-    def post(self, request, *args, **kwargs):
-        user_message = request.data.get('message')
-
-        if not user_message:
-            return Response({'error': 'Message is required'}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            response = openai.chat.completions.create(
-                model="gpt-3.5-turbo",  # Using GPT-3.5 model
-                messages=[{"role": "user", "content": user_message}],
-                max_tokens=150
-            )
-            bot_reply = response.choices[0].message.content.strip()  # Get the response from GPT-3.5
-            return Response({'response': bot_reply}, status=status.HTTP_200_OK)
-
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-
       
 def preprocess_image(image):
     """
@@ -548,13 +519,11 @@ def parse_text_to_dict(text):
 
     return data
 
-
+#chatbot env
 env = environ.Env(
     DEBUG=(bool, False) #default value for DEBUG = False
 )
-
-
-
+        
 openai.api_key = env("OPEN_AI_API_KEY")
 class ChatbotAPIView(APIView):
     def get(self, request, *args, **kwargs):
