@@ -135,6 +135,26 @@ a:hover { color: #FF0; }
   letter-spacing: 0.5px;
 }
 
+.button {
+  background-color: #2891d2; /* Green background */
+  border: none; /* Remove borders */
+  color: white; /* White text */
+  padding: 15px 32px; /* Some padding */
+  text-align: center; /* Centered text */
+  text-decoration: none; /* Remove underline */
+  display: inline-block; 
+  font-size: 16px; 
+  margin: 4px 2px; 
+  cursor: pointer; 
+  border: 1px solid rgb(255, 255, 255);
+  transition: background-color 0.3s ease-in; /* Add ease-in transition */
+  border-radius: 12px; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow */
+}
+
+.button:hover {
+  background-color: #153346; /* Darker green on hover */
+}
 
 .parallax-content {
   width: 100%;
@@ -377,7 +397,6 @@ section {
   font-size: 14px;
   font-weight: 700;
   padding:10px 15px;
-  border:4px solid #fff;
 }
 
 .tabs a:hover {
