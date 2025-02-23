@@ -558,7 +558,7 @@ class ChatbotAPIView(APIView):
             model="gpt-3.5-turbo",
             messages=messages,
             temperature=0.7,
-            api_key=settings.base.OPEN_AI_API_KEY )
+           )
 
         return JsonResponse({
             "query": user_query,  
