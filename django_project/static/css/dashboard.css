@@ -286,7 +286,17 @@ canvas {
 
 #dateFilterForm input, #dateFilterForm button {
     padding: 8px;
-    font-size: 14px;
+    font-size: 17px;
+}
+
+/* Center Date Filter */
+.date-filter-container {
+    display: flex;
+    justify-content: center; /* Centers horizontally */
+    align-items: center; /* Aligns vertically */
+    text-align: center;
+    margin: 20px auto; /* Adjust spacing */
+    width: 100%;
 }
 
 /* Responsive Design */

@@ -55,15 +55,18 @@
 
     <h1><img src="{% static 'images/dash.gif' %}" alt="Dashboard Title" class="dashboard-title-image"></h1>
 
-    <form id="dateFilterForm" method="GET" action="{% url 'dashboard' %}">
-        <label for="start_date">Start Date:</label>
-        <input type="date" id="start_date" name="start_date" value="{{ start_date }}">
+    <div class="date-filter-container">
+        <form id="dateFilterForm" method="GET" action="/dashboard/">
+            <label for="start_date">Start Date:</label>
+            <input type="date" id="start_date" name="start_date" value="2024-01-24">
 
-        <label for="end_date">End Date:</label>
-        <input type="date" id="end_date" name="end_date" value="{{ end_date }}">
+            <label for="end_date">End Date:</label>
+            <input type="date" id="end_date" name="end_date" value="2024-07-24">
 
-        <button type="submit">Filter</button>
-    </form>
+            <button type="submit">Filter</button>
+        </form>
+    </div>
+
 
     <div class="overlay"></div> <!-- Overlay element -->
     <div class="dashboard-container">
