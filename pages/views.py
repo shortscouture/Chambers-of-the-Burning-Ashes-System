@@ -574,7 +574,7 @@ class ChatbotAPIView(APIView):
         #ai_response = query_openai(db_data)
       #  return JsonResponse({"response": ai_response})
     
-    def query_openai(data):
+    def query_openai(self, data):
         try:
             formatted_data = json.dumps(data, indent=2)
         except (TypeError, ValueError) as e:
@@ -617,10 +617,33 @@ def get_section_details(request, section_id):
     columbaries = ColumbaryRecord.objects.filter(section=section_id).values("level", "vault_id", "status")
     return JsonResponse({"section": section_id, "columbaries": list(columbaries)})
 
+#def get_data_from_db():
+#    data = Customer.objects.all().values()  # Fetch all fields
+#    return list(data)
 def get_data_from_db():
-    data = Customer.objects.all().values()  # Fetch all fields
-    return list(data)
+    """Fetch relevant data from the database, excluding the 'customer' table."""
+    from django.db import connection
 
+    data = {}
+
+    try:
+        with connection.cursor() as cursor:
+            # List of tables to query (EXCLUDE 'customer' TABLE)
+            tables = ["parish_knowledge", "parish_staff"]  # Add only safe tables
+
+            for table in tables:
+                try:
+                    cursor.execute(f"SELECT * FROM {table} LIMIT 10;")
+                    columns = [col[0] for col in cursor.description]
+                    rows = cursor.fetchall()
+                    data[table] = [dict(zip(columns, row)) for row in rows]
+                except Exception as e:
+                    print(f"Skipping {table}: {e}")  # Avoid crashing on missing tables
+
+    except Exception as e:
+        print(f"Database error: {e}")
+
+    return data  # Returns a dictionary of database contents
 
 def addnewrecord(request):
     if request.method == 'POST':
