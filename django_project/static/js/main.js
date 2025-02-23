@@ -57,4 +57,20 @@ jQuery(document).ready(function($) {
     });
 
 
+
+
 });
+
+function showInfoBox(event) {
+  event.stopPropagation();
+  document.getElementById('infobox').style.display = 'block';
+  document.addEventListener('click', hideInfoBox);
+}
+
+function hideInfoBox(event) {
+  const infobox = document.getElementById('infobox');
+  if (!infobox.contains(event.target)) {
+    infobox.style.display = 'none';
+    document.removeEventListener('click', hideInfoBox);
+  }
+}

@@ -167,6 +167,34 @@ a:hover { color: #FF0; }
   margin-bottom: 0px;
 }
 
+  .bi-door-open-fill:hover{
+    fill: #2891d2;
+    animation: none;
+  }
+
+  @keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  
+
+  .bi-door-open-fill{
+    cursor: pointer;
+    animation: blink 2s infinite;
+    margin-top: 16%;
+    margin-left: 20px;
+  }
+
+  #infobox {
+    position: absolute;
+    margin: center;
+    top: 120px;
+    width: 1000px;
+    left: 260px;
+    padding: 10px;
+    border-radius: 10px;
+  }
 
 .baner-content em {
   color: #2891d2;
