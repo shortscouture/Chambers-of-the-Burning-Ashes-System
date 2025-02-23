@@ -32,6 +32,9 @@ import json
 import environ
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models.functions import TruncMonth
+from django.http import JsonResponse
+from .models import Customer, Payment
+from datetime import datetime
 
 
 
@@ -88,6 +91,8 @@ class DashboardView(TemplateView):
         full_payment_count = Payment.objects.filter(mode_of_payment="Full Payment").count()
         installment_count = Payment.objects.filter(mode_of_payment="6-Month Installment").count()
         unissued_columbary_records = ColumbaryRecord.objects.filter(issuance_date__isnull=True, customer__isnull=False)
+        start_date = self.request.GET.get("start_date")
+        end_date = self.request.GET.get("end_date")
 
         earnings_by_date = (
             ColumbaryRecord.objects.filter(payment__isnull=False)
@@ -100,12 +105,22 @@ class DashboardView(TemplateView):
         payment_labels = ["Full Payment", "Installment"]
         payment_data = [full_payment_count, installment_count]
 
-         # Get earnings per month
+        # Convert strings to datetime objects (if provided)
+        if start_date:
+            start_date = datetime.strptime(start_date, "%Y-%m-%d")
+        if end_date:
+            end_date = datetime.strptime(end_date, "%Y-%m-%d")
+
+        # Filter earnings based on the selected date range
+        earnings_queryset = Payment.objects.filter(
+            transaction_date__gte=start_date if start_date else "1900-01-01",
+            transaction_date__lte=end_date if end_date else "2100-01-01"
+        ).annotate(month=TruncMonth("transaction_date"))  # ✅ Apply filter BEFORE aggregation
+
         earnings_by_month = (
-            ColumbaryRecord.objects.filter(payment__isnull=False)
-            .annotate(month=TruncMonth("issuance_date"))
+            earnings_queryset
             .values("month")
-            .annotate(total_earnings=Sum("payment__total_amount"))
+            .annotate(total_earnings=Sum("total_amount"))
             .order_by("month")
         )
 
@@ -114,6 +129,10 @@ class DashboardView(TemplateView):
             entry["month"].strftime("%b %Y") for entry in earnings_by_month if entry["month"] is not None
         ]
         earnings_data = [float(entry["total_earnings"]) for entry in earnings_by_month]
+
+        # Debugging: Print earnings data
+        print("Earnings Labels:", earnings_labels)
+        print("Earnings Data:", earnings_data)
 
         # Add data to context
         context.update({
@@ -131,11 +150,28 @@ class DashboardView(TemplateView):
             "payment_data": mark_safe(json.dumps(payment_data)),
             "earnings_labels": mark_safe(json.dumps(earnings_labels)),  # Labels (months)
             "earnings_data": mark_safe(json.dumps(earnings_data)),  # Earnings
+            "start_date": start_date.strftime("%Y-%m-%d") if start_date else "",
+            "end_date": end_date.strftime("%Y-%m-%d") if end_date else "",
 
         })
 
         return context
 
+def accept_letter_of_intent(request, intent_id):
+    """ Update customer status to 'approved' when accepted. """
+    customer = get_object_or_404(Customer, customer_id=intent_id)
+    customer.status = "approved"
+    customer.save()
+    
+    return JsonResponse({"status": "success", "message": "Accepted", "new_status": "approved"})
+
+def decline_letter_of_intent(request, intent_id):
+    """ Update customer status to 'declined' when declined. """
+    customer = get_object_or_404(Customer, customer_id=intent_id)
+    customer.status = "declined"
+    customer.save()
+    
+    return JsonResponse({"status": "success", "message": "Declined", "new_status": "declined"})
             
 def send_letter_of_intent(request):
     if request.method == 'POST':

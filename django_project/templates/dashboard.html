@@ -55,6 +55,16 @@
 
     <h1><img src="{% static 'images/dash.gif' %}" alt="Dashboard Title" class="dashboard-title-image"></h1>
 
+    <form id="dateFilterForm" method="GET" action="{% url 'dashboard' %}">
+        <label for="start_date">Start Date:</label>
+        <input type="date" id="start_date" name="start_date" value="{{ start_date }}">
+
+        <label for="end_date">End Date:</label>
+        <input type="date" id="end_date" name="end_date" value="{{ end_date }}">
+
+        <button type="submit">Filter</button>
+    </form>
+
     <div class="overlay"></div> <!-- Overlay element -->
     <div class="dashboard-container">
         <div class="dashboard-grid">
@@ -90,15 +100,15 @@
                 </thead>
                 <tbody>
                     {% for customer in pending_customers %}
-                    <tr>
+                    <tr id="customer-row-{{ customer.customer_id }}">
                         <td>{{ customer.full_name }}</td>
                         <td>{{ customer.email_address }}</td>
                         <td>{{ customer.mobile_number }}</td>
                         <td>
-                            <a href="{% url 'accept_letter_of_intent' customer.customer_id %}"
-                                class="btn-accept">Accept</a>
-                            <a href="{% url 'decline_letter_of_intent' customer.customer_id %}"
-                                class="btn-decline">Decline</a>
+                            <button class="btn-accept"
+                                onclick="updateCustomerStatus({{ customer.customer_id }}, 'accept')">Accept</button>
+                            <button class="btn-decline"
+                                onclick="updateCustomerStatus({{ customer.customer_id }}, 'decline')">Decline</button>
                         </td>
                     </tr>
                     {% endfor %}
@@ -197,124 +207,273 @@
         </div>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            var ctx = document.getElementById("paymentChart").getContext("2d");
+        <!-- Hidden elements to store filtered earnings data -->
+        <span id="earnings_labels" style="display: none;">{{ earnings_labels|safe }}</span>
+        <span id="earnings_data" style="display: none;">{{ earnings_data|safe }}</span>
 
-            var paymentChart = new Chart(ctx, {
-                type: "doughnut",
-                data: {
-                    labels: {{ payment_labels| safe }},
-            datasets: [{
-                data: {{ payment_data| safe }},
-            backgroundColor: ["#36A2EB", "#FFCE56"],
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                var ctx = document.getElementById("paymentChart").getContext("2d");
+
+                var paymentChart = new Chart(ctx, {
+                    type: "doughnut",
+                    data: {
+                        labels: {{ payment_labels| safe }},
+                datasets: [{
+                    data: {{ payment_data| safe }},
+                backgroundColor: ["#36A2EB", "#FFCE56"],
             }]
         },
-            options: {
-            responsive: true,
-            maintainAspectRatio: true, // Keep aspect ratio
-            aspectRatio: 1, // Ensure it's square
-            plugins: {
-                legend: {
-                    position: 'right',
-                    labels: {
-                        color: "#ffffff",
-                        font: { size: 16 }
-                    }
-                },
-                datalabels: {  // Enable the plugin for showing percentages
-                    formatter: (value, ctx) => {
-                        let sum = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                        let percentage = ((value / sum) * 100).toFixed(2) + "%";
-                        return percentage;
+                options: {
+                responsive: true,
+                maintainAspectRatio: true, // Keep aspect ratio
+                aspectRatio: 1, // Ensure it's square
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            color: "#ffffff",
+                            font: { size: 16 }
+                        }
                     },
-                    color: "#ffffff", // Percentage text color
-                    font: { size: 30, weight: 'normal', family: 'Impact' }
+                    datalabels: {  // Enable the plugin for showing percentages
+                        formatter: (value, ctx) => {
+                            let sum = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                            let percentage = ((value / sum) * 100).toFixed(2) + "%";
+                            return percentage;
+                        },
+                        color: "#ffffff", // Percentage text color
+                        font: { size: 30, weight: 'normal', family: 'Impact' }
+                    }
                 }
-            }
-        },
-            plugins: [ChartDataLabels] // Activate the plugin
+            },
+                plugins: [ChartDataLabels] // Activate the plugin
     });
 });
 
+            var earningsChart = null;  // 🔥 Ensure it's globally defined
 
-        document.addEventListener("DOMContentLoaded", function () {
-            var earningsCtx = document.getElementById("earningsChart").getContext("2d");
+            document.addEventListener("DOMContentLoaded", function () {
+                var earningsCtx = document.getElementById("earningsChart").getContext("2d");
 
-            var earningsChart = new Chart(earningsCtx, {
-                type: "line",
-                data: {
-                    labels: {{ earnings_labels| safe }},
-            datasets: [{
-                label: "Earnings",
-                data: {{ earnings_data| safe }},
-            borderColor: "#36A2EB",  // Line color (blue)
-            backgroundColor: "rgba(54, 162, 235, 0.2)",  // Light blue fill
-            borderWidth: 2,
-            pointRadius: 5,
-            pointBackgroundColor: "#36A2EB"
-                }]
-            },
-            options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        color: "#ffffff"  // White text for readability
+                earningsChart = new Chart(earningsCtx, {  // ✅ Assign globally
+                    type: "line",
+                    data: {
+                        labels: JSON.parse(document.getElementById("earnings_labels").textContent),
+                        datasets: [{
+                            label: "Earnings (₱)",
+                            data: JSON.parse(document.getElementById("earnings_data").textContent),
+                            borderColor: "#36A2EB",
+                            backgroundColor: "rgba(54, 162, 235, 0.2)",
+                            borderWidth: 2,
+                            pointRadius: 5,
+                            pointBackgroundColor: "#36A2EB"
+                        }]
                     },
-                    title: {
-                        display: false  // Hide the Y-axis title
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    color: "#ffffff",
+                                    callback: function (value) {
+                                        return "₱" + value.toLocaleString("en-PH");
+                                    }
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    color: "#ffffff"
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function (tooltipItem) {
+                                        let value = tooltipItem.raw;
+                                        return "₱" + value.toLocaleString("en-PH");
+                                    }
+                                }
+                            },
+                            legend: {
+                                labels: {
+                                    color: "#ffffff",
+                                    font: { size: 16 }
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: "Total Earnings (₱) Over Time",
+                                color: "#ffffff",
+                                font: { size: 18 }
+                            }
+                        }
                     }
-                },
-                x: {
-                    ticks: {
-                        color: "#ffffff"  // White text for readability
-                    },
-                    title: {
-                        display: false  // Hide the X-axis title
-                    }
+                });
+            });
+
+
+
+            function updateCustomerStatus(customerId, action) {
+                let confirmationMessage = action === "accept"
+                    ? "Are you sure you want to accept this letter of intent?"
+                    : "Are you sure you want to decline this letter of intent?";
+
+                if (!confirm(confirmationMessage)) {
+                    return; // Stop if the user clicks "Cancel"
                 }
-            },
-            plugins: {
-                legend: {
-                    labels: {
-                        color: "#ffffff",
-                        font: { size: 16 }
+
+                let url = action === "accept"
+                    ? `/accept/${customerId}/`
+                    : `/decline/${customerId}/`;
+
+                fetch(url, {
+                    method: "GET",
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
                     }
-                },
-                title: {
-                    display: false // This will remove the chart title
-                }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === "success") {
+                            alert(`Letter of Intent ${data.new_status.toUpperCase()} successfully!`);
+                            location.reload(); // 🔥 Refresh the page to reflect changes
+                        } else {
+                            alert("Error updating status. Please try again.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("An error occurred. Please try again.");
+                    });
             }
-        }
-        });
-    });
 
-        function toggleTable() {
-            var tableContainer = document.getElementById("pendingTableContainer");
-            tableContainer.classList.toggle("hidden");
-        }
+            document.getElementById("dateFilterForm").addEventListener("submit", function (event) {
+                event.preventDefault(); // Prevent full page reload
 
-        function toggleAvailableTable() {
-            var availableTable = document.getElementById("availableTableContainer");
-            availableTable.classList.toggle("hidden");
-        }
+                let formData = new FormData(this);
+                let url = this.action + "?" + new URLSearchParams(formData).toString();
 
-        function toggleOccupiedTable() {
-            var occupiedTable = document.getElementById("occupiedTableContainer");
-            occupiedTable.classList.toggle("hidden");
-        }
+                fetch(url)
+                    .then(response => response.text())
+                    .then(html => {
+                        console.log("AJAX Response:", html); // 🔥 Debug response
 
-        function toggleUnissuedTable() {
-            var unissuedTable = document.getElementById("unissuedTableContainer");
-            unissuedTable.classList.toggle("hidden");
-        }
-    </script>
+                        let parser = new DOMParser();
+                        let doc = parser.parseFromString(html, "text/html");
+
+                        let earningsLabelsElement = doc.getElementById("earnings_labels");
+                        let earningsDataElement = doc.getElementById("earnings_data");
+
+                        if (earningsLabelsElement && earningsDataElement) {
+                            let newEarningsLabels = JSON.parse(earningsLabelsElement.textContent);
+                            let newEarningsData = JSON.parse(earningsDataElement.textContent);
+
+                            console.log("Filtered Earnings Labels:", newEarningsLabels);
+                            console.log("Filtered Earnings Data:", newEarningsData);
+
+                            // ✅ Destroy existing chart before recreating
+                            if (earningsChart) {
+                                earningsChart.destroy();
+                                console.log("Previous earningsChart destroyed.");
+                            }
+
+                            // ✅ Recreate chart
+                            var earningsCtx = document.getElementById("earningsChart").getContext("2d");
+                            earningsChart = new Chart(earningsCtx, {
+                                type: "line",
+                                data: {
+                                    labels: newEarningsLabels,
+                                    datasets: [{
+                                        label: "Earnings (₱)",
+                                        data: newEarningsData,
+                                        borderColor: "#36A2EB",
+                                        backgroundColor: "rgba(54, 162, 235, 0.2)",
+                                        borderWidth: 2,
+                                        pointRadius: 5,
+                                        pointBackgroundColor: "#36A2EB"
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true,
+                                            ticks: {
+                                                color: "#ffffff",
+                                                callback: function (value) {
+                                                    return "₱" + value.toLocaleString("en-PH");
+                                                }
+                                            }
+                                        },
+                                        x: {
+                                            ticks: {
+                                                color: "#ffffff"
+                                            }
+                                        }
+                                    },
+                                    plugins: {
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function (tooltipItem) {
+                                                    let value = tooltipItem.raw;
+                                                    return "₱" + value.toLocaleString("en-PH");
+                                                }
+                                            }
+                                        },
+                                        legend: {
+                                            labels: {
+                                                color: "#ffffff",
+                                                font: { size: 16 }
+                                            }
+                                        },
+                                        title: {
+                                            display: true,
+                                            text: "Total Earnings (₱) Over Time",
+                                            color: "#ffffff",
+                                            font: { size: 18 }
+                                        }
+                                    }
+                                }
+                            });
+
+                            console.log("New earningsChart created.");
+                        } else {
+                            console.error("Error: earnings_labels or earnings_data element not found in AJAX response.");
+                        }
+                    })
+                    .catch(error => console.error("Error:", error));
+            });
+
+
+
+            function toggleTable() {
+                var tableContainer = document.getElementById("pendingTableContainer");
+                tableContainer.classList.toggle("hidden");
+            }
+
+            function toggleAvailableTable() {
+                var availableTable = document.getElementById("availableTableContainer");
+                availableTable.classList.toggle("hidden");
+            }
+
+            function toggleOccupiedTable() {
+                var occupiedTable = document.getElementById("occupiedTableContainer");
+                occupiedTable.classList.toggle("hidden");
+            }
+
+            function toggleUnissuedTable() {
+                var unissuedTable = document.getElementById("unissuedTableContainer");
+                unissuedTable.classList.toggle("hidden");
+            }
+        </script>
 </body>
 
 </html>

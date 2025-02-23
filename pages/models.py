@@ -5,6 +5,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from datetime import datetime, timedelta
 from django.utils import timezone
+from datetime import date
 
 
 class Account(models.Model):
@@ -127,11 +128,8 @@ class Payment(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="payments")  # Added customer FK
     mode_of_payment = models.CharField(max_length=20, choices=PAYMENT_MODES, blank=True, null=True)
 
-    class Meta:
-        db_table = "payment"  # 🔥 Ensures Django uses the correct table
-
-    class Meta:
-        db_table = "payment"  # 🔥 Ensures Django uses the correct table
+    # New field for tracking payment date
+    transaction_date = models.DateField(default=date.today)
 
     # Seven receipt fields
     Full_payment_receipt_1 = models.IntegerField(blank=True, null=True)

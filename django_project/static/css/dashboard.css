@@ -101,6 +101,7 @@ h1 {
     background: rgba(90, 90, 90, 0.8);
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
 }
 
 .hidden {
@@ -230,6 +231,62 @@ canvas {
     position: relative; /* Ensures it sits above the overlay */
     z-index: 1; /* Places content above overlay */
     padding: 20px;
+}
+
+/* Accept Button Styles */
+.btn-accept {
+    background-color: #28a745; /* Green */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s ease-in-out;
+}
+
+.btn-accept:hover {
+    background-color: #218838; /* Darker Green */
+    transform: scale(1.1); /* Slight zoom on hover */
+}
+
+.btn-accept:active {
+    transform: scale(0.9); /* Shrink effect when clicked */
+}
+
+/* Decline Button Styles */
+.btn-decline {
+    background-color: #dc3545; /* Red */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s ease-in-out;
+}
+
+.btn-decline:hover {
+    background-color: #7c010d; /* Darker Red */
+    transform: scale(1.1); /* Slight zoom on hover */
+}
+
+.btn-decline:active {
+    transform: scale(0.9); /* Shrink effect when clicked */
+}
+
+#dateFilterForm {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#dateFilterForm input, #dateFilterForm button {
+    padding: 8px;
+    font-size: 14px;
 }
 
 /* Responsive Design */
