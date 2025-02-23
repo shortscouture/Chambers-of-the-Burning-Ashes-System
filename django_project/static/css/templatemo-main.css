@@ -401,9 +401,6 @@ section {
   border:4px solid #2891d2;
 }
 
-.tabgroup div  {
-
-}
 
 .tabgroup p {
   background-color: rgba(0, 0, 0, 0.5);
@@ -417,6 +414,9 @@ section {
   clear:both;
 }
 
+#Map{
+  background-color: white;
+}
 
 .contact-content {
   padding-left: 15px;
