@@ -545,14 +545,16 @@ class ChatbotAPIView(APIView):
         return "I'm not sure about that. Please check with the parish office or refer to the official guidelines."
         
     def post(self, request, *args, **kwargs):
-        #user_query = request.data.get("message", "")
+        database_data  = get_data_from_db()
+        ai_response = self.query_openai(database_data)
+        user_query = request.data.get("message", "")
         context_data = self.get_relevant_info(self.query_openai)
-        logger.info(f"User query: {self.query_openai}")
+        logger.info(f"User query: {user_query}")
         
         messages = [
             {"role": "system", "content": "You are a knowledgeable assistant helping parish staff."},
-            {"role": "assistant", "content": f"Relevant Data from Database: {self.query_openai}"},
-            {"role": "user", "content": f"{self.query_openai}"},  # Include user query in OpenAI request
+            {"role": "assistant", "content": f"Relevant Data from Database: {database_data}"},
+            {"role": "user", "content": f"{user_query}"},  # Include user query in OpenAI request
         ]
         response = openai.chat.completions.create(
             model="gpt-3.5-turbo",
@@ -561,8 +563,9 @@ class ChatbotAPIView(APIView):
            )
 
         return JsonResponse({
-            "query": self.query_openai,  
+            "query": user_query,  
             "context": context_data,  
+            "ai_insights": ai_response,
             "response": response.choices[0].message.content  
         })
    # def chatbot_view(request):
