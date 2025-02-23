@@ -569,9 +569,10 @@ class ChatbotAPIView(APIView):
                 "LIMIT 3;", [query]
             )
             results = cursor.fetchall()
-       
-        return " ".join([row[0] for row in results]) if results else "No relevant information found."
-
+        if results:
+            return " ".join([row[0] for row in results]) if results else ""
+        return "I'm not sure about that. Please check with the parish office or refer to the official guidelines."
+        
     def post(self, request, *args, **kwargs):
         user_query = request.data.get("message", "")
 
