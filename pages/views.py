@@ -19,7 +19,7 @@ from django.views.generic.base import TemplateView
 from django.db.models import Count, Sum
 from .models import Customer, ColumbaryRecord, Beneficiary, Payment
 from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, PaymentForm, DocumentUploadForm
-from django.db import transaction
+from django.db import transaction, connection
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -32,6 +32,7 @@ import json
 import environ
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models.functions import TruncMonth
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 
