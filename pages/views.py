@@ -19,7 +19,7 @@ from django.views.generic.base import TemplateView
 from django.db.models import Count, Sum
 from .models import Customer, ColumbaryRecord, Beneficiary, Payment
 from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, PaymentForm, DocumentUploadForm
-from django.db import transaction
+from django.db import transaction, connection
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -32,7 +32,10 @@ import json
 import environ
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models.functions import TruncMonth
+from django.contrib.auth.mixins import LoginRequiredMixin
+import logging
 
+logger = logging.getLogger(__name__)
 
 
 class SuccesView(TemplateView):
@@ -415,35 +418,6 @@ def verify_otp(request):
 def success(request):
     return render(request, 'pages/success.html')
 
-#chatbot env
-env = environ.Env(
-    DEBUG=(bool, False) #default value for DEBUG = False
-)
-
-openai.api_key = env("OPEN_AI_API_KEY")
-class ChatbotAPIView(APIView):
-    def get(self, request, *args, **kwargs):
-        return Response({"message": "Chatbot API is running! Use POST to send messages."}, status=status.HTTP_200_OK)
-    
-    def post(self, request, *args, **kwargs):
-        user_message = request.data.get('message')
-
-        if not user_message:
-            return Response({'error': 'Message is required'}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            response = openai.chat.completions.create(
-                model="gpt-3.5-turbo",  # Using GPT-3.5 model
-                messages=[{"role": "user", "content": user_message}],
-                max_tokens=150
-            )
-            bot_reply = response.choices[0].message.content.strip()  # Get the response from GPT-3.5
-            return Response({'response': bot_reply}, status=status.HTTP_200_OK)
-
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-
       
 def preprocess_image(image):
     """
@@ -545,39 +519,81 @@ def parse_text_to_dict(text):
 
     return data
 
-
+#chatbot env
 env = environ.Env(
     DEBUG=(bool, False) #default value for DEBUG = False
 )
-
-
-
+        
 openai.api_key = env("OPEN_AI_API_KEY")
 class ChatbotAPIView(APIView):
     def get(self, request, *args, **kwargs):
         return Response({"message": "Chatbot API is running! Use POST to send messages."}, status=status.HTTP_200_OK)
     
-    def post(self, request, *args, **kwargs):
-        user_message = request.data.get('message')
-
-        if not user_message:
-            return Response({'error': 'Message is required'}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            response = openai.chat.completions.create(
-                model="gpt-3.5-turbo",  # Using GPT-3.5 models
-                messages=[{"role": "user", "content": user_message}],
-                max_tokens=150
+    def get_relevant_info(self, query):
+        """
+        Retrieves relevant data from the database using full-text search.
+        """
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT content FROM parish_knowledge "
+                "WHERE MATCH(content) AGAINST (%s IN NATURAL LANGUAGE MODE) "
+                "LIMIT 3;", [query]
             )
-            bot_reply = response.choices[0].message.content.strip()  # Get the response from GPT-3.5
-            #save to database
-            ChatQuery.objects.create(user_message=user_message, bot_response=bot_reply)
+            results = cursor.fetchall()
+        if results:
+            return " ".join([row[0] for row in results]) if results else ""
+        return "I'm not sure about that. Please check with the parish office or refer to the official guidelines."
+        
+    def post(self, request, *args, **kwargs):
+        database_data  = get_data_from_db()
+        ai_response = self.query_openai(database_data)
+        user_query = request.data.get("message", "")
+        context_data = self.get_relevant_info(self.query_openai)
+        logger.info(f"User query: {user_query}")
+        
+        messages = [
+            {"role": "system", "content": "You are a knowledgeable assistant helping parish staff."},
+            {"role": "assistant", "content": f"Relevant Data from Database: {database_data}"},
+            {"role": "user", "content": f"{user_query}"},  # Include user query in OpenAI request
+        ]
+        response = openai.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=messages,
+            temperature=0.7,
+           )
 
-            return Response({'response': bot_reply}, status=status.HTTP_200_OK)
+        return JsonResponse({
+            "query": user_query,  
+            "context": context_data,  
+            "ai_insights": ai_response,
+            "response": response.choices[0].message.content  
+        })
+   # def chatbot_view(request):
+       # """Handle AJAX request and return chatbot response."""
+       # db_data = get_data_from_db()
+        #ai_response = query_openai(db_data)
+      #  return JsonResponse({"response": ai_response})
+    
+    def query_openai(self, data):
+        try:
+            formatted_data = json.dumps(data, indent=2)
+        except (TypeError, ValueError) as e:
+            return f"Error formatting data: {str(e)}"
 
+        prompt = (
+            "You are an AI assistant analyzing parish data. "
+            "Here is the structured database information:\n\n"
+            f"{formatted_data}\n\n"
+            "Please provide insights, trends, and any important observations."
+        )
 
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        response = openai.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "system", "content": "You are an AI assistant."},
+                    {"role": "user", "content": prompt}]
+        )
+        return response.choices[0].message.content
+
 
 def get_crypt_status(request, section):
     # Get all vaults belonging to the given section
@@ -601,28 +617,33 @@ def get_section_details(request, section_id):
     columbaries = ColumbaryRecord.objects.filter(section=section_id).values("level", "vault_id", "status")
     return JsonResponse({"section": section_id, "columbaries": list(columbaries)})
 
+#def get_data_from_db():
+#    data = Customer.objects.all().values()  # Fetch all fields
+#    return list(data)
 def get_data_from_db():
-    data = Customer.objects.all().values()  # Fetch all fields
-    return list(data)
+    """Fetch relevant data from the database, excluding the 'customer' table."""
+    from django.db import connection
 
-def query_openai(data):
-    """Send database data to OpenAI and get a response."""
-    formatted_data = json.dumps(data, indent=2)
-    prompt = f"Here is the database data: {formatted_data}\nAnalyze it and provide insights."
+    data = {}
 
-    response = openai.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "system", "content": "You are an AI assistant."},
-                {"role": "user", "content": prompt}]
-    )
-    return response["choices"][0]["message"]["content"]
+    try:
+        with connection.cursor() as cursor:
+            # List of tables to query (EXCLUDE 'customer' TABLE)
+            tables = ["parish_knowledge", "parish_staff", "pages_account", "pages_customer", "pages_beneficiary"]  # Add only safe tables
 
-def chatbot_view(request):
-    """Handle AJAX request and return chatbot response."""
-    db_data = get_data_from_db()
-    ai_response = query_openai(db_data)
-    return JsonResponse({"response": ai_response})
+            for table in tables:
+                try:
+                    cursor.execute(f"SELECT * FROM {table} LIMIT 10;")
+                    columns = [col[0] for col in cursor.description]
+                    rows = cursor.fetchall()
+                    data[table] = [dict(zip(columns, row)) for row in rows]
+                except Exception as e:
+                    print(f"Skipping {table}: {e}")  # Avoid crashing on missing tables
 
+    except Exception as e:
+        print(f"Database error: {e}")
+
+    return data  # Returns a dictionary of database contents
 
 def addnewrecord(request):
     if request.method == 'POST':
