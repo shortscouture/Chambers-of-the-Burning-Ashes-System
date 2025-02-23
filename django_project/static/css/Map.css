@@ -1,21 +1,26 @@
     .hover-effect {
-        transition: transform 0.2s ease-in-out;
-        transform-origin: center;
-        transform-box: fill-box;
+        cursor: pointer;
+        
     }
 
     .hover-effect:hover {
-        transform: scale(2);
+        fill: blue;
     }
     #svg-container {
-        width: 800px; /* Set the desired visible area */
+        width: 1200px; /* Set the desired visible area */
         height: 600px;
         overflow: hidden;
         border: 1px solid #000;
         position: relative;
         border-radius: 10px;
+        background-color: #ffffff86;
+        cursor: grab;
     }
     
+    #svg-container:active{
+        cursor: grabbing;
+    }
+
     body{
         background-image: url(../images/Front.jpg);
         background-size: cover;
@@ -26,6 +31,7 @@
         justify-content: center;
         align-items: center;
         text-align: center;
+        overflow: hidden;
     }
 
     #grab{
