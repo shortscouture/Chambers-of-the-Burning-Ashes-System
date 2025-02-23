@@ -563,7 +563,7 @@ class ChatbotAPIView(APIView):
         return JsonResponse({
             "query": user_query,  
             "context": context_data,  
-            "response": response["choices"][0].message.content  
+            "response": response.choices[0].message.content  
         })
 def chatbot_view(request):
     """Handle AJAX request and return chatbot response."""
