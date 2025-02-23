@@ -24,6 +24,8 @@ from rest_framework import status
 import pytesseract
 from PIL import Image
 import re
+import numpy as np
+import cv2
 import openai
 from django.db import transaction
 import json
@@ -439,11 +441,27 @@ class ChatbotAPIView(APIView):
       
 def preprocess_image(image):
     """
-    Preprocess the image to improve OCR accuracy
+    Enhanced image preprocessing specifically for form documents
     """
-    img = Image.open(image).convert('L')
-    img = img.point(lambda x: 0 if x < 128 else 255)
-    return img
+    # Convert PIL Image to cv2 format
+    img = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+    
+    # Convert to grayscale
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    # Apply adaptive thresholding
+    binary = cv2.adaptiveThreshold(
+        gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
+        cv2.THRESH_BINARY, 11, 2
+    )
+    
+    # Remove noise
+    denoised = cv2.fastNlMeansDenoising(binary)
+    
+    # Enhance contrast
+    contrast = cv2.convertScaleAbs(denoised, alpha=1.5, beta=0)
+    
+    return Image.fromarray(contrast)
 
 @csrf_exempt 
 def process_ocr(request):
