@@ -33,7 +33,9 @@ import environ
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models.functions import TruncMonth
 from django.contrib.auth.mixins import LoginRequiredMixin
+import logging
 
+logger = logging.getLogger(__name__)
 
 
 class SuccesView(TemplateView):
@@ -575,9 +577,8 @@ class ChatbotAPIView(APIView):
         
     def post(self, request, *args, **kwargs):
         user_query = request.data.get("message", "")
-
         context_data = self.get_relevant_info(user_query)
-
+        logger.info(f"User query: {user_query}")
         
         messages = [
             {"role": "system", "content": "You are a knowledgeable assistant helping parish staff."},
