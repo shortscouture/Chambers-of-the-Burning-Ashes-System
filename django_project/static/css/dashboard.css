@@ -12,7 +12,7 @@ body {
 
 h1 {
     background-size: 100% 75%;
-    margin-top: 0px;
+    margin-top: -40px;
     margin-bottom: -230px;
     padding-top: -20px;
 }
@@ -296,6 +296,7 @@ canvas {
     align-items: center; /* Aligns vertically */
     text-align: center;
     margin: 20px auto; /* Adjust spacing */
+    margin-bottom: -20px;
     width: 100%;
 }
 
