@@ -394,13 +394,7 @@ section {
   text-decoration:none;
   text-transform:uppercase;
   color:#fff;
-  font-size: 14px;
-  font-weight: 700;
-  padding:10px 15px;
-}
 
-.tabs a:hover {
-  color: #2891d2;
 }
 
 .tabs .active {
