@@ -629,7 +629,7 @@ def get_data_from_db():
     try:
         with connection.cursor() as cursor:
             # List of tables to query (EXCLUDE 'customer' TABLE)
-            tables = ["parish_knowledge", "parish_staff"]  # Add only safe tables
+            tables = ["parish_knowledge", "parish_staff", "pages_account", "pages_customer", "pages_beneficiary"]  # Add only safe tables
 
             for table in tables:
                 try:
