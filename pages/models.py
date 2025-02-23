@@ -119,6 +119,9 @@ class Payment(models.Model):
         ("Full Payment", "Full Payment"),
         ("6-Month Installment", "6-Month Installment"),
     ]
+
+    class Meta:
+        db_table = "payment"  # 🔥 Ensures Django uses the correct table
     
     payment_id = models.AutoField(primary_key=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="payments")  # Added customer FK

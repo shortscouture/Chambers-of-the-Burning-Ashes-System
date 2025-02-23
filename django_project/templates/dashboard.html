@@ -51,153 +51,154 @@
 
 <body>
 
-    {{ occupied_columbary }}
-    {{ available_columbary }}
-    {{ unissued_columbary }}
-    {{ pending_letters }}
-
     {% include 'Staff_Headers.html' %}
 
-    <h1>Dashboard</h1>
+    <h1><img src="{% static 'images/dash.gif' %}" alt="Dashboard Title" class="dashboard-title-image"></h1>
 
-    <div class="dashboard-grid">
-        <div class="info-box" onclick="toggleAvailableTable()">
-            <h2>Available Columbaries</h2>
-            <p>{{ vacant_columbaries_count }}</p>
+    <div class="overlay"></div> <!-- Overlay element -->
+    <div class="dashboard-container">
+        <div class="dashboard-grid">
+            <div class="info-box" onclick="toggleAvailableTable()">
+                <h2>AVAILABLE COLUMBARIES</h2>
+                <p>{{ vacant_columbaries_count }}</p>
+            </div>
+            <div class="info-box" onclick="toggleOccupiedTable()">
+                <h2>OCCUPIED COLUMBARIES</h2>
+                <p>{{ occupied_columbaries_count }}</p>
+            </div>
+            <div class="info-box" onclick="toggleUnissuedTable()">
+                <h2>UNISSUED COLUMBARIES</h2>
+                <p>{{ unissued_columbaries }}</p>
+            </div>
+            <div class="info-box" onclick="toggleTable()">
+                <h2>PENDING LETTERS OF INTENT</h2>
+                <p>{{ pending_counts }}</p>
+            </div>
         </div>
-        <div class="info-box" onclick="toggleOccupiedTable()">
-            <h2>Occupied Columbaries</h2>
-            <p>{{ occupied_columbaries_count }}</p>
+
+        <!-- Pending Letter of Intent Table (Initially Hidden) -->
+        <div id="pendingTableContainer" class="table-container hidden">
+            <h3>PENDING LETTERS OF INTENT</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Mobile</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in pending_customers %}
+                    <tr>
+                        <td>{{ customer.full_name }}</td>
+                        <td>{{ customer.email_address }}</td>
+                        <td>{{ customer.mobile_number }}</td>
+                        <td>
+                            <a href="{% url 'accept_letter_of_intent' customer.customer_id %}"
+                                class="btn-accept">Accept</a>
+                            <a href="{% url 'decline_letter_of_intent' customer.customer_id %}"
+                                class="btn-decline">Decline</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-        <div class="info-box" onclick="toggleUnissuedTable()">
-            <h2>Unissued Columbaries</h2>
-            <p>{{ unissued_columbaries }}</p>
+
+        <!-- Available Columbaries Table (Initially Hidden) -->
+        <div id="availableTableContainer" class="table-container hidden">
+            <h3>AVAILABLE COLUMBARIES</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Columbary Name</th>
+                        <th>Location</th>
+                        <th>Capacity</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for columbary in vacant_columbaries %}
+                    <tr>
+                        <td>{{ columbary.vault_id }}</td>
+                        <td>{{ columbary.section }}</td>
+                        <td>{{ columbary.urns_per_columbary }}</td>
+                        <td>{{ columbary.status }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-        <div class="info-box" onclick="toggleTable()">
-            <h2>Pending Letter of Intents</h2>
-            <p>{{ pending_counts }}</p>
+
+        <!-- Occupied Columbaries Table (Initially Hidden) -->
+        <div id="occupiedTableContainer" class="table-container hidden">
+            <h3>OCCUPIED COLUMBARIES</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Columbary Name</th>
+                        <th>Location</th>
+                        <th>Capacity</th>
+                        <th>Occupied By</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for columbary in occupied_columbaries %}
+                    <tr>
+                        <td>{{ columbary.vault_id }}</td>
+                        <td>{{ columbary.section }}</td>
+                        <td>{{ columbary.urns_per_columbary }}</td>
+                        <td>{{ columbary.customer.full_name }}</td>
+                        <td>{{ columbary.status }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Unissued Columbaries Table (Initially Hidden) -->
+        <div id="unissuedTableContainer" class="table-container hidden">
+            <h3>UNISSUED COLUMBARIES</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Vault ID</th>
+                        <th>Issuance Date</th>
+                        <th>Customer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for columbary in unissued_columbary_records %}
+                    <tr>
+                        <td>{{ columbary.vault_id }}</td>
+                        <td>{{ columbary.issuance_date }}</td>
+                        <td>{{ columbary.customer.full_name }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">No unissued columbaries found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="dashboard-grid">
+            <div class="chart-container">
+                <h2>PAYMENT DISTRIBUTION</h2>
+                <canvas id="paymentChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h2>TOTAL EARNINGS OVER TIME</h2>
+                <canvas id="earningsChart"></canvas>
+            </div>
         </div>
     </div>
 
-    <!-- Pending Letter of Intent Table (Initially Hidden) -->
-    <div id="pendingTableContainer" class="table-container hidden">
-        <h3>Pending Letter of Intents</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Full Name</th>
-                    <th>Email</th>
-                    <th>Mobile</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for customer in pending_customers %}
-                <tr>
-                    <td>{{ customer.full_name }}</td>
-                    <td>{{ customer.email_address }}</td>
-                    <td>{{ customer.mobile_number }}</td>
-                    <td>
-                        <a href="{% url 'accept_letter_of_intent' customer.customer_id %}" class="btn-accept">Accept</a>
-                        <a href="{% url 'decline_letter_of_intent' customer.customer_id %}"
-                            class="btn-decline">Decline</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Available Columbaries Table (Initially Hidden) -->
-    <div id="availableTableContainer" class="table-container hidden">
-        <h3>Available Columbaries</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Columbary Name</th>
-                    <th>Location</th>
-                    <th>Capacity</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for columbary in vacant_columbaries %}
-                <tr>
-                    <td>{{ columbary.vault_id }}</td>
-                    <td>{{ columbary.section }}</td>
-                    <td>{{ columbary.urns_per_columbary }}</td>
-                    <td>{{ columbary.status }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Occupied Columbaries Table (Initially Hidden) -->
-    <div id="occupiedTableContainer" class="table-container hidden">
-        <h3>Occupied Columbaries</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Columbary Name</th>
-                    <th>Location</th>
-                    <th>Capacity</th>
-                    <th>Occupied By</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for columbary in occupied_columbaries %}
-                <tr>
-                    <td>{{ columbary.vault_id }}</td>
-                    <td>{{ columbary.section }}</td>
-                    <td>{{ columbary.urns_per_columbary }}</td>
-                    <td>{{ columbary.customer.full_name }}</td>
-                    <td>{{ columbary.status }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Unissued Columbaries Table (Initially Hidden) -->
-    <div id="unissuedTableContainer" class="table-container hidden">
-        <h3>Unissued Columbaries</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Vault ID</th>
-                    <th>Issuance Date</th>
-                    <th>Customer</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for columbary in unissued_columbary_records %}
-                <tr>
-                    <td>{{ columbary.vault_id }}</td>
-                    <td>{{ columbary.issuance_date }}</td>
-                    <td>{{ columbary.customer.full_name }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="3">No unissued columbaries found.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-
-    <div class="dashboard-grid">
-        <div class="chart-container">
-            <h2>Payment Distribution</h2>
-            <canvas id="paymentChart"></canvas>
-        </div>
-        <div class="chart-container">
-            <h2>Total Earnings Over Time</h2>
-            <canvas id="earningsChart"></canvas>
-        </div>
-    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
         function createChart(canvasId, type, labels, data, labelText) {
@@ -251,30 +252,32 @@
 
 
         // Payment Pie Chart
-        var fullPayment = parseInt("{{ full_payment_count|default:"0" }}");
-        var installment = parseInt("{{ installment_count|default:"0" }}");
+        document.addEventListener("DOMContentLoaded", function () {
+            var fullPayment = Number("{{ full_payment_count|default:0 }}");
+            var installment = Number("{{ installment_count|default:0 }}");
 
-
-        var ctx = document.getElementById('paymentChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: ['Full Payment', '6-Month Installment'],
-                datasets: [{
-                    data: [fullPayment, installment],
-                    backgroundColor: ['#36A2EB', '#FF6384'],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
+            var ctx = document.getElementById('paymentChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Full Payment', '6-Month Installment'],
+                    datasets: [{
+                        data: [fullPayment, installment],
+                        backgroundColor: ['#36A2EB', '#FF6384'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
                     }
                 }
-            }
+            });
         });
+
 
         function toggleTable() {
             var tableContainer = document.getElementById("pendingTableContainer");
@@ -294,7 +297,7 @@
         function toggleUnissuedTable() {
             var unissuedTable = document.getElementById("unissuedTableContainer");
             unissuedTable.classList.toggle("hidden");
-    }
+        }
     </script>
 </body>
 
