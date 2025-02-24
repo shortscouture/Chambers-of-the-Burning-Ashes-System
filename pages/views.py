@@ -11,12 +11,11 @@ from datetime import datetime, timedelta
 from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm, PaymentForm, HolderOfPrivilegeForm
 from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, Payment, ChatQuery, ParishAdministrator, HolderOfPrivilege
 from django.views.generic import TemplateView, DeleteView
-from django.forms import modelformset_factoryfrom django.db.models import Q
 from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.views.generic.base import TemplateView
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, Q
 from .models import Customer, ColumbaryRecord, Beneficiary, Payment
 from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, PaymentForm, DocumentUploadForm
 from django.db import transaction, connection
