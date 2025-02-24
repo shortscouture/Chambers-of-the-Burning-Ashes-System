@@ -11,12 +11,11 @@ from datetime import datetime, timedelta
 from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm, PaymentForm, HolderOfPrivilegeForm
 from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, Payment, ChatQuery, ParishAdministrator, HolderOfPrivilege
 from django.views.generic import TemplateView, DeleteView
-from django.forms import modelformset_factory
 from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.views.generic.base import TemplateView
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, Q
 from .models import Customer, ColumbaryRecord, Beneficiary, Payment
 from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, PaymentForm, DocumentUploadForm
 from django.db import transaction, connection
@@ -62,18 +61,69 @@ class CustomerHomeView(TemplateView):
     template_name = "pages/Customer_Home.html"
 
 
+from django.db.models import Q
+
 class ColumbaryRecordsView(TemplateView):
     template_name = "pages/columbaryrecords.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["customers"] = Customer.objects.all()
+
+        columbary_records = ColumbaryRecord.objects.all()
+        records_data = []
+
+        for record in columbary_records:
+            customer = record.customer  # This may be None if no customer is linked
+
+            has_beneficiary = (
+                customer.beneficiaries.filter(first_beneficiary_name__isnull=False).exists()
+                if customer else False
+            )
+
+            has_payment = (
+                customer.payments.filter(
+                    mode_of_payment__isnull=False
+                ).filter(
+                    Q(mode_of_payment="Full Payment", Full_payment_receipt_1__isnull=False, Full_payment_amount_1__isnull=False) |
+                    Q(mode_of_payment="6-Month Installment", 
+                      six_month_receipt_1__isnull=False, six_month_amount_1__isnull=False, 
+                      six_month_receipt_2__isnull=False, six_month_amount_2__isnull=False, 
+                      six_month_receipt_3__isnull=False, six_month_amount_3__isnull=False, 
+                      six_month_receipt_4__isnull=False, six_month_amount_4__isnull=False, 
+                      six_month_receipt_5__isnull=False, six_month_amount_5__isnull=False, 
+                      six_month_receipt_6__isnull=False, six_month_amount_6__isnull=False)
+                ).exists()
+                if customer else False
+            )
+
+            has_holder_of_privilege = (
+                customer.privileges.filter(issuance_date__isnull=False).exists()
+                if customer else False
+            )
+
+            records_data.append({
+                "vault_id": record.vault_id,
+                "customer_name": customer.full_name if customer else "No Customer",
+                "has_beneficiary": has_beneficiary,
+                "has_payment": has_payment,
+                "has_holder_of_privilege": has_holder_of_privilege,
+                "customer_id": customer.customer_id if customer else None,
+            })
+
+        context["records_data"] = records_data
         return context
+
+
 
 
 class MemorialView(TemplateView):
     template_name = "pages/Memorials.html"
 
+
+from django.utils.safestring import mark_safe
+from django.db.models import Count, Sum
+from django.db.models.functions import TruncMonth
+import json
 
 class DashboardView(TemplateView):
     template_name = "dashboard.html"
@@ -83,30 +133,36 @@ class DashboardView(TemplateView):
 
         # Fetch necessary data
         customer_status_counts = Customer.objects.values('status').annotate(count=Count('status'))
-        #inquiry_counts = InquiryRecord.objects.count()
         pending_counts = Customer.objects.filter(status="pending").count()
-        vacant_columbaries = ColumbaryRecord.objects.filter(status="Vacant")
-        occupied_columbaries = ColumbaryRecord.objects.filter(status="Occupied")
-        unissued_columbaries = ColumbaryRecord.objects.filter(issuance_date__isnull=True, customer__isnull=False).count()
+        vacant_columbaries_count = ColumbaryRecord.objects.filter(status="Vacant").count()
+        occupied_columbaries_count = ColumbaryRecord.objects.filter(status="Occupied").count()
         full_payment_count = Payment.objects.filter(mode_of_payment="Full Payment").count()
         installment_count = Payment.objects.filter(mode_of_payment="6-Month Installment").count()
-        unissued_columbary_records = ColumbaryRecord.objects.filter(issuance_date__isnull=True, customer__isnull=False)
 
-        earnings_by_date = (
-            ColumbaryRecord.objects.filter(payment__isnull=False)
-            .values("issuance_date")
-            .annotate(total_earnings=Sum("payment__total_amount"))
-            .order_by("issuance_date")
+        # Ensure correct referencing of issuance date in HolderOfPrivilege
+        unissued_columbaries = ColumbaryRecord.objects.filter(
+            holder_of_privilege__issuance_date__isnull=True, 
+            customer__isnull=False
+        ).count()
+
+        # Retrieve all unissued Columbary records
+        unissued_columbary_records = ColumbaryRecord.objects.filter(
+            holder_of_privilege__issuance_date__isnull=True, 
+            customer__isnull=False
         )
 
-        # Convert data to JSON for Chart.js
-        payment_labels = ["Full Payment", "Installment"]
-        payment_data = [full_payment_count, installment_count]
+        # Calculate earnings per issuance date
+        earnings_by_date = (
+            ColumbaryRecord.objects.filter(payment__isnull=False, holder_of_privilege__issuance_date__isnull=False)
+            .values("holder_of_privilege__issuance_date")
+            .annotate(total_earnings=Sum("payment__total_amount"))
+            .order_by("holder_of_privilege__issuance_date")
+        )
 
-         # Get earnings per month
+        # Get earnings per month
         earnings_by_month = (
-            ColumbaryRecord.objects.filter(payment__isnull=False)
-            .annotate(month=TruncMonth("issuance_date"))
+            ColumbaryRecord.objects.filter(payment__isnull=False, holder_of_privilege__issuance_date__isnull=False)
+            .annotate(month=TruncMonth("holder_of_privilege__issuance_date"))
             .values("month")
             .annotate(total_earnings=Sum("payment__total_amount"))
             .order_by("month")
@@ -116,25 +172,25 @@ class DashboardView(TemplateView):
         earnings_labels = [
             entry["month"].strftime("%b %Y") for entry in earnings_by_month if entry["month"] is not None
         ]
-        earnings_data = [float(entry["total_earnings"]) for entry in earnings_by_month]
+        earnings_data = [float(entry["total_earnings"]) if entry["total_earnings"] else 0 for entry in earnings_by_month]
+
+        # Convert payment method data
+        payment_labels = ["Full Payment", "Installment"]
+        payment_data = [full_payment_count, installment_count]
 
         # Add data to context
         context.update({
             'customer_status_counts': customer_status_counts,
-            #'inquiry_counts': inquiry_counts,
-            'pending_counts': Customer.objects.filter(status="pending").count(),
+            'pending_counts': pending_counts,
             'pending_customers': Customer.objects.filter(status="pending"),
-            'unissued_columbaries': ColumbaryRecord.objects.filter(issuance_date__isnull=True, customer__isnull=False).count(),
-            'vacant_columbaries': ColumbaryRecord.objects.filter(status="Vacant"),
-            'vacant_columbaries_count': ColumbaryRecord.objects.filter(status="Vacant").count(),  # Returns an int
-            'occupied_columbaries': ColumbaryRecord.objects.filter(status="Occupied"),
-            'occupied_columbaries_count': ColumbaryRecord.objects.filter(status="Occupied").count(),
-            'unissued_columbary_records' : unissued_columbary_records,
+            'unissued_columbaries': unissued_columbaries,
+            'vacant_columbaries_count': vacant_columbaries_count,
+            'occupied_columbaries_count': occupied_columbaries_count,
+            'unissued_columbary_records': unissued_columbary_records,  
             "payment_labels": mark_safe(json.dumps(payment_labels)),
             "payment_data": mark_safe(json.dumps(payment_data)),
-            "earnings_labels": mark_safe(json.dumps(earnings_labels)),  # Labels (months)
-            "earnings_data": mark_safe(json.dumps(earnings_data)),  # Earnings
-
+            "earnings_labels": mark_safe(json.dumps(earnings_labels)),  
+            "earnings_data": mark_safe(json.dumps(earnings_data)),  
         })
 
         return context
@@ -646,6 +702,7 @@ def get_data_from_db():
     return data  # Returns a dictionary of database contents
 
 def addnewrecord(request):
+    
     if request.method == 'POST':
         customer_form = CustomerForm(request.POST)
         payment_form = PaymentForm(request.POST)
@@ -694,3 +751,84 @@ def addnewrecord(request):
         'holder_form': holder_form,
         'beneficiary_form': beneficiary_form
     })
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import ColumbaryRecord, Customer, Payment, HolderOfPrivilege, Beneficiary
+from .forms import CustomerForm, PaymentForm, ColumbaryRecordForm, HolderOfPrivilegeForm, BeneficiaryForm
+
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import ColumbaryRecord
+from .forms import CustomerForm, PaymentForm, HolderOfPrivilegeForm, BeneficiaryForm, ColumbaryRecordForm
+
+def addnewcustomer(request):
+    vault_id = request.GET.get('vault_id')
+    vault = None
+
+    if vault_id:
+        vault = get_object_or_404(ColumbaryRecord, vault_id=vault_id, customer__isnull=True)
+
+    if request.method == 'POST':
+        customer_form = CustomerForm(request.POST)
+        payment_form = PaymentForm(request.POST)
+        holder_form = HolderOfPrivilegeForm(request.POST)
+        beneficiary_form = BeneficiaryForm(request.POST)
+        columbary_form = ColumbaryRecordForm(request.POST)
+
+        if (
+            customer_form.is_valid() and 
+            payment_form.is_valid() and 
+            holder_form.is_valid() and 
+            beneficiary_form.is_valid() and 
+            columbary_form.is_valid()
+        ):
+            customer = customer_form.save()
+
+            payment = payment_form.save(commit=False)
+            payment.customer = customer
+            payment.save()
+
+            holder = holder_form.save(commit=False)
+            holder.customer = customer
+            holder.save()
+
+            beneficiary = beneficiary_form.save(commit=False)
+            beneficiary.customer = customer
+            beneficiary.save()
+
+            if vault:
+                # Update the existing vault
+                vault.customer = customer
+                vault.payment = payment
+                vault.holder_of_privilege = holder
+                vault.beneficiary = beneficiary
+                vault.inurnment_date = columbary_form.cleaned_data['inurnment_date']
+                vault.urns_per_columbary = columbary_form.cleaned_data['urns_per_columbary']
+                vault.save()
+            else:
+                # Create a new ColumbaryRecord
+                columbary_record = columbary_form.save(commit=False)
+                columbary_record.customer = customer
+                columbary_record.payment = payment
+                columbary_record.holder_of_privilege = holder
+                columbary_record.beneficiary = beneficiary
+                columbary_record.save()  # **Now properly saving the ColumbaryRecord**
+
+            return redirect('success')  # Redirect after successful save
+
+    else:
+        customer_form = CustomerForm()
+        payment_form = PaymentForm()
+        holder_form = HolderOfPrivilegeForm()
+        beneficiary_form = BeneficiaryForm()
+        columbary_form = ColumbaryRecordForm()
+
+    return render(request, 'pages/addcustomer.html', {
+        'customer_form': customer_form,
+        'payment_form': payment_form,
+        'holder_form': holder_form,
+        'beneficiary_form': beneficiary_form,
+        'columbary_form': columbary_form,
+        'vault_id': vault_id
+    })
+
