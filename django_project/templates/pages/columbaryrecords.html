@@ -2,10 +2,12 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'css/columbaryrecords.css' %}">
+    <script src="{% static 'js/records.js' %}" defer></script>
     <title>Columbary Records</title>
     <style>
         body {
@@ -18,60 +20,93 @@
             height: 100%;
             width: 100%;
         }
+
+        /* Style for sortable headers */
+        th.sortable {
+            cursor: pointer;
+            padding: 10px;
+            background-color: #f4f4f4;
+            transition: background-color 0.3s ease;
+            text-align: left;
+        }
+
+        th.sortable:hover {
+            background-color: #ddd;
+        }
     </style>
 </head>
+
 <body>
-    <div class="page-container">
-        <div class="dashboard-container">
 
-            <!-- Search Bar and Add New Button -->
-            <div class="search-bar-container">
-                <div class="search-bar">
-                    <input type="text" placeholder="Insert Name" id="search-name" aria-label="Search by Name">
-                    <input type="text" placeholder="Insert Crypt No." id="search-crypt" aria-label="Search by Crypt Number">
-                    <button id="search-button" aria-label="Search">Search</button>
-                    <a href="{% url 'addnewrecord' %}">
-                        <button id="add-new-button" aria-label="Add New Record">Add New</button>
+    <div class="content">
 
-                    </a>
-                </div>
+        <!-- Top Navigation -->
+        <header class="top-nav">
+            <h2>Columbary Records</h2>
+            <div class="search-bar">
+                <input type="text" placeholder="Insert Name" id="search-name" aria-label="Search by Name">
+                <input type="text" placeholder="Insert Crypt No." id="search-crypt" aria-label="Search by Crypt Number">
+                <button id="search-button" aria-label="Search">Search</button>
+                <a href="{% url 'addnewrecord' %}">
+                    <button id="add-new-button" aria-label="Add New Record">Add New</button>
+                </a>
             </div>
+        </header>
 
-            <!-- Table with Customers -->
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email Address</th>
-                            <th>Crypt #</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if customers %}
-                            {% for customer in customers %}
-                                <tr>
-                                    <td class="white-box">{{ customer.full_name }}</td>
-                                    <td class="white-box">{{ customer.email_address }}</td>
-                                    <td class="white-box">{{ customer.customer_id }}</td>
-                                    <td>
-                                        <a href="{% url 'recordsdetails' customer.customer_id %}">
+        <!-- Table Section -->
+        <section class="table-container">
+            <table data-sort-order="asc">
+                <thead>
+                    <tr>
+                        <th class="sortable" onclick="sortTable(0)">Vault ID</th>
+                        <th class="sortable" onclick="sortTable(1)">Name</th>
+                        <th class="sortable" onclick="sortTable(2)">Beneficiary</th>
+                        <th class="sortable" onclick="sortTable(3)">Payment</th>
+                        <th class="sortable" onclick="sortTable(4)">Holder of Privilege</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if records_data %}
+                        {% for data in records_data %}
+                            <tr>
+                                <td>{{ data.vault_id }}</td>
+                                <td>{{ data.customer_name }}</td>
+                                <td class="{% if data.has_beneficiary %}status-completed{% else %}status-incomplete{% endif %}">
+                                    {% if data.has_beneficiary %}Completed{% else %}Incomplete{% endif %}
+                                </td>
+                                <td class="{% if data.has_payment %}status-completed{% else %}status-incomplete{% endif %}">
+                                    {% if data.has_payment %}Completed{% else %}Incomplete{% endif %}
+                                </td>
+                                <td class="{% if data.has_holder_of_privilege %}status-completed{% else %}status-incomplete{% endif %}">
+                                    {% if data.has_holder_of_privilege %}Completed{% else %}Incomplete{% endif %}
+                                </td>
+                                <td>
+                                    {% if data.customer_id %}
+                                        <a href="{% url 'recordsdetails' data.customer_id %}">
                                             <button class="details-button">Details</button>
                                         </a>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr>
-                                <td colspan="4" class="no-records">No Records Found</td>
+                                    {% else %}
+                                        <a href="{% url 'addnewcustomer' %}?vault_id={{ data.vault_id }}">
+                                            <button class="add-button">Add Customer</button>
+                                        </a>
+                                    {% endif %}
+                                </td>
+                                
                             </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
-            </div>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="no-records">No Records Found</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+                
+            </table>
+        </section>
 
-        </div>
     </div>
+
 </body>
+
 </html>
