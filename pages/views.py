@@ -64,15 +64,31 @@ class CustomerHomeView(TemplateView):
     template_name = "pages/Customer_Home.html"
 
 
+from django.views.generic import TemplateView
+from django.core.paginator import Paginator
+from django.db.models import Q
+from .models import ColumbaryRecord
+
 class ColumbaryRecordsView(TemplateView):
     template_name = "pages/columbaryrecords.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        columbary_records = ColumbaryRecord.objects.select_related("customer").all()
-        records_data = []
+        # Get search query
+        search_query = self.request.GET.get("search", "").strip()
 
+        # Get all records and filter by search query
+        columbary_records = ColumbaryRecord.objects.select_related("customer").all()
+
+        if search_query:
+            columbary_records = columbary_records.filter(
+                Q(vault_id__icontains=search_query) | 
+                Q(customer__first_name__icontains=search_query) | 
+                Q(customer__last_name__icontains=search_query)
+            )
+
+        records_data = []
         for record in columbary_records:
             customer = getattr(record, "customer", None)  # Avoid error if no customer exists
 
@@ -108,8 +124,16 @@ class ColumbaryRecordsView(TemplateView):
                 "customer_id": customer.customer_id if customer else None,
             })
 
-        context["records_data"] = records_data
+        # Apply pagination (10 records per page)
+        page = self.request.GET.get("page", 1)
+        paginator = Paginator(records_data, 10)  # Show 10 per page
+        paginated_records = paginator.get_page(page)
+
+        # Add to context
+        context["records_data"] = paginated_records
+        context["search_query"] = search_query  # Keep search input filled
         return context
+
 
 
 
