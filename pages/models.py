@@ -342,6 +342,8 @@ class TwoFactorAuth(models.Model):
 class ParishKnowledge(models.Model):
     question = models.TextField()
     answer = models.TextField()
+    class Meta:
+        db_table = "parish_knowledge"
 
 #chatbot
 class ChatQuery(models.Model):

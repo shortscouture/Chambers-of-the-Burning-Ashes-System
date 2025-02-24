@@ -586,44 +586,43 @@ class ChatbotAPIView(APIView):
         return Response({"message": "Chatbot API is running! Use POST to send messages."}, status=status.HTTP_200_OK)
     
     def get_relevant_info(self, query):
-        """
-        Retrieves relevant data from the database using full-text search.
-        """
         with connection.cursor() as cursor:
             cursor.execute(
-                "SELECT content FROM parish_knowledge "
-                "WHERE MATCH(content) AGAINST (%s IN NATURAL LANGUAGE MODE) "
+                "SELECT answer FROM parish_knowledge "
+                "WHERE MATCH(question,answer) AGAINST (%s IN NATURAL LANGUAGE MODE) "
                 "LIMIT 3;", [query]
             )
             results = cursor.fetchall()
-        if results:
-            return " ".join([row[0] for row in results]) if results else ""
-        return "I'm not sure about that. Please check with the parish office or refer to the official guidelines."
-        
+        return " ".join([row[0] for row in results]) if results else "I'm not sure about that."
+
+   
     def post(self, request, *args, **kwargs):
-        database_data  = get_data_from_db()
-        ai_response = self.query_openai(database_data)
         user_query = request.data.get("message", "")
-        context_data = self.get_relevant_info(self.query_openai)
-        logger.info(f"User query: {user_query}")
+        database_data = self.get_relevant_info(user_query)
+        ai_response = self.query_openai(database_data)
+        context_data = self.get_relevant_info(user_query) 
         
+        logger.info(f"User query: {user_query}")
+
         messages = [
             {"role": "system", "content": "You are a knowledgeable assistant helping parish staff."},
             {"role": "assistant", "content": f"Relevant Data from Database: {database_data}"},
-            {"role": "user", "content": f"{user_query}"},  # Include user query in OpenAI request
+            {"role": "user", "content": f"{user_query}"},
         ]
+
         response = openai.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=messages,
             temperature=0.7,
-           )
+        )
 
         return JsonResponse({
-            "query": user_query,  
-            "context": context_data,  
+            "query": user_query,
+            "context": context_data,
             "ai_insights": ai_response,
-            "response": response.choices[0].message.content  
+            "response": response.choices[0].message.content
         })
+
    # def chatbot_view(request):
        # """Handle AJAX request and return chatbot response."""
        # db_data = get_data_from_db()
