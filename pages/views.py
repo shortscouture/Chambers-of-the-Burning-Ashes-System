@@ -12,7 +12,7 @@ from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVeri
 from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, Payment, ChatQuery, ParishAdministrator, HolderOfPrivilege
 from django.views.generic import TemplateView, DeleteView
 from django.forms import modelformset_factory
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.views.generic.base import TemplateView
@@ -142,53 +142,50 @@ class DashboardView(TemplateView):
             
 def send_letter_of_intent(request):
     if request.method == 'POST':
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        email_address = request.POST.get('email_address')
-        mobile_number = request.POST.get('mobile_number')
+        first_name = request.POST['first_name']
+        last_name = request.POST['last_name']
+        mobile_number = request.POST['mobile_number']
+        email_address = request.POST['email_address']
+        section = request.POST['section']
+        level = request.POST['level']
 
-        # Get selected section and level from form
-        section = request.POST.get('section')
-        level = request.POST.get('level')
+        # Ensure selected vault is vacant
+        try:
+            vault = ColumbaryRecord.objects.get(section=section, level=level, status="Vacant")
+        except ColumbaryRecord.DoesNotExist:
+            return JsonResponse({"error": "Selected vault is already occupied or does not exist!"}, status=400)
 
-        # Check if the selected columbary exists and is vacant
-        columbary = ColumbaryRecord.objects.filter(
-            section=section, level=level, status="Vacant"
-        ).first()
-
-        if not columbary:
-            return render(request, 'error.html', {'message': 'Selected crypt is no longer available.'})
-
-        # Create customer record
+        # Save the customer record with a pending status
         customer = Customer.objects.create(
             first_name=first_name,
             last_name=last_name,
-            email_address=email_address,
             mobile_number=mobile_number,
-            status='pending'
+            email_address=email_address,
+            status="pending"
         )
 
-        # Assign customer to columbary and update status
-        columbary.customer = customer
-        columbary.status = "Occupied"
-        columbary.save()
-
-        # Send email to admin
-        accept_url = request.build_absolute_uri(f'/accept/{customer.customer_id}/')
-        decline_url = request.build_absolute_uri(f'/decline/{customer.customer_id}/')
+        # Generate accept & decline URLs dynamically
+        accept_url = request.build_absolute_uri(reverse('accept_letter_of_intent', args=[customer.customer_id]))
+        decline_url = request.build_absolute_uri(reverse('decline_letter_of_intent', args=[customer.customer_id]))
 
         email_body = f"""
-        Dear Admin,
+Dear Rev. Bobby,
 
-        A new Letter of Intent has been submitted.
+A new Letter of Intent has been submitted:
 
-        Name: {first_name} {last_name}
-        Email: {email_address}
-        Mobile: {mobile_number}
-        Section: {section}, Level: {level}
+First Name: {first_name}
+Last Name:{last_name}
+Mobile Number: {mobile_number}
+Email Address: {email_address}
+Requested Vault: Section {section}, Level {level}
 
-        Accept: {accept_url}
-        Decline: {decline_url}
+[✅ Accept]({accept_url})
+[❌ Decline]({decline_url})
+
+Please review this request.
+
+Best regards,
+St. Alphonsus Parish
         """
 
         send_mail(
@@ -196,40 +193,37 @@ def send_letter_of_intent(request):
             email_body,
             settings.DEFAULT_FROM_EMAIL,
             [settings.ADMIN_EMAIL],
+            fail_silently=False,
         )
 
-        return render(request, 'success.html', {'customer': customer})
+        return JsonResponse({"message": "Letter of Intent submitted successfully!"})
 
+    return JsonResponse({"error": "Invalid request method"}, status=405)
     
 
 def accept_letter_of_intent(request, intent_id):
     intent = get_object_or_404(Customer, customer_id=intent_id)
-    intent.status = 'approved'
+    intent.status = "approved"
     intent.save()
 
-    # Assign the selected vault to the customer
-    vault_id = request.POST.get('vault_id')  # Ensure this comes from the form submission
-    level = request.POST.get('level')
-
-    if vault_id and level:
-        vault = get_object_or_404(ColumbaryRecord, vault_id=vault_id, level=level, status="Vacant")
-        vault.customer = intent
-        vault.status = "Occupied"
-        vault.save()
+    # Find the assigned vault
+    columbary = ColumbaryRecord.objects.filter(customer=intent).first()
+    if columbary:
+        columbary.status = "Occupied"
+        columbary.save()
 
     # Send acceptance email
     send_mail(
         subject="Your Letter of Intent has been Accepted",
-        message=f"Dear {intent.full_name()},\n\n"
-                "We are pleased to inform you that your letter of intent has been accepted.\n"
-                f"You have been assigned to Vault ID: {vault_id}, Level: {level}.\n\n"
-                "Best regards,\nSt. Alphonsus",
+        message=f"Dear {intent.first_name} {intent.last_name},\n\n"
+                "We are pleased to inform you that your letter of intent has been accepted.\n\n"
+                "Best regards,\nSt. Alphonsus Parish",
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[intent.email_address],
         fail_silently=False,
     )
 
-    return render(request, 'pages/accept_success.html', {'intent': intent})
+    return render(request, 'success.html', {'intent': intent})
 
 
 def decline_letter_of_intent(request, intent_id):
@@ -240,9 +234,9 @@ def decline_letter_of_intent(request, intent_id):
     # Send rejection email
     send_mail(
         subject="Your Letter of Intent has been Declined",
-        message=f"Dear {intent.full_name()},\n\n"
+        message=f"Dear {intent.first_name} {intent.last_name},\n\n"
                 "We regret to inform you that your letter of intent has been declined.\n\n"
-                "Best regards,\n St. Alphonsus",
+                "Best regards,\n St. Alphonsus Parish",
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[intent.email_address],
         fail_silently=False,
