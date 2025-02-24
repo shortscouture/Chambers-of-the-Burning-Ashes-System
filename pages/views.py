@@ -117,6 +117,24 @@ class DashboardView(TemplateView):
             transaction_date__lte=end_date if end_date else "2100-01-01"
         ).annotate(month=TruncMonth("transaction_date"))  # ✅ Apply filter BEFORE aggregation
 
+        # Get filter dates from request
+        start_date = self.request.GET.get("start_date", "")
+        end_date = self.request.GET.get("end_date", "")
+
+        # Convert dates to datetime (if provided)
+        start_date = datetime.strptime(start_date, "%Y-%m-%d") if start_date else None
+        end_date = datetime.strptime(end_date, "%Y-%m-%d") if end_date else None
+
+        # Default: No filter (include all data)
+        filter_conditions = {}
+        if start_date:
+            filter_conditions["transaction_date__gte"] = start_date
+        if end_date:
+            filter_conditions["transaction_date__lte"] = end_date
+
+        # Apply filter
+        earnings_queryset = Payment.objects.filter(**filter_conditions).annotate(month=TruncMonth("transaction_date"))
+
         earnings_by_month = (
             earnings_queryset
             .values("month")
