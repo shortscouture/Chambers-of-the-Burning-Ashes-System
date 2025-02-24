@@ -182,7 +182,6 @@ class ColumbaryRecord(models.Model):
     beneficiary = models.ForeignKey(Beneficiary, on_delete=models.SET_NULL, null=True, blank=True)
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, null=True, blank=True)
 
-    # 🔥 Corrected HolderOfPrivilege reference
     holder_of_privilege = models.ForeignKey(HolderOfPrivilege, on_delete=models.SET_NULL, null=True, blank=True)
 
     STATUS_CHOICES = [('Vacant', 'Vacant'), ('Occupied', 'Occupied')]

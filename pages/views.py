@@ -761,6 +761,10 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import ColumbaryRecord
 from .forms import CustomerForm, PaymentForm, HolderOfPrivilegeForm, BeneficiaryForm, ColumbaryRecordForm
 
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Customer, Payment, HolderOfPrivilege, Beneficiary, ColumbaryRecord
+from .forms import CustomerForm, PaymentForm, HolderOfPrivilegeForm, BeneficiaryForm, ColumbaryRecordForm
+
 def addnewcustomer(request):
     vault_id = request.GET.get('vault_id')
     vault = None
@@ -773,62 +777,64 @@ def addnewcustomer(request):
         payment_form = PaymentForm(request.POST)
         holder_form = HolderOfPrivilegeForm(request.POST)
         beneficiary_form = BeneficiaryForm(request.POST)
-        columbary_form = ColumbaryRecordForm(request.POST)
 
-        if (
-            customer_form.is_valid() and 
-            payment_form.is_valid() and 
-            holder_form.is_valid() and 
-            beneficiary_form.is_valid() and 
-            columbary_form.is_valid()
-        ):
+        if customer_form.is_valid():
             customer = customer_form.save()
-
-            payment = payment_form.save(commit=False)
-            payment.customer = customer
-            payment.save()
-
-            holder = holder_form.save(commit=False)
-            holder.customer = customer
-            holder.save()
-
-            beneficiary = beneficiary_form.save(commit=False)
-            beneficiary.customer = customer
-            beneficiary.save()
+            
+            # Save payment only if valid
+            payment = None
+            if payment_form.is_valid():
+                payment = payment_form.save(commit=False)
+                payment.customer = customer
+                payment.save()
+            
+            # Save holder of privilege only if valid
+            holder = None
+            if holder_form.is_valid():
+                holder = holder_form.save(commit=False)
+                holder.customer = customer
+                holder.save()
+            
+            # Save beneficiary only if valid
+            beneficiary = None
+            if beneficiary_form.is_valid():
+                beneficiary = beneficiary_form.save(commit=False)
+                beneficiary.customer = customer
+                beneficiary.save()
 
             if vault:
-                # Update the existing vault
+                # Link the new customer and associated records to the existing vault
                 vault.customer = customer
-                vault.payment = payment
-                vault.holder_of_privilege = holder
-                vault.beneficiary = beneficiary
-                vault.inurnment_date = columbary_form.cleaned_data['inurnment_date']
-                vault.urns_per_columbary = columbary_form.cleaned_data['urns_per_columbary']
+                vault.payment = payment if payment else None
+                vault.holder_of_privilege = holder if holder else None
+                vault.beneficiary = beneficiary if beneficiary else None
                 vault.save()
             else:
                 # Create a new ColumbaryRecord
-                columbary_record = columbary_form.save(commit=False)
-                columbary_record.customer = customer
-                columbary_record.payment = payment
-                columbary_record.holder_of_privilege = holder
-                columbary_record.beneficiary = beneficiary
-                columbary_record.save()  # **Now properly saving the ColumbaryRecord**
+                columbary_record = ColumbaryRecord(
+                    vault_id=vault_id,
+                    customer=customer,
+                    payment=payment if payment else None,
+                    holder_of_privilege=holder if holder else None,
+                    beneficiary=beneficiary if beneficiary else None,
+                    status='Occupied'
+                )
+                columbary_record.save()
 
-            return redirect('success')  # Redirect after successful save
+            return redirect('success')  # Redirect to success page
 
     else:
         customer_form = CustomerForm()
         payment_form = PaymentForm()
         holder_form = HolderOfPrivilegeForm()
         beneficiary_form = BeneficiaryForm()
-        columbary_form = ColumbaryRecordForm()
 
     return render(request, 'pages/addcustomer.html', {
         'customer_form': customer_form,
         'payment_form': payment_form,
         'holder_form': holder_form,
         'beneficiary_form': beneficiary_form,
-        'columbary_form': columbary_form,
         'vault_id': vault_id
     })
+
 
