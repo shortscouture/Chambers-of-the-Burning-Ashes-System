@@ -7,7 +7,6 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 
 
-
 class Account(models.Model):
     account_id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=45, unique=True)
@@ -34,6 +33,8 @@ class ParishStaff(models.Model):
 
 
 class Customer(models.Model):
+    class Meta:
+        db_table = "customer" 
     customer_id = models.AutoField(primary_key=True)
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -115,10 +116,19 @@ class Payment(models.Model):
         ("Full Payment", "Full Payment"),
         ("6-Month Installment", "6-Month Installment"),
     ]
+
+    class Meta:
+        db_table = "payment"  # 🔥 Ensures Django uses the correct table
     
     payment_id = models.AutoField(primary_key=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="payments")  # Added customer FK
     mode_of_payment = models.CharField(max_length=20, choices=PAYMENT_MODES, blank=True, null=True)
+
+    class Meta:
+        db_table = "payment"  # 🔥 Ensures Django uses the correct table
+
+    class Meta:
+        db_table = "payment"  # 🔥 Ensures Django uses the correct table
 
     # Seven receipt fields
     Full_payment_receipt_1 = models.IntegerField(blank=True, null=True)
@@ -167,8 +177,14 @@ class ColumbaryRecord(models.Model):
     issuance_date = models.DateField(null=True)
     expiration_date = models.DateField(null=True)
     inurnment_date = models.DateField(blank=True, null=True)
-    urns_per_columbary = models.CharField(max_length=1, blank=True, null=True, choices=[('1', '1'), ('2', '2'), ('3', '3'), ('4', '4')])
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='columbary_records', db_column="customer_id", null=True)
+    issuing_parish_priest = models.CharField(max_length=45, blank=True, null=True)
+    urns_per_columbary = models.CharField(max_length=1, null=True, choices=[('1', '1'), ('2', '2'), ('3', '3'), ('4', '4')])
+    status = models.CharField(max_length=10, default="Vacant")
+
+    class Meta:
+        db_table = "columbaryrecord"  # 🔥 Ensures Django uses the correct table
+
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
     parish_staff = models.ForeignKey(ParishStaff, on_delete=models.SET_NULL, null=True, blank=True)
     beneficiary = models.ForeignKey(Beneficiary, on_delete=models.SET_NULL, null=True, blank=True)
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, null=True, blank=True)
@@ -177,7 +193,8 @@ class ColumbaryRecord(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Vacant')
     
     def __str__(self):
-        return f"Vault {self.vault_id}"
+        return f"Vault {self.vault_id} - {self.status}"
+
     def get_record_data(self):
         """Get formatted record data"""
         data = {

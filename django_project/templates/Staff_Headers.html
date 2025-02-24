@@ -10,17 +10,18 @@
 </head>
 
 <body>
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <img src="{% static 'images/logohead.png' %}" alt="logoheader" class="logohead">
-        </div>
-        <nav class="sidebar-nav">
-            <ul>
-                <li><a href="{% url 'home' %}">Home</a></li>
-                <li><a href="{% url 'columbaryrecords' %}">Records</a></li>
-                <li>Columbary</a></li>
-                <li><a id="logoutBtn" href="{% url 'account_logout' %}">Log Out</a></li>
-            </ul>
+  <header>
+    <div id="header">
+      <div class="container">
+        <nav>
+          <img src="{% static 'images/sa_logo.gif' %}" alt="logoheader" class="logohead">
+          <ul class="headname">
+            <li><a href="{% url 'dashboard' %}">HOME</a></li>
+            <li><a href="{% url 'columbaryrecords' %}">RECORDS</a></li>
+            <li><a href='pages/columbaryrecords.html'>COLUMBARY</a></li>
+            <li><a id="logoutBtn" href="{% url 'account_logout' %}" class="custom-signup-btn mb-2">LOG OUT</a></li>
+          </ul>
+          
         </nav>
     </div>
 </body>

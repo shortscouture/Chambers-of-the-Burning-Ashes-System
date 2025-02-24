@@ -184,4 +184,89 @@ input[type="date"]:focus {
   outline: none;
 }
 
+.ocr-section {
+  margin-bottom: 2em;
+  padding: 1em;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+}
 
+.capture-options {
+  display: flex;
+  gap: 1em;
+  margin-bottom: 1em;
+}
+
+.capture-option {
+  padding: 0.5em 1em;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.capture-option.active {
+  background-color: #0056b3;
+}
+
+#webcam-container {
+  display: none;
+  margin: 1em 0;
+}
+
+#webcam-view {
+  width: 100%;
+  max-width: 640px;
+  margin-bottom: 1em;
+}
+
+#capture-controls {
+  display: flex;
+  gap: 1em;
+  margin-bottom: 1em;
+}
+
+.camera-button {
+  padding: 0.5em 1em;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.camera-button:hover {
+  background-color: #218838;
+}
+
+#captured-image {
+  display: none;
+  max-width: 640px;
+  margin: 1em 0;
+}
+
+.file-upload {
+  display: none;
+  margin: 1em 0;
+}
+
+.processing-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.processing-message {
+  background: white;
+  padding: 2em;
+  border-radius: 8px;
+  text-align: center;
+}

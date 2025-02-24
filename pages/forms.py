@@ -157,11 +157,22 @@ class BeneficiaryForm(forms.ModelForm):
     class Meta:
         model = Beneficiary
         fields = ['first_beneficiary_name', 'second_beneficiary_name', 'third_beneficiary_name']
+
         widgets = {
             'first_beneficiary_name': forms.TextInput(attrs={'placeholder': 'First Beneficiary', 'class': 'form-control'}),
             'second_beneficiary_name': forms.TextInput(attrs={'placeholder': 'Second Beneficiary', 'class': 'form-control'}),
             'third_beneficiary_name': forms.TextInput(attrs={'placeholder': 'Third Beneficiary', 'class': 'form-control'})
         }
+
+
+
+class DocumentUploadForm(forms.Form):
+    document = forms.ImageField(
+        label='Upload Document',
+        help_text='Upload a clear image of the handwritten form'
+    )
+
+
 
 class PaymentForm(forms.ModelForm):
     MODE_OF_PAYMENT_CHOICES = [
@@ -189,6 +200,7 @@ class PaymentForm(forms.ModelForm):
     )
 
     # 6-Month Installment fields
+
     six_month_receipt_1 = forms.IntegerField(required=False, widget=forms.NumberInput(attrs={'placeholder': 'Receipt #1 (Optional)', 'class': 'form-control'}))
     six_month_amount_1 = forms.DecimalField(required=False, widget=forms.NumberInput(attrs={'placeholder': 'Amount', 'class': 'form-control'}))
     six_month_receipt_2 = forms.IntegerField(required=False, widget=forms.NumberInput(attrs={'placeholder': 'Receipt #2 (Optional)', 'class': 'form-control'}))
@@ -230,6 +242,4 @@ class PaymentForm(forms.ModelForm):
                 cleaned_data[amount_field] = None
 
         return cleaned_data
-
-
 
