@@ -6,7 +6,7 @@ from .views import (
     CustomerHomeView, MemorialView, send_letter_of_intent, verify_otp,
     memorials_verification, accept_letter_of_intent, decline_letter_of_intent,
     RecordsDetailsView, CustomerEditView, SuccesView, ChatbotAPIView, DashboardView, get_crypt_status, MapView, CustomerDeleteView,
-    process_ocr
+    process_ocr, update_letter_of_intent_status
 )
 
 urlpatterns = [
@@ -32,5 +32,6 @@ urlpatterns = [
     path('addnewrecord/', views.addnewrecord, name='addnewrecord'),
     path('delete_customer/<int:customer_id>/', CustomerDeleteView.as_view(), name='delete_customer'),
     path('process-ocr/', views.process_ocr, name='process_ocr'),
+    path("update-loi-status/<int:loi_id>/", update_letter_of_intent_status, name="update_loi_status"),
 
 ]

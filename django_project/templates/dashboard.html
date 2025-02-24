@@ -109,9 +109,9 @@
                         <td>{{ customer.mobile_number }}</td>
                         <td>
                             <button class="btn-accept"
-                                onclick="updateCustomerStatus({{ customer.customer_id }}, 'accept')">Accept</button>
+                                onclick="updateCustomerStatus({{ customer.customer_id }}, 'approved')">Accept</button>
                             <button class="btn-decline"
-                                onclick="updateCustomerStatus({{ customer.customer_id }}, 'decline')">Decline</button>
+                                onclick="updateCustomerStatus({{ customer.customer_id }}, 'declined')">Decline</button>
                         </td>
                     </tr>
                     {% endfor %}
@@ -323,39 +323,44 @@
 
 
 
-            function updateCustomerStatus(customerId, action) {
-                let confirmationMessage = action === "accept"
-                    ? "Are you sure you want to accept this letter of intent?"
-                    : "Are you sure you want to decline this letter of intent?";
+            function updateCustomerStatus(loiId, action) {
+                let confirmation = confirm(`Are you sure you want to ${action} this LOI?`);
+                if (!confirmation) return; // Stop if user cancels
 
-                if (!confirm(confirmationMessage)) {
-                    return; // Stop if the user clicks "Cancel"
-                }
-
-                let url = action === "accept"
-                    ? `/accept/${customerId}/`
-                    : `/decline/${customerId}/`;
-
-                fetch(url, {
-                    method: "GET",
+                fetch(`/update-loi-status/${loiId}/`, {
+                    method: "POST",
                     headers: {
-                        "X-Requested-With": "XMLHttpRequest"
-                    }
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCSRFToken() // 🔥 Ensure CSRF protection
+                    },
+                    body: JSON.stringify({ status: action === "accept" ? "Accepted" : "Declined" })
                 })
                     .then(response => response.json())
                     .then(data => {
-                        if (data.status === "success") {
-                            alert(`Letter of Intent ${data.new_status.toUpperCase()} successfully!`);
-                            location.reload(); // 🔥 Refresh the page to reflect changes
+                        if (data.success) {
+                            alert(`LOI ${action} successfully!`);
+                            location.reload(); // ✅ Refresh the page to reflect changes
                         } else {
-                            alert("Error updating status. Please try again.");
+                            alert("Error: " + data.error);
                         }
                     })
-                    .catch(error => {
-                        console.error("Error:", error);
-                        alert("An error occurred. Please try again.");
-                    });
+                    .catch(error => console.error("Error:", error));
             }
+
+            // 🔹 Function to get CSRF Token from cookies
+            function getCSRFToken() {
+                let name = "csrftoken=";
+                let decodedCookie = decodeURIComponent(document.cookie);
+                let cookies = decodedCookie.split(";");
+                for (let i = 0; i < cookies.length; i++) {
+                    let cookie = cookies[i].trim();
+                    if (cookie.indexOf(name) === 0) {
+                        return cookie.substring(name.length, cookie.length);
+                    }
+                }
+                return "";
+            }
+
 
             document.getElementById("dateFilterForm").addEventListener("submit", function (event) {
                 event.preventDefault(); // Prevent full page reload

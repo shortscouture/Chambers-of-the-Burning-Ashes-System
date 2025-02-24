@@ -157,21 +157,37 @@ class DashboardView(TemplateView):
 
         return context
 
-def accept_letter_of_intent(request, intent_id):
-    """ Update customer status to 'approved' when accepted. """
-    customer = get_object_or_404(Customer, customer_id=intent_id)
-    customer.status = "approved"
-    customer.save()
-    
-    return JsonResponse({"status": "success", "message": "Accepted", "new_status": "approved"})
+@csrf_exempt
+def update_letter_of_intent_status(request, loi_id):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            new_status = data.get("status", "").strip().title()  # ✅ Format correctly
 
-def decline_letter_of_intent(request, intent_id):
-    """ Update customer status to 'declined' when declined. """
-    customer = get_object_or_404(Customer, customer_id=intent_id)
-    customer.status = "declined"
-    customer.save()
-    
-    return JsonResponse({"status": "success", "message": "Declined", "new_status": "declined"})
+            print(f"Updating LOI status to: '{new_status}'")  # Debugging
+
+            loi = get_object_or_404(Customer, customer_id=loi_id)
+
+            # ✅ Ensure the status is valid
+            VALID_STATUSES = {"Pending", "Accepted", "Declined"}
+            if new_status not in VALID_STATUSES:
+                return JsonResponse({"success": False, "error": f"Invalid status: {new_status}"}, status=400)
+
+            # ✅ Debug column length
+            print(f"New Status: '{new_status}', Length: {len(new_status)}")
+
+            loi.status = new_status
+            loi.save()
+
+            return JsonResponse({"success": True, "message": f"LOI {new_status}"})
+
+        except Exception as e:
+            print(f"Error updating LOI: {e}")  # Debugging
+            return JsonResponse({"success": False, "error": str(e)}, status=400)
+
+    return JsonResponse({"success": False, "error": "Invalid request"}, status=400)
+
+
             
 def send_letter_of_intent(request):
     if request.method == 'POST':
