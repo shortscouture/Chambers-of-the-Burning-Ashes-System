@@ -31,3 +31,33 @@ document.addEventListener("DOMContentLoaded", function () {
         tbody.append(...rows);
     }
 });
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const searchButton = document.getElementById("search-button");
+    const searchNameInput = document.getElementById("search-name");
+    const searchVaultInput = document.getElementById("search-crypt");
+
+    searchButton.addEventListener("click", function () {
+        performSearch();
+    });
+
+    searchNameInput.addEventListener("keyup", function (event) {
+        if (event.key === "Enter") performSearch();
+    });
+
+    searchVaultInput.addEventListener("keyup", function (event) {
+        if (event.key === "Enter") performSearch();
+    });
+
+    function performSearch() {
+        const nameQuery = searchNameInput.value.trim();
+        const vaultQuery = searchVaultInput.value.trim();
+
+        const url = new URL(window.location.href);
+        url.searchParams.set("search_name", nameQuery);
+        url.searchParams.set("search_vault", vaultQuery);
+
+        window.location.href = url.toString();
+    }
+});

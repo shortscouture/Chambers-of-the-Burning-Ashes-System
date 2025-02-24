@@ -61,7 +61,9 @@ class CustomerHomeView(TemplateView):
     template_name = "pages/Customer_Home.html"
 
 
+from django.views.generic import TemplateView
 from django.db.models import Q
+from .models import ColumbaryRecord
 
 class ColumbaryRecordsView(TemplateView):
     template_name = "pages/columbaryrecords.html"
@@ -69,19 +71,18 @@ class ColumbaryRecordsView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        columbary_records = ColumbaryRecord.objects.all()
+        columbary_records = ColumbaryRecord.objects.select_related("customer").all()
         records_data = []
 
         for record in columbary_records:
-            customer = record.customer  # This may be None if no customer is linked
+            customer = getattr(record, "customer", None)  # Avoid error if no customer exists
 
             has_beneficiary = (
-                customer.beneficiaries.filter(first_beneficiary_name__isnull=False).exists()
-                if customer else False
+                customer and customer.beneficiaries.filter(first_beneficiary_name__isnull=False).exists()
             )
 
             has_payment = (
-                customer.payments.filter(
+                customer and customer.payments.filter(
                     mode_of_payment__isnull=False
                 ).filter(
                     Q(mode_of_payment="Full Payment", Full_payment_receipt_1__isnull=False, Full_payment_amount_1__isnull=False) |
@@ -93,17 +94,15 @@ class ColumbaryRecordsView(TemplateView):
                       six_month_receipt_5__isnull=False, six_month_amount_5__isnull=False, 
                       six_month_receipt_6__isnull=False, six_month_amount_6__isnull=False)
                 ).exists()
-                if customer else False
             )
 
             has_holder_of_privilege = (
-                customer.privileges.filter(issuance_date__isnull=False).exists()
-                if customer else False
+                customer and customer.privileges.filter(issuance_date__isnull=False).exists()
             )
 
             records_data.append({
                 "vault_id": record.vault_id,
-                "customer_name": customer.full_name if customer else "No Customer",
+                "customer_name": customer.full_name() if customer else "No Customer",
                 "has_beneficiary": has_beneficiary,
                 "has_payment": has_payment,
                 "has_holder_of_privilege": has_holder_of_privilege,

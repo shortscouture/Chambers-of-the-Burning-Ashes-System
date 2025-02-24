@@ -95,3 +95,29 @@ table th {
   color: red;
   font-weight: bold;
 }
+
+
+.pagination {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.pagination a {
+  display: inline-block;
+  padding: 8px 16px;
+  margin: 2px;
+  text-decoration: none;
+  color: white;
+  background-color: #007bff;
+  border-radius: 5px;
+  transition: 0.3s;
+}
+
+.pagination a:hover {
+  background-color: #0056b3;
+}
+
+.pagination span {
+  font-weight: bold;
+  padding: 8px 16px;
+}
