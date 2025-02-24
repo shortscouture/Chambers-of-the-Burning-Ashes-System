@@ -119,12 +119,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for columbary in vacant_columbaries %}
+                    {% for columns in columbaryrecord %}
                     <tr>
-                        <td>{{ columbary.vault_id }}</td>
-                        <td>{{ columbary.section }}</td>
-                        <td>{{ columbary.urns_per_columbary }}</td>
-                        <td>{{ columbary.status }}</td>
+                        <td>{{ columns.vault_id }}</td>
+                        <td>{{ columns.section }}</td>
+                        <td>{{ columns.urns_per_columbary }}</td>
+                        <td>{{ columns.status }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
