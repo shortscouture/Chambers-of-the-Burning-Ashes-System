@@ -203,15 +203,25 @@ def accept_letter_of_intent(request, intent_id):
     intent = get_object_or_404(Customer, customer_id=intent_id)
     intent.status = 'approved'
     intent.save()
-    
+
+    # Assign the selected vault to the customer
+    vault_id = request.POST.get('vault_id')  # Ensure this comes from the form submission
+    level = request.POST.get('level')
+
+    if vault_id and level:
+        vault = get_object_or_404(ColumbaryRecord, vault_id=vault_id, level=level, status="Vacant")
+        vault.customer = intent
+        vault.status = "Occupied"
+        vault.save()
+
+    # Send acceptance email
     send_mail(
         subject="Your Letter of Intent has been Accepted",
-        message=(
-            f"Dear {intent.full_name},\n\n"
-            "We are pleased to inform you that your letter of intent has been accepted.\n\n"
-            "Best regards,\nThe Team"
-        ),
-        from_email='stalphonsusmakati@gmail.com',
+        message=f"Dear {intent.full_name()},\n\n"
+                "We are pleased to inform you that your letter of intent has been accepted.\n"
+                f"You have been assigned to Vault ID: {vault_id}, Level: {level}.\n\n"
+                "Best regards,\nSt. Alphonsus",
+        from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[intent.email_address],
         fail_silently=False,
     )
@@ -222,19 +232,20 @@ def accept_letter_of_intent(request, intent_id):
 def decline_letter_of_intent(request, intent_id):
     intent = get_object_or_404(Customer, customer_id=intent_id)
     intent.status = 'declined'
-    intent.delete()
-        
+    intent.save()  # Keep the record instead of deleting it
+
+    # Send rejection email
     send_mail(
         subject="Your Letter of Intent has been Declined",
-        message=(
-            f"Dear {intent.full_name},\n\n"
-            "We regret to inform you that your letter of intent has been declined.\n\n"
-            "Best regards,\nThe Team"
-        ),
-        from_email='stalphonsusmakati@gmail.com',
+        message=f"Dear {intent.full_name()},\n\n"
+                "We regret to inform you that your letter of intent has been declined.\n\n"
+                "Best regards,\n St. Alphonsus",
+        from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[intent.email_address],
         fail_silently=False,
     )
+
+    return redirect('some_rejection_page')
 
 
 class RecordsDetailsView(TemplateView):
