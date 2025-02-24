@@ -139,44 +139,55 @@ class DashboardView(TemplateView):
             
 def send_letter_of_intent(request):
     if request.method == 'POST':
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email_address = request.POST.get('email_address')
+        mobile_number = request.POST.get('mobile_number')
 
-        full_name = request.POST['full_name']
-        permanent_address = request.POST['permanent_address']
-        landline_number = request.POST.get('landline_number', '')
-        mobile_number = request.POST['mobile_number']
-        email_address = request.POST['email_address']
-        # Save the form data with a pending status
-        intent = Customer.objects.create(
-            full_name=full_name,
-            permanent_address=permanent_address,
-            landline_number=landline_number,
-            mobile_number=mobile_number,
+        # Get selected section and level from form
+        section = request.POST.get('section')
+        level = request.POST.get('level')
+
+        # Check if the selected columbary exists and is vacant
+        columbary = ColumbaryRecord.objects.filter(
+            section=section, level=level, status="Vacant"
+        ).first()
+
+        if not columbary:
+            return render(request, 'error.html', {'message': 'Selected crypt is no longer available.'})
+
+        # Create customer record
+        customer = Customer.objects.create(
+            first_name=first_name,
+            last_name=last_name,
             email_address=email_address,
+            mobile_number=mobile_number,
+            status='pending'
         )
-        
+
+        # Assign customer to columbary and update status
+        columbary.customer = customer
+        columbary.status = "Occupied"
+        columbary.save()
+
         # Send email to admin
-        accept_url = request.build_absolute_uri(f'/accept/{intent.customer_id}/')
-        decline_url = request.build_absolute_uri(f'/decline/{intent.customer_id}/')
+        accept_url = request.build_absolute_uri(f'/accept/{customer.customer_id}/')
+        decline_url = request.build_absolute_uri(f'/decline/{customer.customer_id}/')
+
         email_body = f"""
-Dear Rev. Bobby
-    
-I hope this message finds you well. I am writing to formally submit my letter of intent for Acquiring a Columbary find my details below:
+        Dear Admin,
 
-Full Name: {full_name}
-Permanent Address: {permanent_address}
-Landline Number: {landline_number if landline_number else 'N/A'}
-Mobile Number: {mobile_number}
-Email Address: {email_address}
+        A new Letter of Intent has been submitted.
 
-I would appreciate your time and attention to this matter. Please feel free to reach out to me if any further information or clarification is needed.
-
-Thank you for considering my submission.
-
-Best regards,
+        Name: {first_name} {last_name}
+        Email: {email_address}
+        Mobile: {mobile_number}
+        Section: {section}, Level: {level}
 
         Accept: {accept_url}
         Decline: {decline_url}
         """
+
         send_mail(
             'New Letter of Intent',
             email_body,
@@ -184,7 +195,8 @@ Best regards,
             [settings.ADMIN_EMAIL],
         )
 
-        return render(request, 'Success.html', {'intent': intent})
+        return render(request, 'success.html', {'customer': customer})
+
     
 
 def accept_letter_of_intent(request, intent_id):
