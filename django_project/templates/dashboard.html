@@ -59,10 +59,10 @@
         <form id="dateFilterForm" method="GET" action="/dashboard/">
             <label for="start_date">Start Date:</label>
             <input type="date" id="start_date" name="start_date">
-        
+
             <label for="end_date">End Date:</label>
             <input type="date" id="end_date" name="end_date">
-        
+
             <button type="submit">Filter</button>
         </form>
     </div>
@@ -132,12 +132,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for columns in columbaryrecord %}
+                    {% for columbary in vacant_columbaries %}
                     <tr>
-                        <td>{{ columns.vault_id }}</td>
-                        <td>{{ columns.section }}</td>
-                        <td>{{ columns.urns_per_columbary }}</td>
-                        <td>{{ columns.status }}</td>
+                        <td>{{ columbary.vault_id }}</td>
+                        <td>{{ columbary.section }}</td>
+                        <td>{{ columbary.urns_per_columbary }}</td>
+                        <td>{{ columbary.status }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -158,13 +158,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for columns in columbaryrecord %}
+                    {% for columbary in occupied_columbaries %}
                     <tr>
-                        <td>{{ column.vault_id }}</td>
-                        <td>{{ column.section }}</td>
-                        <td>{{ column.urns_per_columbary }}</td>
-                        <td>{{ column.customer.full_name }}</td>
-                        <td>{{ column.status }}</td>
+                        <td>{{ columbary.vault_id }}</td>
+                        <td>{{ columbary.section }}</td>
+                        <td>{{ columbary.urns_per_columbary }}</td>
+                        <td>{{ columbary.customer.full_name|default:"Unassigned" }}</td>
+                        <td>{{ columbary.status }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -183,11 +183,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for column in colmbaryrecord %}
+                    {% for columbary in unissued_columbary_records %}
                     <tr>
                         <td>{{ columbary.vault_id }}</td>
                         <td>{{ columbary.issuance_date }}</td>
-                        <td>{{ columbary.customer.full_name }}</td>
+                        <td>{{ columbary.customer.full_name|default:"Unassigned" }}</td>
                     </tr>
                     {% empty %}
                     <tr>

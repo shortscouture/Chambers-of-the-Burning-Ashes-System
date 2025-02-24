@@ -151,9 +151,7 @@ class DashboardView(TemplateView):
         ]
         earnings_data = [float(entry["total_earnings"]) for entry in earnings_by_month]
 
-        # Debugging: Print earnings data
-        print("Earnings Labels:", earnings_labels)
-        print("Earnings Data:", earnings_data)
+
 
         # Add data to context
         context.update({

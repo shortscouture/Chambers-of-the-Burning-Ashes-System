@@ -1,0 +1,22 @@
+    .hover-effect {
+        transition: transform 0.2s ease-in-out;
+        transform-origin: center;
+        transform-box: fill-box;
+    }
+
+    .hover-effect:hover {
+        transform: scale(2);
+    }
+    #svg-container {
+        width: 800px; /* Set the desired visible area */
+        height: 600px;
+        overflow: hidden;
+        border: 1px solid #000;
+        position: relative;
+    }
+    #grab{
+        cursor: grab; /* Default cursor */
+    }
+    #grab:active {
+        cursor: grabbing; /* When dragging */
+    }
