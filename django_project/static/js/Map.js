@@ -116,6 +116,9 @@ function updateCryptColor(section) {
 
 
 
+<<<<<<< HEAD
+>>>>>>> parent of 3328d38 (added some changes)
+=======
 >>>>>>> parent of 3328d38 (added some changes)
 function closePopup() {
     document.getElementById('popup').style.display = 'none';
