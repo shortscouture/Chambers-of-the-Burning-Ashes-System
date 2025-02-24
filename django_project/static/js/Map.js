@@ -78,17 +78,23 @@ function updateCryptColor(section) {
     fetch(`/get_vault_data/${sectionId}/`)
         .then(response => response.json())
         .then(data => {
-            // Loop through potential levels (A to E)
+            if (data.error) {
+                alert("No records found for this section.");
+                return;
+            }
+
+            // Update the text to show the selected section
+            document.getElementById('selected-section').textContent = `Section: ${sectionId}`;
+
+            // Update SVG colors dynamically
             ['A', 'B', 'C', 'D', 'E'].forEach(level => {
                 let levelElement = document.getElementById(`level-${level}`);
-                if (levelElement) { // Ensure element exists
-                    if (data.levels.hasOwnProperty(level)) {
-                        // Only show if the level actually exists in the data
-                        levelElement.style.display = ''; // Reset to default
-                        levelElement.setAttribute('fill', data.levels[level] ? 'red' : 'green');
+                if (levelElement) {
+                    if (data.levels[level] === undefined) {
+                        levelElement.style.display = 'none'; // Hide non-existent levels
                     } else {
-                        // Hide the element if the level does not exist
-                        levelElement.style.display = 'none';
+                        levelElement.style.display = 'block';
+                        levelElement.setAttribute('fill', data.levels[level] ? 'red' : 'green');
                     }
                 }
             });
@@ -105,12 +111,12 @@ function updateCryptColor(section) {
                 }
             });
 
+            // Show the popup
             document.getElementById('popup').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
-        });
+        })
+        .catch(error => console.error("Error fetching data:", error));
 }
-
-
 
 
 
