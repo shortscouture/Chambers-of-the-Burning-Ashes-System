@@ -403,9 +403,27 @@ class CustomerDeleteView(DeleteView):
         return get_object_or_404(Customer, customer_id=customer_id)
 
     def delete(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        self.object.delete()
-        messages.success(request, "Customer and all related records deleted successfully.")
+        customer = self.get_object()
+
+        # Unlink ColumbaryRecord (keep the vault ID, but remove associations)
+        columbary_records = ColumbaryRecord.objects.filter(customer=customer)
+        for record in columbary_records:
+            record.customer = None
+            record.payment = None
+            record.holder_of_privilege = None
+            record.beneficiary = None
+            record.status = 'Vacant'  # Mark as Vacant if necessary
+            record.save()
+
+        # Delete all related records
+        Payment.objects.filter(customer=customer).delete()
+        HolderOfPrivilege.objects.filter(customer=customer).delete()
+        Beneficiary.objects.filter(customer=customer).delete()
+
+        # Delete the customer
+        customer.delete()
+
+        messages.success(request, "Customer and related records deleted successfully, but Vault ID remains intact.")
         return redirect(self.success_url)
 
 
