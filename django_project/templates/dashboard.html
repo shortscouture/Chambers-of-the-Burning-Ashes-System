@@ -416,7 +416,7 @@
                 userMessage.textContent = "You: " + message;
                 chatbox.appendChild(userMessage);
                 input.value = "";
-                fetch("{% url 'chatbot_api' %}", {
+                fetch("{% url 'chatbot' %}", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ message: message })
