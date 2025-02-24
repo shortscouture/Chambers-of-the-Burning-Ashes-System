@@ -81,22 +81,14 @@
       </g>
     </g>
   </svg>
-  <form method="post" action="{% url 'submit_letter_of_intent' %}">
-    {% csrf_token %}
-
-    <input type="text" placeholder="First Name" required id="fn" name="first_name">
-    <input type="text" placeholder="Last Name" required id="ln" name="last_name">
-    <input type="email" placeholder="Email Address" required name="email_address">
-    <input type="tel" placeholder="Mobile Number" required name="mobile_number">
-
-    <!-- Hidden Inputs for Section & Level -->
-    <input type="hidden" id="section-input" name="section">
-    <input type="hidden" id="level-input" name="level">
-
-    <button type="submit">Send Letter of Intent</button>
-</form>
-  <br><br>
-  <button onclick="closePopup()">Close</button>
+  <label for="level-select">Select Level:</label>
+  <select id="level-select">
+      <option value="A">A</option>
+      <option value="B">B</option>
+      <option value="C">C</option>
+      <option value="D">D</option>
+      <option value="E">E</option>
+  </select>
 </div>
 
 <script src="../../static/js/Map.js"></script>

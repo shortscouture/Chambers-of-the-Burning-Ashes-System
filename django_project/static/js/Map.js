@@ -83,9 +83,21 @@ function updateCryptColor(section) {
                 return;
             }
 
-            // Show selected section
+            // Update the text to show the selected section
             document.getElementById('selected-section').textContent = `Section: ${sectionId}`;
-            document.getElementById('section-input').value = sectionId; // 🔥 Save section in form
+
+            // Update SVG colors dynamically
+            ['A', 'B', 'C', 'D', 'E'].forEach(level => {
+                let levelElement = document.getElementById(`level-${level}`);
+                if (levelElement) {
+                    if (data.levels[level] === undefined) {
+                        levelElement.style.display = 'none'; // Hide non-existent levels
+                    } else {
+                        levelElement.style.display = 'block';
+                        levelElement.setAttribute('fill', data.levels[level] ? 'red' : 'green');
+                    }
+                }
+            });
 
             // Populate dropdown with available levels
             let dropdown = document.getElementById('level-select');
@@ -94,15 +106,10 @@ function updateCryptColor(section) {
                 if (!data.levels[level]) {  // If level is vacant
                     let option = document.createElement('option');
                     option.value = level;
-                    option.textContent = `Level ${level}`;
+                    option.textContent = level;
                     dropdown.appendChild(option);
                 }
             });
-
-            // Auto-set first available level
-            if (dropdown.options.length > 0) {
-                document.getElementById('level-input').value = dropdown.options[0].value;
-            }
 
             // Show the popup
             document.getElementById('popup').style.display = 'block';
@@ -110,14 +117,6 @@ function updateCryptColor(section) {
         })
         .catch(error => console.error("Error fetching data:", error));
 }
-
-// Update hidden level input when user selects a level
-document.getElementById('level-select').addEventListener('change', function() {
-    document.getElementById('level-input').value = this.value;
-});
-
-
-
 
 function closePopup() {
     document.getElementById('popup').style.display = 'none';

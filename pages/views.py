@@ -701,4 +701,7 @@ def get_vault_data(request, section_id):
     vaults = ColumbaryRecord.objects.filter(section=section_id)
     levels = {vault.level: vault.status == "Occupied" for vault in vaults}
     
-    return JsonResponse({'levels': levels})
+    response_data = {'levels': levels}
+    print(json.dumps(response_data, indent=4))  # Debugging output
+    
+    return JsonResponse(response_data)
