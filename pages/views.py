@@ -572,9 +572,9 @@ def addnewcustomer(request):
         payment_form = PaymentForm(request.POST)
         holder_form = HolderOfPrivilegeForm(request.POST)
         beneficiary_form = BeneficiaryForm(request.POST)
-        columbary_form = ColumbaryRecordForm(request.P0ST)
+        columbary_form = ColumbaryRecordForm(request.POST)
         
-        if customer_form.is_valid() and payment_form.is_valid() and holder_form.is_valid() and beneficiary_form.is_valid():
+        if customer_form.is_valid() and payment_form.is_valid() and holder_form.is_valid() and beneficiary_form.is_valid() and columbary_form.is_valid():
             customer = customer_form.save()
             
             payment = payment_form.save(commit=False)
@@ -588,7 +588,11 @@ def addnewcustomer(request):
             beneficiary = beneficiary_form.save(commit=False)
             beneficiary.customer = customer
             beneficiary.save()
-            
+
+            columbary = columbary_form.save(commit=False)
+            columbary.customer= customer   
+            columbary.save()
+
             if vault:
                 vault.customer = customer
                 vault.payment = payment
