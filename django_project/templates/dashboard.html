@@ -119,12 +119,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for columbary in vacant_columbaries %}
+                    {% for columns in columbaryrecord %}
                     <tr>
-                        <td>{{ columbary.vault_id }}</td>
-                        <td>{{ columbary.section }}</td>
-                        <td>{{ columbary.urns_per_columbary }}</td>
-                        <td>{{ columbary.status }}</td>
+                        <td>{{ columns.vault_id }}</td>
+                        <td>{{ columns.section }}</td>
+                        <td>{{ columns.urns_per_columbary }}</td>
+                        <td>{{ columns.status }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -145,13 +145,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for columbary in occupied_columbaries %}
+                    {% for columns in columbaryrecord %}
                     <tr>
-                        <td>{{ columbary.vault_id }}</td>
-                        <td>{{ columbary.section }}</td>
-                        <td>{{ columbary.urns_per_columbary }}</td>
-                        <td>{{ columbary.customer.full_name }}</td>
-                        <td>{{ columbary.status }}</td>
+                        <td>{{ column.vault_id }}</td>
+                        <td>{{ column.section }}</td>
+                        <td>{{ column.urns_per_columbary }}</td>
+                        <td>{{ column.customer.full_name }}</td>
+                        <td>{{ column.status }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -170,7 +170,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for columbary in unissued_columbary_records %}
+                    {% for column in colmbaryrecord %}
                     <tr>
                         <td>{{ columbary.vault_id }}</td>
                         <td>{{ columbary.issuance_date }}</td>
