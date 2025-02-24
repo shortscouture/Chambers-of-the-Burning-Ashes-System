@@ -287,6 +287,13 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
+    <form id="chat-form">
+        {% csrf_token %}
+        <input type="text" id="chatbot-input" placeholder="Type your message">
+        <button type="button" onclick="sendMessage(event)">Send</button>
+    </form>
+
+    <div id="chatbot-messages"></div>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             var ctx = document.getElementById("paymentChart").getContext("2d");
@@ -407,28 +414,51 @@
             chatbot.style.display = chatbot.style.display === "none" ? "flex" : "none";
         }
 
-        function sendMessage() {
+        function getCSRFToken() {
+            return document.querySelector("[name=csrfmiddlewaretoken]").value; // Get CSRF token
+        }
+        function sendMessage(event) {
+            event.preventDefault();  // Prevent form submission
+            
             var input = document.getElementById("chatbot-input");
             var message = input.value.trim();
+            
             if (message) {
                 var chatbox = document.getElementById("chatbot-messages");
+    
+                // Display user message
                 var userMessage = document.createElement("div");
                 userMessage.textContent = "You: " + message;
                 chatbox.appendChild(userMessage);
                 input.value = "";
+    
+                // Send request to Django chatbot API
                 fetch("{% url 'chatbot' %}", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCSRFToken()  // Include CSRF token
+                    },
                     body: JSON.stringify({ message: message })
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Forbidden: You may not have access to this chatbot.");
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     var botMessage = document.createElement("div");
                     botMessage.textContent = "Bot: " + data.response;
                     chatbox.appendChild(botMessage);
                     chatbox.scrollTop = chatbox.scrollHeight;
                 })
-                .catch(error => console.error("Error:", error));
+                .catch(error => {
+                    console.error("Error:", error);
+                    var errorMessage = document.createElement("div");
+                    errorMessage.textContent = "Error: " + error.message;
+                    chatbox.appendChild(errorMessage);
+                });
             }
         }
     </script>

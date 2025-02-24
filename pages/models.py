@@ -338,6 +338,11 @@ class TwoFactorAuth(models.Model):
                 return True
         return False
 
+#for ai only dont move
+class ParishKnowledge(models.Model):
+    question = models.TextField()
+    answer = models.TextField()
+
 #chatbot
 class ChatQuery(models.Model):
     user_message = models.TextField()
