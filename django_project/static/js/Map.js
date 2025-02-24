@@ -78,23 +78,17 @@ function updateCryptColor(section) {
     fetch(`/get_vault_data/${sectionId}/`)
         .then(response => response.json())
         .then(data => {
-            if (data.error) {
-                alert("No records found for this section.");
-                return;
-            }
-
-            // Update the text to show the selected section
-            document.getElementById('selected-section').textContent = `Section: ${sectionId}`;
-
-            // Update SVG colors dynamically
+            // Loop through potential levels (A to E)
             ['A', 'B', 'C', 'D', 'E'].forEach(level => {
                 let levelElement = document.getElementById(`level-${level}`);
-                if (levelElement) {
-                    if (data.levels[level] === undefined) {
-                        levelElement.style.display = 'none'; // Hide non-existent levels
-                    } else {
-                        levelElement.style.display = 'block';
+                if (levelElement) { // Ensure element exists
+                    if (data.levels.hasOwnProperty(level)) {
+                        // Only show if the level actually exists in the data
+                        levelElement.style.display = ''; // Reset to default
                         levelElement.setAttribute('fill', data.levels[level] ? 'red' : 'green');
+                    } else {
+                        // Hide the element if the level does not exist
+                        levelElement.style.display = 'none';
                     }
                 }
             });
@@ -111,13 +105,18 @@ function updateCryptColor(section) {
                 }
             });
 
-            // Show the popup
             document.getElementById('popup').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
-        })
-        .catch(error => console.error("Error fetching data:", error));
+        });
 }
 
+<<<<<<< HEAD
+=======
+
+
+
+
+>>>>>>> parent of 3328d38 (added some changes)
 function closePopup() {
     document.getElementById('popup').style.display = 'none';
     document.getElementById('overlay').style.display = 'none';
