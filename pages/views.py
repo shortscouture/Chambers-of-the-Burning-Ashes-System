@@ -581,10 +581,49 @@ env = environ.Env(
 )
         
 openai.api_key = env("OPEN_AI_API_KEY")
-class ChatbotAPIView(APIView):
-    def get(self, request, *args, **kwargs):
-        return Response({"message": "Chatbot API is running! Use POST to send messages."}, status=status.HTTP_200_OK)
+
+
     
+class ChatbotAPIView(APIView):
+    def get_all_table_names(self):
+        """Fetch all table names from the current database."""
+        with connection.cursor() as cursor:
+            cursor.execute("SHOW TABLES;")
+            return [row[0] for row in cursor.fetchall()]
+        
+    def get_text_columns(self, table_name):
+        """Fetch text-based columns from a given table."""
+        with connection.cursor() as cursor:
+            cursor.execute(f"SHOW COLUMNS FROM {table_name};")
+            return [row[0] for row in cursor.fetchall() if "text" in row[1].lower() or "char" in row[1].lower()]
+        def get(self, request, *args, **kwargs):
+            return Response({"message": "Chatbot API is running! Use POST to send messages."}, status=status.HTTP_200_OK)
+        
+    def search_whole_database(self, query):
+        """Search for relevant data in all text-based columns across the entire database."""
+        results = []
+        tables = self.get_all_table_names()
+
+        with connection.cursor() as cursor:
+            for table in tables:
+                text_columns = self.get_text_columns(table)
+                if not text_columns:
+                    continue  # Skip tables without text columns
+
+                # ✅ Escape column names using backticks (`) to avoid MySQL syntax errors
+                search_conditions = " OR ".join([f"`{col}` LIKE %s" for col in text_columns])
+                sql_query = f"SELECT * FROM `{table}` WHERE {search_conditions} LIMIT 5;"
+
+                try:
+                    cursor.execute(sql_query, [f"%{query}%"] * len(text_columns))
+                    fetched_data = cursor.fetchall()
+                    if fetched_data:
+                        results.append({"table": table, "data": fetched_data})
+                except Exception as e:
+                    print(f"⚠️ Skipping table {table} due to error: {e}")  # Log errors
+
+        return results
+
     def get_relevant_info(self, query):
         with connection.cursor() as cursor:
             cursor.execute(
@@ -601,8 +640,15 @@ class ChatbotAPIView(APIView):
         database_data = self.get_relevant_info(user_query)
         ai_response = self.query_openai(database_data)
         context_data = self.get_relevant_info(user_query) 
+        relevant_info = self.search_whole_database(user_query)
         
+        
+        if relevant_info:
+            database_context = json.dumps(relevant_info, indent=2)
+        else:
+            database_context = "No relevant data found in the database."
         logger.info(f"User query: {user_query}")
+        
 
         messages = [
             {"role": "system", "content": "You are a knowledgeable assistant helping parish staff."},
@@ -618,9 +664,9 @@ class ChatbotAPIView(APIView):
 
         return JsonResponse({
             "query": user_query,
-            "context": context_data,
-            "ai_insights": ai_response,
-            "response": response.choices[0].message.content
+            "context": database_context,
+            "ai_insights": response.choices[0].message.content,
+            #"response": 
         })
 
    # def chatbot_view(request):
