@@ -33,6 +33,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models.functions import TruncMonth
 from django.contrib.auth.mixins import LoginRequiredMixin
 import logging
+from django.views.generic import TemplateView
+from django.db.models import Q
+from .models import ColumbaryRecord
 
 logger = logging.getLogger(__name__)
 
@@ -60,10 +63,6 @@ class MainDashView(TemplateView):
 class CustomerHomeView(TemplateView):
     template_name = "pages/Customer_Home.html"
 
-
-from django.views.generic import TemplateView
-from django.db.models import Q
-from .models import ColumbaryRecord
 
 class ColumbaryRecordsView(TemplateView):
     template_name = "pages/columbaryrecords.html"
@@ -768,19 +767,6 @@ def addnewrecord(request):
         'holder_form': holder_form,
         'beneficiary_form': beneficiary_form
     })
-
-
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import ColumbaryRecord, Customer, Payment, HolderOfPrivilege, Beneficiary
-from .forms import CustomerForm, PaymentForm, ColumbaryRecordForm, HolderOfPrivilegeForm, BeneficiaryForm
-
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import ColumbaryRecord
-from .forms import CustomerForm, PaymentForm, HolderOfPrivilegeForm, BeneficiaryForm, ColumbaryRecordForm
-
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Customer, Payment, HolderOfPrivilege, Beneficiary, ColumbaryRecord
-from .forms import CustomerForm, PaymentForm, HolderOfPrivilegeForm, BeneficiaryForm, ColumbaryRecordForm
 
 def addnewcustomer(request):
     vault_id = request.GET.get('vault_id')
