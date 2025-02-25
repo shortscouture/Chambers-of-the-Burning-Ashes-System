@@ -1,0 +1,146 @@
+/* Chat container */
+@media (max-width: 768px) { /* Example breakpoint */
+    .chat-wrapper, .Bot {
+        left: 10px; /* Adjust for smaller screens */
+    }
+}
+.chat-wrapper {
+    position: fixed; /* Keep it fixed in the viewport */
+    bottom: 20px;
+    right: 20px;
+    width: 300px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    display: none; /* Initially hidden */
+    z-index: 21; /* Ensure it's on top */
+}
+.chat-title-container {
+    text-align: center; /* Center the title */
+    margin-bottom: 10px; /* Add some space below */
+}
+
+.chat-title-container h3 {
+    color: #333; /* Example color */
+}
+.chat-title {
+    font-weight: bold;
+    margin-right: auto; /* Push the title to the left */
+    /* Add any other styling you want for the title */
+}
+
+.chat-header {
+    display: flex;
+    justify-content: flex-end; /* Align close button to the right */
+    padding: 5px;
+    border-bottom: 1px solid #ccc;
+    z-index:21
+  }
+  
+  .close-btn {
+    cursor: pointer;
+    padding: 5px 10px;
+    border: none;
+    background: none;
+    font-size: 16px;
+  }
+
+  .chatbox {
+    flex-grow: 1; /* Keep this if you want it to take up available space */
+    padding: 10px;
+    overflow-y: auto; /* Add scrollbar when content overflows */
+    max-height: 300px; /* Set your desired maximum height */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 300px;
+}
+body {
+    /* Extend the background (example - customize as needed) */
+    background-color: #f0f0f0; /* Light gray background */
+    margin: 0; /* Remove default body margins */
+    height: 100vh; /* Make body full viewport height */
+}
+
+
+/* User message bubble (align right) */
+.chatbox .user-message {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    border-radius: 15px;
+    max-width: 80%;
+    align-self: flex-end; /* Align right */
+    word-wrap: break-word;
+    margin-bottom: 10px; /* Consistent margin */
+}
+
+/* Bot message bubble (align left) */
+.chatbox .bot-message {
+    background-color: #f1f1f1;
+    color: #333;
+    padding: 10px;
+    border-radius: 15px;
+    max-width: 80%;
+    align-self: flex-start; /* Align left */
+    word-wrap: break-word;
+    margin-bottom: 10px; /* Consistent margin */
+}
+
+/* Input container */
+.input-container {
+    display: flex; /* Keep the input and button in a row */
+    padding: 10px;
+    background-color: #f8f8f8;
+}
+
+/* Input field styling */
+.input-container input {
+    flex-grow: 1; /* Input takes up available space */
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-right: 10px;
+}
+
+/* Send button styling */
+.send-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px; /* Adjust padding for button size */
+    border-radius: 5px; /* Consistent border radius */
+    cursor: pointer;
+    border: none;
+}
+
+/* Bot button (fixed position) */
+.Bot {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #007bff;
+    color: white;
+    padding: 15px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 20; /* Ensure the button is below the chatbox */
+}
+
+.Bot svg {
+    width: 30px;
+    height: 30px;
+}
+
+/* Optional: Style the scrollbar */
+.chatbox::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chatbox::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.chatbox::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
