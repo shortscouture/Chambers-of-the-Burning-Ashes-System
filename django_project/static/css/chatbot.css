@@ -63,3 +63,12 @@
     background-color: rgba(14, 102, 179, 0.521);
     color: white;
 }
+
+.chatbox {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    height: 200px;
+    border-bottom: 1px solid #ddd;
+    border-radius: 4px 4px 0 0; /* Optional: Make the top corners rounded */
+}
