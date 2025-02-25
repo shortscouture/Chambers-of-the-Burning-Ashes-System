@@ -52,11 +52,11 @@
     width: 500px;
     height: 500px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
 }
 .popup svg {
     width: 300px;
     height: auto;
+    z-index: 1;
 }
 .overlay {
     display: none;
@@ -78,9 +78,11 @@
     padding: 20px;
     position: absolute;
     margin-top: -290px;
+    z-index: 1;
 }   
 .container svg{
     width: 700px;
+    z-index: 1;
 }
 
 .form-container {
@@ -95,12 +97,9 @@
     margin-top: -250px;
     color: white;
     font-family: sans-serif;
+    z-index: 2;
 }
 
-#level-select{
-    color: white;
-    font-family: sans-serif;
-}
 
 input{
     width: 100%;
@@ -112,6 +111,7 @@ input{
     font-size: 16px;
     outline: none;
     transition: border-color 0.3s ease;
+    z-index: 2;
 }
 select{
     width: 83%;
@@ -136,6 +136,7 @@ input:focus, select:focus {
     padding: 10px;
     margin-top: 10px;
     border: none;
+    background-color: #2e93fe;
     border-radius: 5px;
     font-size: 12px;
     cursor: pointer;
@@ -143,6 +144,12 @@ input:focus, select:focus {
     transition: 0.3s ease;
     margin-top: 10px;
     font-family: sans-serif;
+    z-index: 2;
+}
+
+.submit-btn:hover{
+    background-color: white;
+    transition: ease-in-out 0.5s;
 }
 
 .details{
@@ -154,17 +161,21 @@ input:focus, select:focus {
     font-size: 10px;
     margin-left: -260px;
     margin-top: 75px;
+    font-style: bold;
+    border: none;
     width: 50px;
     padding: 5px;
+    font-size: 10px;
     font-family: sans-serif;
     border-radius: 50px;
-    background-color: #007bff;
-    box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.818);;
+    background-color: #2e93fe;
+    cursor: pointer;
+    z-index: 2;
 }
 
 .close-btn:hover{
     background-color: white;
-    transition: ease-in;
+    transition: ease-in 1s;
 }
 
 form {
