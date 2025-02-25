@@ -1,0 +1,308 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    background: url("/static/images/church.174330eba836.jpg") no-repeat center center fixed;
+    background-size: cover;
+    color: #333;
+}
+  
+
+h1 {
+    background-size: 100% 75%;
+    margin-top: -40px;
+    margin-bottom: -230px;
+    padding-top: -20px;
+}
+
+.container {
+    width: 85%;
+    margin: auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding-top: 80px;
+}
+
+/* Info Boxes */
+.info-box h2 {
+    font-size: 17px;
+    font-weight: normal;
+    font-family: sans-serif;
+    color: #505050;
+    margin-bottom: 5px;
+}
+
+.info-box p {
+    font-size: 50px;
+    font-weight: bold;
+    font-family: 'Impact', sans-serif;
+    color: #505050;
+    margin: 0;
+}
+
+.info-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: 120px;
+    background: rgba(90, 90, 90, 0.8); /* Slight transparency */
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.info-box:hover {
+    background: rgba(209, 236, 255, 0.9);
+    transform: scale(1.02);
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    align-items: start;
+    width: 85%; /* Adjust width to create spacing on both sides */
+    margin: 0 auto; /* Centers it */
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.chart-container canvas {
+    max-width: 400px;
+    height: 250px;
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        /* Stack items on smaller screens */
+    }
+}
+
+.table-container h3 {
+    font-size: 17px;
+    /* Make title smaller */
+    font-weight: normal;
+    font-family: sans-serif;
+    color: #ffffff;
+    margin-bottom: 5px;
+}
+
+.table-container {
+    width: 70%; /* Adjust width to create spacing on both sides */
+    margin: 0 auto; /* Centers it */
+    margin-top: 20px;
+    padding: 20px;
+    background: rgba(90, 90, 90, 0.8);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+}
+
+.hidden {
+    display: none;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 17px;
+    font-family: sans-serif;
+    color: #ffffff;
+}
+
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+
+th {
+    background-color: #0565cc;
+    color: white;
+}
+
+.btn-accept {
+    background-color: green;
+    color: white;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.btn-decline {
+    background-color: red;
+    color: white;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.info-box {
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.info-box:hover {
+    background-color: #d1ecff;
+}
+
+/* Chart Containers */
+.chart-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* Aligns content at the top */
+    width: auto;
+    height: 450px; /* Ensure charts have the same height */
+    padding: 20px;
+    background: rgba(90, 90, 90, 0.8);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    position: relative; /* Ensures absolute positioning works */
+}
+
+.chart-container h2 {
+    font-size: 17px;
+    font-weight: bold;
+    font-family: sans-serif;
+    color: #ffffff;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 10px; /* Ensures spacing is equal */
+}
+
+#paymentChart {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 85%;
+    max-height: 85%;
+    display: block;
+    margin-bottom: 10%;
+    margin-top: 1%;
+}
+
+#earningsChart {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100%;
+    max-height: 90%;
+    display: block;
+    margin-bottom: 100px;
+    margin-top: 0px;
+}
+
+canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+#dashboard-title {
+    text-align: center; /* Center the image */
+    margin-top: -50px; /* Adjust spacing */
+}
+
+.dashboard-title-image {
+    width: 500px; /* Adjust image width */
+    height: auto; /* Maintain aspect ratio */
+}
+
+/* Ensures the overlay covers the entire dashboard */
+.overlay {
+    position: fixed; /* Keeps it covering the entire page */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%; /* Ensures it covers full content */
+    background: rgba(255, 255, 255, 0.651);
+    z-index: -1;
+}
+
+/* Make sure the dashboard container determines the height */
+.dashboard-container {
+    position: relative; /* Ensures it sits above the overlay */
+    z-index: 1; /* Places content above overlay */
+    padding: 20px;
+}
+
+/* Accept Button Styles */
+.btn-accept {
+    background-color: #28a745; /* Green */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s ease-in-out;
+}
+
+.btn-accept:hover {
+    background-color: #218838; /* Darker Green */
+    transform: scale(1.1); /* Slight zoom on hover */
+}
+
+.btn-accept:active {
+    transform: scale(0.9); /* Shrink effect when clicked */
+}
+
+/* Decline Button Styles */
+.btn-decline {
+    background-color: #dc3545; /* Red */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s ease-in-out;
+}
+
+.btn-decline:hover {
+    background-color: #7c010d; /* Darker Red */
+    transform: scale(1.1); /* Slight zoom on hover */
+}
+
+.btn-decline:active {
+    transform: scale(0.9); /* Shrink effect when clicked */
+}
+
+#dateFilterForm {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#dateFilterForm input, #dateFilterForm button {
+    padding: 8px;
+    font-size: 17px;
+}
+
+/* Center Date Filter */
+.date-filter-container {
+    display: flex;
+    justify-content: center; /* Centers horizontally */
+    align-items: center; /* Aligns vertically */
+    text-align: center;
+    margin: 20px auto; /* Adjust spacing */
+    margin-bottom: -20px;
+    width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+    }
+}

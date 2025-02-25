@@ -1,0 +1,362 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: Arial, sans-serif;
+    color: white;
+    text-align: center;
+}
+.background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Places the image behind other content */
+}
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: white; /* Text color for contrast */
+    text-align: center;
+}
+.content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 103%;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+}
+
+/* Main heading */
+.content h1 {
+    font-size: 3.5rem;
+    margin: 0 0 40px;
+}
+
+/* Button */
+.content .btn {
+    display: inline-block;
+    padding: 20px 30px;
+    font-size: 1.2rem;  
+    font-weight: bold;
+    color: white;
+    background-color: rgba(21, 124, 215, 0.784);
+    border: 2px solid rgb(69, 148, 238);
+    border-radius: 5px;
+    text-decoration: none;
+    transition: 0.3s ease;
+}
+
+/* Button hover effect */
+.content .btn:hover {
+    background-color: white;
+    color: black;
+}
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.modal-content {
+    background-color: #f4f4f4;
+    padding: 20px;
+    border-radius: 10px;
+    width: 100%;
+    height: 100%;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    text-align: left;
+    border: 5px solid #007bff;
+}
+
+.modal-content h2 {
+    margin: 0 0 20px;
+    text-align: center;
+}
+
+#fn {
+    width: 45%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px; 
+}
+#ln{
+    width: 45%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px; 
+}
+.modal-content form input {
+    width: 94.5%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px; 
+}
+
+.modal-content form button {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+}
+
+.modal-content form button:hover {
+    background-color: #0056b3;
+}
+.tour {
+    display: block; /* Ensure it's visible */
+    margin-top: 20px; /* Add spacing */
+    background-color: rgb(237, 237, 237); /* Optional: Semi-transparent background */
+    padding: 10px; /* Optional: Padding for readability */
+    border-radius: 20px; /* Optional: Rounded edges */
+    justify-content: space-between;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    margin: 0 auto;
+    flex-wrap: wrap; /* Makes it responsive */
+    z-index: 1;
+}
+ #tour{
+    margin-top: 50px;
+    width: 600px; /* Set a size for the image */
+    height: auto;
+    animation: float 3s ease-in-out infinite;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border-radius:50px;
+    z-index: 1;
+}
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0); /* No movement at the start and end */
+    }
+    50% {   
+        transform: translateY(-20px); /* Move up by 20px */
+    }
+}
+#tour:hover {
+    animation: float 1.5s ease-in-out infinite; /* Faster floating on hover */
+    transform: scale(1.05); /* Slightly enlarge the image */
+}
+#txt{
+    font-size: 35px; /* Adjust as needed */
+    color: #012953; /* Ensure contrast against the background */
+    text-align: left;
+    margin-right: 100px;
+}
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column; /* Stacks on small screens */
+    }
+
+    .text, .image {
+        text-align: center;
+    }
+}
+#txt2{
+    font-size:18px;
+}
+
+.about{
+    margin-top: 100px;
+    color:#012953;
+    font-size: 20px;
+    margin-right: 60% ;
+}
+.abt{
+    display: flex; /* Use Flexbox for horizontal alignment */
+    gap: 20px; /* Spacing between cards */
+    flex-wrap: wrap; /* Allow cards to wrap to the next row on small screens */
+    justify-content: center; /* Align cards to the center */
+    padding: 20px;
+    margin: 0 auto;
+}
+
+.card {
+    position: flex;
+    margin: 20px;
+    padding: 20px 40px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: transform 0.3s, background-color 0.3s;
+    flex-wrap: wrap;
+}
+.card:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+    transform: translateY(-5px);
+}
+.card::after {
+    content: "";
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: #007bff;
+    top: 0;
+    left: 0;
+    border-radius: 12px;
+    transform: translateY(-100%);
+    transition: transform 0.5s;
+    z-index: -1;
+}
+.card:hover::after {
+    transform: translateY(0);
+}
+.card svg {
+    width: 110px;
+    height: auto;
+    fill: #007bff;
+    padding: 10px;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+.card:hover svg {
+    transform: translateY(-10px);
+}
+.card-title {
+    font-size: 1.35rem;
+    font-weight: bold;
+    color: #e5e5e5;
+    transition: color 0.3s;
+}
+.card:hover .card-title {
+    color: #191919;
+}
+.card-subtitle {
+    font-size: 0.75rem;
+    color: #757575;
+    font-weight: bold;
+}
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+.price {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #007bff;
+    transition: color 0.3s;
+}
+.card:hover .price {
+    color: #4a4a4a;
+}
+.order-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background-color: #007bff;
+    padding: 10px 20px;
+    font-size: 0.875rem;
+    font-weight: bold;
+    color: white;
+    border-radius: 9999px;
+    box-shadow: 10px 10px 150px #012953;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    margin-left: 180px;
+}
+.order-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #4a4a4a;
+}
+#History{
+    width: 200px;
+}
+/* Style for Popup */
+/* General styles for the popup */
+.popup {
+    display: none;
+    max-width: 80%; /* Adjust width as needed */
+    max-height: 80%; /* Prevent the popup from exceeding the viewport height */
+    overflow-y: auto; /* Add scroll for overflowing content */
+    padding: 20px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    border-radius: 10px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.popup h2 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.popup img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 15px 0;
+}
+
+.popup p {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #555;
+    margin: 10px 0;
+}
+
+.popup button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: #fff;
+    background-color: #007BFF;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-right: 85%;
+}
+
+.popup button:hover {
+    background-color: #0056b3;
+}
+
+/* Fallback for screen overlay */
+
+
+
+/* Animation for smooth appearance */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}

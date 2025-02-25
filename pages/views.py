@@ -40,7 +40,10 @@ import json
 from django.http import JsonResponse
 from .models import Customer, Payment
 from datetime import datetime
-
+=========
+from django.contrib.auth.mixins import LoginRequiredMixin
+import logging
+>>>>>>>>> Temporary merge branch 2
 
 logger = logging.getLogger(__name__)
 
