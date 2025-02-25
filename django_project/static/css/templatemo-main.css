@@ -801,3 +801,114 @@ body.lb-disable-scrolling {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
   opacity: 1;
 }
+
+.Bot{
+  position: fixed;
+  width: 60px;
+  height: 60px;
+  z-index: 100;
+  margin-top: 200px;
+  margin-left: 650px;
+  fill: #2891d2; 
+  background-color: #2891d2;
+  border-radius: 40px;
+  border-color: none;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.Bot:hover{
+  background-color: #134868;
+  transition: ease-in 0.25s;
+}
+
+.container-bot {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 300px;
+  height: 400px;
+  background: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+}
+
+.chat-container {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 320px;
+  height: 400px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: none;
+  flex-direction: column;
+  margin-right: 50px;
+  z-index: 9999;
+  font-family: sans-serif;
+}
+.chatbox {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  border-bottom: 1px solid #ddd;
+
+}
+.input-container {
+  display: flex;
+  padding: 10px;
+}
+.input-box {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+.send-btn {
+  margin-left: 10px;
+  padding: 8px 12px;
+  background: #2891d2;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+#chatbox {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 10px;
+  width: 100%;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.message {
+  padding: 10px;
+  margin: 5px;
+  border-radius: 10px;
+  color: black;
+  font-size: 14px;
+  word-wrap: break-word;
+  min-width: 20%;
+  max-width: 60%;
+}
+
+.user-message {
+  align-self: flex-end;
+  text-align: right;
+  background-color: #2891d2;
+  border-radius: 10px;
+}
+
+.bot-message {
+  align-self: flex-start;
+  text-align: left;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+}
+

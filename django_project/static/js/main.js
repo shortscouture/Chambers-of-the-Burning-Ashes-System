@@ -59,3 +59,47 @@ function hideInfoBox(event) {
     document.removeEventListener('click', hideInfoBox);
   }
 }
+
+function toggleChat() {
+  let chatContainer = document.getElementById("chatContainer");
+  chatContainer.style.display = (chatContainer.style.display === "none" || chatContainer.style.display === "") ? "flex" : "none";
+}
+
+function sendMessage() {
+  const inputField = document.getElementById("userInput");
+  const message = inputField.value.trim();
+  const chatbox = document.getElementById("chatbox");
+
+  if (message === "") return;
+
+  // Create user message element
+  const userMessage = document.createElement("div");
+  userMessage.className = "message user-message";
+  userMessage.textContent = message;
+
+  // Adjust width based on message length
+  let messageLength = message.length;
+  if (messageLength < 10) {
+      userMessage.style.width = "20%";  // Small width for short messages
+  } else if (messageLength < 30) {
+      userMessage.style.width = "40%";  // Medium width for medium messages
+  } else {
+      userMessage.style.width = "60%";  // Large width for long messages
+  }
+
+  chatbox.appendChild(userMessage);
+  inputField.value = "";
+
+  // Send message to API
+  axios.post("/api/chatbot/", { message: message })
+      .then(response => {
+          const botMessage = document.createElement("div");
+          botMessage.className = "message bot-message";
+          botMessage.textContent = response.data.response || "No response from bot.";
+          chatbox.appendChild(botMessage);
+          chatbox.scrollTop = chatbox.scrollHeight;
+      })
+      .catch(error => {
+          console.error("Error:", error);
+      });
+}
