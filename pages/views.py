@@ -208,10 +208,42 @@ class DashboardView(TemplateView):
             .order_by("holder_of_privilege__issuance_date")
         )
 
-        # Get earnings per month
+        # Get filter parameters from the request
+        request = self.request
+        start_date = request.GET.get("start_date")
+        end_date = request.GET.get("end_date")
+
+        if start_date and end_date:
+            start_date = datetime.strptime(start_date, "%Y-%m-%d")
+            end_date = datetime.strptime(end_date, "%Y-%m-%d")
+        else:
+            start_date = None
+            end_date = None
+
+        # Always include unissued columbaries and pending letters (no filtering on them)
+        unissued_columbaries = ColumbaryRecord.objects.filter(
+            holder_of_privilege__issuance_date__isnull=True, 
+            customer__isnull=False
+        )
+        pending_customers = Customer.objects.filter(status="pending")
+
+        # Filter only issued columbaries and payments
+        payments = Payment.objects.all()
+        issued_columbaries = ColumbaryRecord.objects.exclude(holder_of_privilege__issuance_date__isnull=True)
+
+        if start_date and end_date:
+            payments = payments.filter(created_at__date__range=[start_date, end_date])
+            issued_columbaries = issued_columbaries.filter(holder_of_privilege__issuance_date__range=[start_date, end_date])
+
+        # Count filtered data
+        vacant_columbaries_count = issued_columbaries.filter(status="Vacant").count()
+        occupied_columbaries_count = issued_columbaries.filter(status="Occupied").count()
+        full_payment_count = payments.filter(mode_of_payment="Full Payment").count()
+        installment_count = payments.filter(mode_of_payment="6-Month Installment").count()
+
+        # Earnings per month based on filtered payments
         earnings_by_month = (
-            Payment.objects
-            .annotate(month=TruncMonth("created_at"))  # Use `created_at` instead
+            payments.annotate(month=TruncMonth("created_at"))
             .values("month")
             .annotate(total_earnings=Sum("total_amount"))
             .order_by("month")
@@ -221,23 +253,23 @@ class DashboardView(TemplateView):
         earnings_labels = [entry["month"].strftime("%b %Y") if entry["month"] else "Unknown" for entry in earnings_by_month]
         earnings_data = [float(entry["total_earnings"]) if entry["total_earnings"] else 0 for entry in earnings_by_month]
 
-        # Convert payment method data
         payment_labels = ["Full Payment", "Installment"]
         payment_data = [full_payment_count, installment_count]
 
-        # Add data to context
+        # Update context with filtered & unfiltered data
         context.update({
-            'customer_status_counts': customer_status_counts,
-            'pending_counts': pending_counts,
-            'pending_customers': Customer.objects.filter(status="pending"),
-            'unissued_columbaries': unissued_columbaries,
-            'vacant_columbaries_count': vacant_columbaries_count,
-            'occupied_columbaries_count': occupied_columbaries_count,
-            'unissued_columbary_records': unissued_columbary_records,  
+            "vacant_columbaries_count": vacant_columbaries_count,
+            "occupied_columbaries_count": occupied_columbaries_count,
+            "unissued_columbaries": unissued_columbaries.count(),  # Fix unissued count
+            "pending_counts": pending_customers.count(),  # Fix pending count
+            "unissued_columbary_records": unissued_columbaries,  # Ensure records are passed
+            "pending_customers": pending_customers,  # Ensure customers are passed
             "payment_labels": mark_safe(json.dumps(payment_labels)),
             "payment_data": mark_safe(json.dumps(payment_data)),
-            "earnings_labels": mark_safe(json.dumps(earnings_labels)),  
-            "earnings_data": mark_safe(json.dumps(earnings_data)),  
+            "earnings_labels": mark_safe(json.dumps(earnings_labels)),
+            "earnings_data": mark_safe(json.dumps(earnings_data)),
+            "start_date": start_date.strftime("%Y-%m-%d") if start_date else "",
+            "end_date": end_date.strftime("%Y-%m-%d") if end_date else "",
         })
 
         return context

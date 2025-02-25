@@ -24,15 +24,15 @@
     <h1><img src="{% static 'images/dash.gif' %}" alt="Dashboard Title" class="dashboard-title-image"></h1>
 
     <div class="date-filter-container">
-        <form id="dateFilterForm" method="GET" action="/dashboard/">
+        <form id="dateFilterForm" method="GET" action="{% url 'dashboard' %}">
             <label for="start_date">Start Date:</label>
-            <input type="date" id="start_date" name="start_date">
-
+            <input type="date" id="start_date" name="start_date" value="{{ start_date }}">
+        
             <label for="end_date">End Date:</label>
-            <input type="date" id="end_date" name="end_date">
-
+            <input type="date" id="end_date" name="end_date" value="{{ end_date }}">
+        
             <button type="submit">Filter</button>
-        </form>
+        </form>        
     </div>
 
 
@@ -155,7 +155,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="4">No unissued columbaries found.</td>
+                        <td colspan="3">No unissued columbaries found.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -419,7 +419,7 @@
                     }
                 }
 
-
+                
 
                 // Add event listeners AFTER the page loads
                 document.querySelector(".info-box:nth-child(1)").addEventListener("click", function () {
