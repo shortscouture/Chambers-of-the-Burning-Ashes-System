@@ -440,22 +440,18 @@ def preprocess_image(image):
     """
     Enhanced image preprocessing specifically for form documents
     """
-    # Convert PIL Image to cv2 format
+    # Converting PIL Image to cv2 format
     img = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
-    
-    # Convert to grayscale
+
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     
-    # Apply adaptive thresholding
     binary = cv2.adaptiveThreshold(
         gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
         cv2.THRESH_BINARY, 11, 2
     )
     
-    # Remove noise
     denoised = cv2.fastNlMeansDenoising(binary)
     
-    # Enhance contrast
     contrast = cv2.convertScaleAbs(denoised, alpha=1.5, beta=0)
     
     return Image.fromarray(contrast)
@@ -581,21 +577,28 @@ def parse_text_to_form_data(text):
 
     return data
 
-@csrf_exempt 
+@csrf_exempt
 def process_ocr(request):
     if request.method == 'POST' and request.FILES.get('document'):
         try:
-            # Extract text from the uploaded image
             image = request.FILES['document']
-            extracted_text = extract_text(image)
-            
-            # Parse the extracted text into a dictionary
-            data = parse_text_to_dict(extracted_text)
-            
-            return JsonResponse({'success': True, 'data': data})
+            extracted_text = extract_text_openai(image)
+
+            return JsonResponse({'success': True, 'extracted_text': extracted_text})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
+    
     return JsonResponse({'success': False, 'error': 'Invalid request'})
+
+def extract_text_openai(image):
+    """
+    Extract text using OpenAI's OCR API.
+    """
+    response = openai.images.create_variation(
+        image=image.read(),
+        model="gpt-4-vision-preview"
+    )
+    return response.data['text']  # Extract text from response
 
 def extract_text(image):
     """
@@ -604,6 +607,62 @@ def extract_text(image):
     img = Image.open(image).convert('L')  # Convert to grayscale
     text = pytesseract.image_to_string(img)
     return text
+
+def parse_extracted_text(text):
+    """
+    Parse extracted text into structured form fields.
+    Modify this function to fit your document structure.
+    """
+    structured_data = {
+        "first_name": "",
+        "middle_name": "",
+        "last_name": "",
+        "suffix": "",
+        "country": "Philippines",
+        "address_line_1": "",
+        "address_line_2": "",
+        "city": "",
+        "province_or_state": "",
+        "postal_code": "",
+        "landline_number": "",
+        "mobile_number": "",
+        "email_address": "",
+        "first_beneficiary_name": "",
+        "second_beneficiary_name": "",
+        "third_beneficiary_name": "",
+        "vault_id": "",
+        "inurnment_date": "",
+        "urns_per_columbary": ""
+    }
+
+    lines = text.split("\n")
+    for line in lines:
+        if "First Name" in line:
+            structured_data["first_name"] = line.split(":")[1].strip()
+        elif "Middle Name" in line:
+            structured_data["middle_name"] = line.split(":")[1].strip()
+        elif "Last Name" in line:
+            structured_data["last_name"] = line.split(":")[1].strip()
+        elif "Suffix" in line:
+            structured_data["suffix"] = line.split(":")[1].strip()
+        elif "City" in line:
+            structured_data["city"] = line.split(":")[1].strip()
+        elif "Province" in line:
+            structured_data["province_or_state"] = line.split(":")[1].strip()
+        elif "Postal Code" in line:
+            structured_data["postal_code"] = line.split(":")[1].strip()
+        elif "Landline" in line:
+            structured_data["landline_number"] = line.split(":")[1].strip()
+        elif "Mobile" in line:
+            structured_data["mobile_number"] = line.split(":")[1].strip()
+        elif "Email" in line:
+            structured_data["email_address"] = line.split(":")[1].strip()
+        elif "Vault ID" in line:
+            structured_data["vault_id"] = line.split(":")[1].strip()
+        elif "Inurnment Date" in line:
+            structured_data["inurnment_date"] = line.split(":")[1].strip()
+
+    return structured_data
 
 def parse_text_to_dict(text):
     """
