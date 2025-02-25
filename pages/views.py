@@ -67,6 +67,8 @@ class CustomerHomeView(TemplateView):
 
 
 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 class ColumbaryRecordsView(TemplateView):
     template_name = "pages/columbaryrecords.html"
 
@@ -148,13 +150,21 @@ class ColumbaryRecordsView(TemplateView):
         # Apply pagination (10 records per page)
         page = self.request.GET.get("page", 1)
         paginator = Paginator(records_data, 10)  # Show 10 per page
-        paginated_records = paginator.get_page(page)
+
+        try:
+            paginated_records = paginator.page(page)
+        except PageNotAnInteger:
+            paginated_records = paginator.page(1)  # Show first page if invalid
+        except EmptyPage:
+            paginated_records = paginator.page(paginator.num_pages)  # Show last page if out of range
 
         # Add to context
         context["records_data"] = paginated_records
         context["search_query"] = search_query  # Keep search input filled
         context["selected_filters"] = selected_filters  # Keep selected filters
+        context["is_paginated"] = paginator.num_pages > 1  # Flag for pagination
         return context
+
 
 
 
