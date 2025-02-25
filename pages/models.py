@@ -172,10 +172,14 @@ class Payment(models.Model):
 
 class ColumbaryRecord(models.Model):
     vault_id = models.CharField(primary_key=True, max_length=8, blank=False)
-    section = models.CharField(null=False, max_length=7)
-    level = models.CharField(null=False, max_length=1)
+    section = models.CharField(null= False, max_length=7)
+    level = models.CharField(null= False, max_length=1)
     inurnment_date = models.DateField(blank=True, null=True)
-    urns_per_columbary = models.CharField(max_length=1, blank=True, null=True, choices=[('1', '1'), ('2', '2'), ('3', '3'), ('4', '4')])
+    urns_per_columbary = models.CharField(max_length=1, null=True, choices=[('1', '1'), ('2', '2'), ('3', '3'), ('4', '4')])
+
+    class Meta:
+        db_table = "columbaryrecord"  # 🔥 Ensures Django uses the correct table
+
 
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
     parish_staff = models.ForeignKey(ParishStaff, on_delete=models.SET_NULL, null=True, blank=True)
