@@ -621,10 +621,10 @@ def upload_to_s3_and_extract_text(request):
         bucket_name = env("AWS_S3_BUCKET_NAME")
         file_name = uploaded_file.name
         
-        # Upload file to S3
+        
         s3_client.upload_fileobj(uploaded_file, bucket_name, file_name)
         
-        # Call AWS Textract
+        
         textract_client = boto3.client(
             "textract",
             aws_access_key_id=env("AWS_ACCESS_KEY_ID"),
@@ -634,7 +634,7 @@ def upload_to_s3_and_extract_text(request):
             Document={"S3Object": {"Bucket": bucket_name, "Name": file_name}}
         )
         
-        # Extract text from Textract response
+        
         extracted_text = "".join([block["Text"] for block in response.get("Blocks", []) if block["BlockType"] == "LINE"])
         
         return JsonResponse({"text": extracted_text})
@@ -686,10 +686,10 @@ def upload_and_process(request):
         bucket_name = env("AWS_S3_BUCKET_NAME")
         file_key = f"uploads/{uploaded_file.name}"
 
-        # Upload file to S3
+        
         s3_client.upload_fileobj(uploaded_file, bucket_name, file_key)
 
-        # Process with Textract
+        
         textract_client = boto3.client("textract")
         response = textract_client.analyze_document(
             Document={"S3Object": {"Bucket": bucket_name, "Name": file_key}},
@@ -713,7 +713,7 @@ def upload_and_process(request):
                 if key_text and value_text:
                     extracted_data[key_text] = value_text
 
-        # Return extracted data as JSON
+        
         return JsonResponse({"success": True, "data": extracted_data})
 
     return JsonResponse({"success": False, "error": "Invalid request"})
@@ -748,7 +748,7 @@ def parse_text_to_dict(text):
         "urns_per_columbary": None
     }
     
-    # Extract full name
+    
     full_name_match = re.search(r"Full\s*name:\s*([^\n]*)", text, re.IGNORECASE)
     if full_name_match:
         full_name = full_name_match.group(1).strip()
@@ -765,17 +765,16 @@ def parse_text_to_dict(text):
                 else:
                     data["middle_name"] = " ".join(name_parts[1:-1])
     
-    # Extract address
+    
     address_match = re.search(r"Address:\s*([^\n]*)", text, re.IGNORECASE)
     if address_match:
         address = address_match.group(1).strip()
         
-        # Try to extract city, province, and postal code from address
+        
         postal_code_match = re.search(r"(\d{4,})", address)
         if postal_code_match:
             data["postal_code"] = postal_code_match.group(1)
         
-        # Simplified address parsing
         address_parts = address.split(',')
         if len(address_parts) >= 1:
             data["address_line_1"] = address_parts[0].strip()
@@ -784,7 +783,7 @@ def parse_text_to_dict(text):
         if len(address_parts) >= 3:
             data["province_or_state"] = address_parts[-1].strip()
     
-    # Extract phone numbers
+    
     landline_match = re.search(r"Landline\s*Number:?\s*([0-9()\s\-+]*)", text, re.IGNORECASE)
     if landline_match:
         data["landline_number"] = landline_match.group(1).strip()
@@ -793,17 +792,17 @@ def parse_text_to_dict(text):
     if mobile_match:
         data["mobile_number"] = mobile_match.group(1).strip()
     
-    # Extract email
+    
     email_match = re.search(r"Email\s*Address:?\s*([^\s\n]*@[^\s\n]*)", text, re.IGNORECASE)
     if email_match:
         data["email_address"] = email_match.group(1).strip()
     
-    # Extract beneficiary information
+    
     beneficiary_match = re.search(r"Beneficiary\s*Name:?\s*([^\n]*)", text, re.IGNORECASE)
     if beneficiary_match:
         data["first_beneficiary_name"] = beneficiary_match.group(1).strip()
     
-    # Extract vault ID if present
+    
     vault_match = re.search(r"Vault\s*ID:?\s*([^\n\s]*)", text, re.IGNORECASE)
     if vault_match:
         data["vault_id"] = vault_match.group(1).strip()
