@@ -71,6 +71,8 @@ class CustomerHomeView(TemplateView):
 
 
 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 class ColumbaryRecordsView(TemplateView):
     template_name = "pages/columbaryrecords.html"
 
@@ -152,13 +154,23 @@ class ColumbaryRecordsView(TemplateView):
         # Apply pagination (10 records per page)
         page = self.request.GET.get("page", 1)
         paginator = Paginator(records_data, 10)  # Show 10 per page
-        paginated_records = paginator.get_page(page)
+
+        try:
+            paginated_records = paginator.page(page)
+        except PageNotAnInteger:
+            paginated_records = paginator.page(1)  # Show first page if invalid
+        except EmptyPage:
+            paginated_records = paginator.page(paginator.num_pages)  # Show last page if out of range
 
         # Add to context
         context["records_data"] = paginated_records
         context["search_query"] = search_query  # Keep search input filled
         context["selected_filters"] = selected_filters  # Keep selected filters
+        context["is_paginated"] = paginator.num_pages > 1  # Flag for pagination
         return context
+
+
+
 
 
 
@@ -391,22 +403,43 @@ def decline_letter_of_intent(request, intent_id):
     return redirect('some_rejection_page')
 
 
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views.generic import TemplateView
+from .models import Customer, ColumbaryRecord, HolderOfPrivilege, Beneficiary, Payment, CustomerFile
+from .forms import CustomerFileForm
+
 class RecordsDetailsView(TemplateView):
     template_name = "pages/recordsdetails.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        customer_id = self.kwargs.get('customer_id')
-        
+        customer_id = self.kwargs.get("customer_id")
+
         customer = get_object_or_404(Customer, customer_id=customer_id)
         
-        context['customer'] = customer
-        context['columbary_records'] = ColumbaryRecord.objects.filter(customer=customer)
-        context['holderofprivilege'] = HolderOfPrivilege.objects.filter(customer=customer)
-        context['beneficiaries'] = Beneficiary.objects.filter(customer=customer)
-        context['payments'] = Payment.objects.filter(customer=customer)
-        
+        context["customer"] = customer
+        context["columbary_records"] = ColumbaryRecord.objects.filter(customer=customer)
+        context["holderofprivilege"] = HolderOfPrivilege.objects.filter(customer=customer)
+        context["beneficiaries"] = Beneficiary.objects.filter(customer=customer)
+        context["payments"] = Payment.objects.filter(customer=customer)
+        context["files"] = CustomerFile.objects.filter(customer=customer)
+        context["file_form"] = CustomerFileForm()
+
         return context
+
+    def post(self, request, *args, **kwargs):
+        customer_id = self.kwargs.get("customer_id")
+        customer = get_object_or_404(Customer, customer_id=customer_id)
+
+        file_form = CustomerFileForm(request.POST, request.FILES)
+        if file_form.is_valid():
+            file_instance = file_form.save(commit=False)
+            file_instance.customer = customer
+            file_instance.save()
+            return redirect("recordsdetails", customer_id=customer.customer_id)
+
+        return self.get(request, *args, **kwargs)
+
 
 
 class CustomerEditView(TemplateView):
@@ -706,74 +739,125 @@ env = environ.Env(
 )
         
 openai.api_key = env("OPEN_AI_API_KEY")
+logger = logging.getLogger(__name__)
 class ChatbotAPIView(APIView):
     def get(self, request, *args, **kwargs):
-        return Response({"message": "Chatbot API is running! Use POST to send messages."}, status=status.HTTP_200_OK)
+        return Response({"message": "Chatbot API is running! Use POST to send messages."}, status=200)
+
     
-    def get_relevant_info(self, query):
-        """
-        Retrieves relevant data from the database using full-text search.
-        """
-        with connection.cursor() as cursor:
-            cursor.execute(
-                "SELECT content FROM parish_knowledge "
-                "WHERE MATCH(content) AGAINST (%s IN NATURAL LANGUAGE MODE) "
-                "LIMIT 3;", [query]
-            )
-            results = cursor.fetchall()
-        if results:
-            return " ".join([row[0] for row in results]) if results else ""
-        return "I'm not sure about that. Please check with the parish office or refer to the official guidelines."
-        
     def post(self, request, *args, **kwargs):
-        database_data  = get_data_from_db()
-        ai_response = self.query_openai(database_data)
-        user_query = request.data.get("message", "")
-        context_data = self.get_relevant_info(self.query_openai)
-        logger.info(f"User query: {user_query}")
+        user_query = request.data.get("message", "").strip()
+        if not user_query:
+            return JsonResponse({"error": "No query provided"}, status=400)
+
+        db_answer = self.get_answer_from_parish_knowledge(user_query)
+
+        ai_response = self.query_openai(user_query, db_answer)
         
-        messages = [
-            {"role": "system", "content": "You are a knowledgeable assistant helping parish staff."},
-            {"role": "assistant", "content": f"Relevant Data from Database: {database_data}"},
-            {"role": "user", "content": f"{user_query}"},  # Include user query in OpenAI request
-        ]
-        response = openai.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=messages,
-            temperature=0.7,
-           )
+        # Save the chat history into pages_chatquery
+        self.save_chat_history(user_query, ai_response)
+
 
         return JsonResponse({
-            "query": user_query,  
-            "context": context_data,  
-            "ai_insights": ai_response,
-            "response": response.choices[0].message.content  
+            "query": user_query,
+            "response": ai_response,
         })
-   # def chatbot_view(request):
-       # """Handle AJAX request and return chatbot response."""
-       # db_data = get_data_from_db()
-        #ai_response = query_openai(db_data)
-      #  return JsonResponse({"response": ai_response})
-    
-    def query_openai(self, data):
+
+
+    def get_answer_from_parish_knowledge(self, query):
+        """Uses FULLTEXT search to find the best matching answer in parish_knowledge."""
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT answer, MATCH(question) AGAINST (%s IN NATURAL LANGUAGE MODE) AS relevance 
+                FROM parish_knowledge 
+                WHERE MATCH(question) AGAINST (%s IN NATURAL LANGUAGE MODE) 
+                ORDER BY relevance DESC LIMIT 1;
+                """, [query, query])
+            result = cursor.fetchone()
+            return result[0] if result else None
+
+
+    def get_all_knowledge(self):
+        """Retrieves all questions and answers from parish_knowledge for AI context."""
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT question, answer FROM parish_knowledge;")
+            rows = cursor.fetchall()
+        return [{"question": q, "answer": a} for q, a in rows]
+
+
+
+    def query_openai(self, user_query, db_answer=None, past_conversations=None):
+        """Uses OpenAI while incorporating database knowledge."""
         try:
-            formatted_data = json.dumps(data, indent=2)
-        except (TypeError, ValueError) as e:
-            return f"Error formatting data: {str(e)}"
+            # Construct the AI prompt to guide behavior
+            system_prompt = (
+                "You are a helpful chatbot for church visitors. "
+                "If there is relevant information from the church database, use it, "
+                "Only answer questions about the columbarium, and if they answer things such as baptism or wedding, or funeral services, direct them to the contact information, it's found in the parish_questions database"
+                "but if the user gives you specific instructions on how to respond, follow them."
+                "direct them to the church's contact information."
+            )
 
-        prompt = (
-            "You are an AI assistant analyzing parish data. "
-            "Here is the structured database information:\n\n"
-            f"{formatted_data}\n\n"
-            "Please provide insights, trends, and any important observations."
-        )
+            # Prepare messages with context  
+            messages = [{"role": "system", "content": system_prompt}]
 
-        response = openai.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "system", "content": "You are an AI assistant."},
-                    {"role": "user", "content": prompt}]
-        )
-        return response.choices[0].message.content
+            if past_conversations:
+                for convo in past_conversations:
+                    messages.append({"role": "user", "content": convo["query"]})
+                    messages.append({"role": "assistant", "content": convo["response"]})
+
+            if db_answer:
+                messages.append({"role": "assistant", "content": f"Database says: {db_answer}"})
+
+                messages.append({"role": "user", "content": user_query})
+
+                response = openai.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=messages,
+                    temperature=0.7
+                )
+
+                if response and response.choices:
+                    return response.choices[0].message.content.strip()
+            
+        except Exception as e:
+            print(f"OpenAI API error: {e}")
+
+        return "I'm not sure how to answer that. Please contact the St. Alphonsus Mary de Liguori Parish for further assistance."
+
+
+    def save_unanswered_query(self, query):
+        """Logs unanswered queries to pages_chatquery."""
+        with connection.cursor() as cursor:
+            cursor.execute("INSERT INTO pages_chatquery (query, created_at) VALUES (%s, NOW());", [query])
+
+    
+    def get_related_parish_knowledge(self, query):
+        """Finds questions in parish_knowledge that contain keywords from the user's query."""
+        search_query = f"%{query}%"
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT question, answer FROM parish_knowledge WHERE question LIKE %s LIMIT 5;", [search_query])
+            return cursor.fetchall()  # Returns a list of (question, answer) tuples
+
+    def get_past_conversations(self, limit=5):
+        """Retrieve the last few conversations from pages_chatquery for context"""
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT user_message, bot_response FROM pages_chatquery ORDER BY created_at DESC LIMIT %s;",
+                [limit]
+            )
+            past_chats = cursor.fetchall()
+
+        return [{"query": chat[0], "response": chat[1]} for chat in past_chats]
+    
+    def save_chat_history(self, user_query, bot_response):
+        """Logs chat messages to pages_chatquery."""
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "INSERT INTO pages_chatquery (user_message, bot_response, created_at) VALUES (%s, %s, NOW(6));",
+                [user_query, bot_response]
+            )
+
 
 
 def get_crypt_status(request, section):
@@ -801,30 +885,7 @@ def get_section_details(request, section_id):
 #def get_data_from_db():
 #    data = Customer.objects.all().values()  # Fetch all fields
 #    return list(data)
-def get_data_from_db():
-    """Fetch relevant data from the database, excluding the 'customer' table."""
-    from django.db import connection
 
-    data = {}
-
-    try:
-        with connection.cursor() as cursor:
-            # List of tables to query (EXCLUDE 'customer' TABLE)
-            tables = ["parish_knowledge", "parish_staff", "pages_account", "pages_customer", "pages_beneficiary"]  # Add only safe tables
-
-            for table in tables:
-                try:
-                    cursor.execute(f"SELECT * FROM {table} LIMIT 10;")
-                    columns = [col[0] for col in cursor.description]
-                    rows = cursor.fetchall()
-                    data[table] = [dict(zip(columns, row)) for row in rows]
-                except Exception as e:
-                    print(f"Skipping {table}: {e}")  # Avoid crashing on missing tables
-
-    except Exception as e:
-        print(f"Database error: {e}")
-
-    return data  # Returns a dictionary of database contents
 
 def addnewrecord(request):
     
@@ -899,25 +960,26 @@ def addnewcustomer(request):
         payment_form = PaymentForm(request.POST)
         holder_form = HolderOfPrivilegeForm(request.POST)
         beneficiary_form = BeneficiaryForm(request.POST)
+        columbary_form = ColumbaryRecordForm(request.POST, instance=vault)  # ✅ Load existing vault record
 
-        if customer_form.is_valid():
+        if customer_form.is_valid() and columbary_form.is_valid():
             customer = customer_form.save()
+
             
-            # Save payment only if valid
             payment = None
             if payment_form.is_valid():
                 payment = payment_form.save(commit=False)
                 payment.customer = customer
                 payment.save()
+
             
-            # Save holder of privilege only if valid
             holder = None
             if holder_form.is_valid():
                 holder = holder_form.save(commit=False)
                 holder.customer = customer
                 holder.save()
+
             
-            # Save beneficiary only if valid
             beneficiary = None
             if beneficiary_form.is_valid():
                 beneficiary = beneficiary_form.save(commit=False)
@@ -925,38 +987,38 @@ def addnewcustomer(request):
                 beneficiary.save()
 
             if vault:
-                # Link the new customer and associated records to the existing vault
+                
                 vault.customer = customer
                 vault.payment = payment if payment else None
                 vault.holder_of_privilege = holder if holder else None
                 vault.beneficiary = beneficiary if beneficiary else None
-                vault.save()
-            else:
-                # Create a new ColumbaryRecord
-                columbary_record = ColumbaryRecord(
-                    vault_id=vault_id,
-                    customer=customer,
-                    payment=payment if payment else None,
-                    holder_of_privilege=holder if holder else None,
-                    beneficiary=beneficiary if beneficiary else None,
-                    status='Occupied'
-                )
-                columbary_record.save()
 
-            return redirect('success')  # Redirect to success page
+                
+                vault.inurnment_date = columbary_form.cleaned_data.get("inurnment_date")
+                vault.urns_per_columbary = columbary_form.cleaned_data.get("urns_per_columbary")
+                vault.status = 'Occupied'
+                
+                vault.save()
+
+            return redirect('columbaryrecords')  
 
     else:
         customer_form = CustomerForm()
         payment_form = PaymentForm()
         holder_form = HolderOfPrivilegeForm()
         beneficiary_form = BeneficiaryForm()
+        columbary_form = ColumbaryRecordForm(instance=vault)  
 
     return render(request, 'pages/addcustomer.html', {
         'customer_form': customer_form,
         'payment_form': payment_form,
         'holder_form': holder_form,
         'beneficiary_form': beneficiary_form,
+        'columbary_form': columbary_form,  
         'vault_id': vault_id
     })
+
+
+
 
 
