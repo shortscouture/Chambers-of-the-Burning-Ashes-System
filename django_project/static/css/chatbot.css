@@ -6,69 +6,64 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    bottom: 20px;
+    /* Remove bottom positioning, let flexbox handle it */
 }
 
-/* User message bubble (align left) */
+/* User message bubble (align right) */
 .chatbox .user-message {
     background-color: #007bff;
     color: white;
     padding: 10px;
     border-radius: 15px;
     max-width: 80%;
-    align-self: flex-end; /* Align left */
+    align-self: flex-end; /* Align right */
     word-wrap: break-word;
+    margin-bottom: 10px; /* Consistent margin */
 }
 
-/* Bot message bubble (align right) */
+/* Bot message bubble (align left) */
 .chatbox .bot-message {
     background-color: #f1f1f1;
     color: #333;
     padding: 10px;
     border-radius: 15px;
     max-width: 80%;
-    align-self: flex-start; /* Align right */
+    align-self: flex-start; /* Align left */
     word-wrap: break-word;
+    margin-bottom: 10px; /* Consistent margin */
 }
 
-/* Optional: Add a little space between the chat container and the input box */
+/* Input container */
 .input-container {
-    position: fixed; /* Keeps the input bar at the bottom */
-    bottom: 0;
-    width: 100%;
+    padding: 10px; /* Add padding for visual spacing */
     background-color: #f8f8f8;
-    padding: 10px;
     display: flex;
-    gap: 10px;
-    z-index: 10; /* Ensure it's on top of the chatbox */
+    /* Remove relative positioning unless specifically needed */
 }
 
 /* Input field styling */
 .input-container input {
-    width: 80%;
+    flex-grow: 1; /* Allow input to take up available space */
     padding: 10px;
     border-radius: 5px;
     border: 1px solid #ccc;
-}
-/* Optional: Add a margin to ensure the bubbles don't touch the edge */
-.chatbox .user-message,
-.chatbox .bot-message {
-    margin-bottom: 10px;
+    margin-right: 10px; /* Space between input and button */
 }
 
 /* Send button styling */
 .send-btn {
     background-color: #007bff;
     color: white;
-    padding: 10px;
-    border-radius: 10px;
+    padding: 10px 15px; /* Adjust padding for button size */
+    border-radius: 5px; /* Consistent border radius */
     cursor: pointer;
     border: none;
 }
 
+/* Bot button (fixed position) */
 .Bot {
     position: fixed;
-    bottom: 80px; /* Adjust so the button is not overlapping the input */
+    bottom: 20px; /* Adjust as needed */
     right: 20px;
     background-color: #007bff;
     color: white;
@@ -81,4 +76,47 @@
 .Bot svg {
     width: 30px;
     height: 30px;
+}
+
+/* Styles to make the chatbox appear above the bot button */
+.chat-wrapper { /* A wrapper around the chatbox and input */
+    position: fixed;
+    bottom: 80px; /* Adjust as needed to be above .Bot */
+    left: 20px; /* Or adjust as needed */
+    width: 300px; /* Or adjust as needed */
+    background-color: #fff; /* Ensure a background color */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Optional: Style the scrollbar */
+.chatbox::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chatbox::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.chatbox::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+/* Optional: Add a close button to the chatbox */
+.chat-header {
+  display: flex;
+  justify-content: flex-end; /* Align close button to the right */
+  padding: 5px;
+  border-bottom: 1px solid #ccc;
+}
+
+.close-btn {
+  cursor: pointer;
+  padding: 5px 10px;
+  border: none;
+  background: none;
+  font-size: 16px;
 }
