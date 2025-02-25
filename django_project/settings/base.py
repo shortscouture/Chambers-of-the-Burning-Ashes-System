@@ -5,8 +5,7 @@ import os
 from django.core.exceptions import ImproperlyConfigured
 import pytesseract
 
-# Set the Tesseract path
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+
 
 #debug-toolbar
 hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
