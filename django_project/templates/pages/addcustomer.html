@@ -1,0 +1,120 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Customer</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/addcustomer.css' %}">
+    <script src="{% static 'js/addnewrecord.js' %}" defer></script>
+</head>
+<body>
+
+<div class="container">
+    <h2 class="text-center mt-4">Add New Customer</h2>
+    <form method="post" class="card p-4 mt-3">
+        {% csrf_token %}
+
+        <h4>Customer Details</h4>
+        {% if vault_id %}
+            <p>Assigning to Vault ID: <strong>{{ vault_id }}</strong></p>
+            <input type="hidden" name="vault_id" value="{{ vault_id }}">
+        {% endif %}
+        
+        <div class="row">
+            <div class="col-md-4">{{ customer_form.first_name.label_tag }} {{ customer_form.first_name }}</div>
+            <div class="col-md-4">{{ customer_form.middle_name.label_tag }} {{ customer_form.middle_name }}</div>
+            <div class="col-md-4">{{ customer_form.last_name.label_tag }} {{ customer_form.last_name }}</div>
+            <div class="col-md-4">{{ customer_form.suffix.label_tag }} {{ customer_form.suffix }}</div>
+        </div>
+
+        <h4>Address</h4>
+        <div class="row">
+            <div class="col-md-6">{{ customer_form.address_line_1.label_tag }} {{ customer_form.address_line_1 }}</div>
+            <div class="col-md-6">{{ customer_form.address_line_2.label_tag }} {{ customer_form.address_line_2 }}</div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">{{ customer_form.city.label_tag }} {{ customer_form.city }}</div>
+            <div class="col-md-6">{{ customer_form.province_or_state.label_tag }} {{ customer_form.province_or_state }}</div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">{{ customer_form.postal_code.label_tag }} {{ customer_form.postal_code }}</div>
+            <div class="col-md-6">{{ customer_form.country.label_tag }} {{ customer_form.country }}</div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">{{ customer_form.landline_number.label_tag }} {{ customer_form.landline_number }}</div>
+            <div class="col-md-6">{{ customer_form.mobile_number.label_tag }} {{ customer_form.mobile_number }}</div>
+        </div>
+
+        <h4>Beneficiaries</h4>
+        <div class="row">
+            <div class="col-md-4">{{ beneficiary_form.first_beneficiary_name.label_tag }} {{ beneficiary_form.first_beneficiary_name }}</div>
+            <div class="col-md-4">{{ beneficiary_form.second_beneficiary_name.label_tag }} {{ beneficiary_form.second_beneficiary_name }}</div>
+            <div class="col-md-4">{{ beneficiary_form.third_beneficiary_name.label_tag }} {{ beneficiary_form.third_beneficiary_name }}</div>
+        </div>
+
+        <h4>Payment Details</h4>
+        <div class="row">
+            <div class="col-md-6">{{ payment_form.mode_of_payment.label_tag }} {{ payment_form.mode_of_payment }}</div>
+        </div>
+
+        <div id="full_payment_fields" style="display: none;">
+            <h5>Full Payment</h5>
+            <label>Receipt #1:</label> {{ payment_form.Full_payment_receipt_1 }}
+            <label>Amount #1:</label> {{ payment_form.Full_payment_amount_1 }}
+        </div>
+
+        <div id="installment_payment_fields" style="display: none;">
+            <h5>6-Month Installment</h5>
+            <div class="row">
+                <div class="col-md-6"><label>Receipt #1:</label> {{ payment_form.six_month_receipt_1 }}</div>
+                <div class="col-md-6"><label>Amount #1:</label> {{ payment_form.six_month_amount_1 }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-6"><label>Receipt #2:</label> {{ payment_form.six_month_receipt_2 }}</div>
+                <div class="col-md-6"><label>Amount #2:</label> {{ payment_form.six_month_amount_2 }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-6"><label>Receipt #3:</label> {{ payment_form.six_month_receipt_3 }}</div>
+                <div class="col-md-6"><label>Amount #3:</label> {{ payment_form.six_month_amount_3 }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-6"><label>Receipt #4:</label> {{ payment_form.six_month_receipt_4 }}</div>
+                <div class="col-md-6"><label>Amount #4:</label> {{ payment_form.six_month_amount_4 }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-6"><label>Receipt #5:</label> {{ payment_form.six_month_receipt_5 }}</div>
+                <div class="col-md-6"><label>Amount #5:</label> {{ payment_form.six_month_amount_5 }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-6"><label>Receipt #6:</label> {{ payment_form.six_month_receipt_6 }}</div>
+                <div class="col-md-6"><label>Amount #6:</label> {{ payment_form.six_month_amount_6 }}</div>
+            </div>
+        </div>
+
+        <h4>Holder of Privilege</h4>
+        <div class="row">
+            <div class="col-md-6">{{ holder_form.issuance_date.label_tag }} {{ holder_form.issuance_date }}</div>
+            <div class="col-md-6">{{ holder_form.expiration_date.label_tag }} {{ holder_form.expiration_date }}</div>
+        </div>
+
+        <h4>Columbary Record</h4>
+        <div class="row">
+            <div class="col-md-6">{{ columbary_form.inurnment_date.label_tag }} {{ columbary_form.inurnment_date }}</div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">{{ columbary_form.urns_per_columbary.label_tag }} {{ columbary_form.urns_per_columbary }}</div>
+        </div>        
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">Add Customer</button>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

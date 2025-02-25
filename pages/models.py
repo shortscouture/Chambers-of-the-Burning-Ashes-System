@@ -89,9 +89,6 @@ class Customer(models.Model):
         return self.full_name() or "Unnamed Customer"
 
 
-
-
-
 class HolderOfPrivilege(models.Model):
     holder_of_privilege_id = models.AutoField(primary_key=True)
     issuance_date = models.DateField(null=True, blank=True)
@@ -122,14 +119,17 @@ class Payment(models.Model):
     ]
 
     class Meta:
-        db_table = "payment"  # 🔥 Ensures Django uses the correct table
+        db_table = "payment"
     
     payment_id = models.AutoField(primary_key=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="payments")  # Added customer FK
     mode_of_payment = models.CharField(max_length=20, choices=PAYMENT_MODES, blank=True, null=True)
 
-    # New field for tracking payment date
-    transaction_date = models.DateField(default=date.today)
+    class Meta:
+        db_table = "payment"
+
+    class Meta:
+        db_table = "payment"
 
     # Seven receipt fields
     Full_payment_receipt_1 = models.IntegerField(blank=True, null=True)
@@ -175,24 +175,26 @@ class ColumbaryRecord(models.Model):
     vault_id = models.CharField(primary_key=True, max_length=8, blank=False)
     section = models.CharField(null= False, max_length=7)
     level = models.CharField(null= False, max_length=1)
-    issuance_date = models.DateField(null=True)
-    expiration_date = models.DateField(null=True)
     inurnment_date = models.DateField(blank=True, null=True)
-    issuing_parish_priest = models.CharField(max_length=45, blank=True, null=True)
     urns_per_columbary = models.CharField(max_length=1, null=True, choices=[('1', '1'), ('2', '2'), ('3', '3'), ('4', '4')])
-    status = models.CharField(max_length=10, default="Vacant")
 
     class Meta:
         db_table = "columbaryrecord"  # 🔥 Ensures Django uses the correct table
+
 
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
     parish_staff = models.ForeignKey(ParishStaff, on_delete=models.SET_NULL, null=True, blank=True)
     beneficiary = models.ForeignKey(Beneficiary, on_delete=models.SET_NULL, null=True, blank=True)
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, null=True, blank=True)
+
     holder_of_privilege = models.ForeignKey(HolderOfPrivilege, on_delete=models.SET_NULL, null=True, blank=True)
+
     STATUS_CHOICES = [('Vacant', 'Vacant'), ('Occupied', 'Occupied')]
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Vacant')
-    
+
+    class Meta:
+        db_table = "columbaryrecord"
+
     def __str__(self):
         return f"Vault {self.vault_id} - {self.status}"
 
@@ -201,37 +203,51 @@ class ColumbaryRecord(models.Model):
         data = {
             'vault_info': {
                 'vault_id': self.vault_id,
-                'issuance_date': self.issuance_date,
-                'expiration_date': self.expiration_date,
                 'inurnment_date': self.inurnment_date,
                 'urns_per_columbary': self.urns_per_columbary,
-                'issuing_parish_priest': self.issuing_parish_priest,
+                'status': self.status,
             }
         }
         
         if self.customer:
             data['customer_info'] = {
-                'full_name': self.customer.full_name,
+                'full_name': self.customer.full_name(),
                 'address': self.customer.permanent_address,
                 'mobile': self.customer.mobile_number,
                 'email': self.customer.email_address,
             }
-        
+
+        if self.holder_of_privilege:
+            data['holder_of_privilege_info'] = {
+                'issuance_date': self.holder_of_privilege.issuance_date,
+                'expiration_date': self.holder_of_privilege.expiration_date,
+                'issuing_parish_priest': self.holder_of_privilege.issuing_parish_priest,
+            }
+
         if self.beneficiary:
             data['beneficiary_info'] = {
                 'first_beneficiary': self.beneficiary.first_beneficiary_name,
                 'second_beneficiary': self.beneficiary.second_beneficiary_name,
                 'third_beneficiary': self.beneficiary.third_beneficiary_name,
             }
-        
+
         if self.payment:
             data['payment_info'] = {
-                'full_contribution': self.payment.full_contribution,
-                'six_month_installment': self.payment.six_month_installment,
-                'official_receipt': self.payment.official_receipt,
+                'mode_of_payment': self.payment.mode_of_payment,
+                'full_payment_receipt': self.payment.Full_payment_receipt_1,
+                'six_month_receipts': [
+                    self.payment.six_month_receipt_1,
+                    self.payment.six_month_receipt_2,
+                    self.payment.six_month_receipt_3,
+                    self.payment.six_month_receipt_4,
+                    self.payment.six_month_receipt_5,
+                    self.payment.six_month_receipt_6
+                ],
+                'total_amount': self.payment.total_amount,
             }
             
         return data
+
 
     def send_record_email(self):
         """Send record details to customer's email"""

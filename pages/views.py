@@ -1,4 +1,4 @@
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, DeleteView
 from django.shortcuts import render, redirect, get_object_or_404,  HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail
@@ -6,20 +6,16 @@ from django.conf import settings
 from django.contrib import messages
 from django.utils import timezone
 from django.utils.safestring import mark_safe
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, Q
 from datetime import datetime, timedelta
-from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm, PaymentForm, HolderOfPrivilegeForm
-from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, Payment, ChatQuery, ParishAdministrator, HolderOfPrivilege
-from django.views.generic import TemplateView, DeleteView
+from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm, PaymentForm, HolderOfPrivilegeForm, DocumentUploadForm
+from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, ChatQuery, ParishAdministrator, HolderOfPrivilege
 from django.forms import modelformset_factory
-from django.urls import reverse_lazy
-from django.http import HttpResponseRedirect, JsonResponse
+from django.urls import reverse_lazy, reverse
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.views.generic.base import TemplateView
-from django.db.models import Count, Sum
-from .models import Customer, ColumbaryRecord, Beneficiary, Payment
-from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, PaymentForm, DocumentUploadForm
-from django.db import transaction
+from django.db import transaction, connection
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -30,12 +26,23 @@ import openai
 from django.db import transaction
 import json
 import environ
-from django.views.decorators.csrf import csrf_exempt
 from django.db.models.functions import TruncMonth
+from django.contrib.auth.mixins import LoginRequiredMixin
+import logging
+from django.views.generic import TemplateView
+from django.core.paginator import Paginator
+from django.db.models import Q
+from .models import ColumbaryRecord
+from django.utils.safestring import mark_safe
+from django.db.models import Count, Sum
+from django.db.models.functions import TruncMonth
+import json
 from django.http import JsonResponse
 from .models import Customer, Payment
 from datetime import datetime
 
+
+logger = logging.getLogger(__name__)
 
 
 class SuccesView(TemplateView):
@@ -62,13 +69,98 @@ class CustomerHomeView(TemplateView):
     template_name = "pages/Customer_Home.html"
 
 
+
 class ColumbaryRecordsView(TemplateView):
     template_name = "pages/columbaryrecords.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["customers"] = Customer.objects.all()
+
+        # Get search query & selected filters
+        search_query = self.request.GET.get("search", "").strip()
+        selected_filters = self.request.GET.getlist("filter")  # Multiple selections
+
+        # Fetch all records
+        columbary_records = ColumbaryRecord.objects.select_related("customer").all()
+
+        # Apply search filter
+        if search_query:
+            columbary_records = columbary_records.filter(
+                Q(vault_id__icontains=search_query) | 
+                Q(customer__first_name__icontains=search_query) | 
+                Q(customer__last_name__icontains=search_query)
+            )
+
+        records_data = []
+        for record in columbary_records:
+            customer = getattr(record, "customer", None)  # Avoid NoneType errors
+
+            has_beneficiary = (
+                customer and customer.beneficiaries.filter(first_beneficiary_name__isnull=False).exists()
+            )
+
+            has_payment = (
+                customer and customer.payments.filter(
+                    mode_of_payment__isnull=False
+                ).filter(
+                    Q(mode_of_payment="Full Payment", Full_payment_receipt_1__isnull=False, Full_payment_amount_1__isnull=False) |
+                    Q(mode_of_payment="6-Month Installment", 
+                      six_month_receipt_1__isnull=False, six_month_amount_1__isnull=False, 
+                      six_month_receipt_2__isnull=False, six_month_amount_2__isnull=False, 
+                      six_month_receipt_3__isnull=False, six_month_amount_3__isnull=False, 
+                      six_month_receipt_4__isnull=False, six_month_amount_4__isnull=False, 
+                      six_month_receipt_5__isnull=False, six_month_amount_5__isnull=False, 
+                      six_month_receipt_6__isnull=False, six_month_amount_6__isnull=False)
+                ).exists()
+            )
+
+            has_holder_of_privilege = (
+                customer and customer.privileges.filter(issuance_date__isnull=False).exists()
+            )
+
+            record_entry = {
+                "vault_id": record.vault_id,
+                "customer_name": customer.full_name() if customer else "No Customer",
+                "has_beneficiary": has_beneficiary,
+                "has_payment": has_payment,
+                "has_holder_of_privilege": has_holder_of_privilege,
+                "customer_id": customer.customer_id if customer else None,
+            }
+
+            records_data.append(record_entry)
+
+        # Apply filter logic
+        if selected_filters:
+            if len(selected_filters) == 3:
+                # Show only fully completed records if all three filters are selected
+                records_data = [
+                    record for record in records_data
+                    if record["has_beneficiary"] and record["has_payment"] and record["has_holder_of_privilege"]
+                ]
+            else:
+                # Show records that match at least one selected filter
+                records_data = [
+                    record for record in records_data
+                    if (
+                        ("beneficiary" in selected_filters and record["has_beneficiary"]) or
+                        ("payment" in selected_filters and record["has_payment"]) or
+                        ("holder" in selected_filters and record["has_holder_of_privilege"])
+                    )
+                ]
+
+        # Apply pagination (10 records per page)
+        page = self.request.GET.get("page", 1)
+        paginator = Paginator(records_data, 10)  # Show 10 per page
+        paginated_records = paginator.get_page(page)
+
+        # Add to context
+        context["records_data"] = paginated_records
+        context["search_query"] = search_query  # Keep search input filled
+        context["selected_filters"] = selected_filters  # Keep selected filters
         return context
+
+
+
 
 
 class MemorialView(TemplateView):
@@ -83,60 +175,36 @@ class DashboardView(TemplateView):
 
         # Fetch necessary data
         customer_status_counts = Customer.objects.values('status').annotate(count=Count('status'))
-        #inquiry_counts = InquiryRecord.objects.count()
         pending_counts = Customer.objects.filter(status="pending").count()
-        vacant_columbaries = ColumbaryRecord.objects.filter(status="Vacant")
-        occupied_columbaries = ColumbaryRecord.objects.filter(status="Occupied")
-        unissued_columbaries = ColumbaryRecord.objects.filter(issuance_date__isnull=True, customer__isnull=False).count()
+        vacant_columbaries_count = ColumbaryRecord.objects.filter(status="Vacant").count()
+        occupied_columbaries_count = ColumbaryRecord.objects.filter(status="Occupied").count()
         full_payment_count = Payment.objects.filter(mode_of_payment="Full Payment").count()
         installment_count = Payment.objects.filter(mode_of_payment="6-Month Installment").count()
-        unissued_columbary_records = ColumbaryRecord.objects.filter(issuance_date__isnull=True, customer__isnull=False)
-        start_date = self.request.GET.get("start_date")
-        end_date = self.request.GET.get("end_date")
 
-        earnings_by_date = (
-            ColumbaryRecord.objects.filter(payment__isnull=False)
-            .values("issuance_date")
-            .annotate(total_earnings=Sum("payment__total_amount"))
-            .order_by("issuance_date")
+        # Ensure correct referencing of issuance date in HolderOfPrivilege
+        unissued_columbaries = ColumbaryRecord.objects.filter(
+            holder_of_privilege__issuance_date__isnull=True, 
+            customer__isnull=False
+        ).count()
+
+        # Retrieve all unissued Columbary records
+        unissued_columbary_records = ColumbaryRecord.objects.filter(
+            holder_of_privilege__issuance_date__isnull=True, 
+            customer__isnull=False
         )
 
-        # Convert data to JSON for Chart.js
-        payment_labels = ["Full Payment", "Installment"]
-        payment_data = [full_payment_count, installment_count]
+        # Calculate earnings per issuance date
+        earnings_by_date = (
+            ColumbaryRecord.objects.filter(payment__isnull=False, holder_of_privilege__issuance_date__isnull=False)
+            .values("holder_of_privilege__issuance_date")
+            .annotate(total_earnings=Sum("payment__total_amount"))
+            .order_by("holder_of_privilege__issuance_date")
+        )
 
-        # Convert strings to datetime objects (if provided)
-        if start_date:
-            start_date = datetime.strptime(start_date, "%Y-%m-%d")
-        if end_date:
-            end_date = datetime.strptime(end_date, "%Y-%m-%d")
-
-        # Filter earnings based on the selected date range
-        earnings_queryset = Payment.objects.filter(
-            transaction_date__gte=start_date if start_date else "1900-01-01",
-            transaction_date__lte=end_date if end_date else "2100-01-01"
-        ).annotate(month=TruncMonth("transaction_date"))  # ✅ Apply filter BEFORE aggregation
-
-        # Get filter dates from request
-        start_date = self.request.GET.get("start_date", "")
-        end_date = self.request.GET.get("end_date", "")
-
-        # Convert dates to datetime (if provided)
-        start_date = datetime.strptime(start_date, "%Y-%m-%d") if start_date else None
-        end_date = datetime.strptime(end_date, "%Y-%m-%d") if end_date else None
-
-        # Default: No filter (include all data)
-        filter_conditions = {}
-        if start_date:
-            filter_conditions["transaction_date__gte"] = start_date
-        if end_date:
-            filter_conditions["transaction_date__lte"] = end_date
-
-        # Apply filter
-        earnings_queryset = Payment.objects.filter(**filter_conditions).annotate(month=TruncMonth("transaction_date"))
-
+        # Get earnings per month
         earnings_by_month = (
-            earnings_queryset
+            ColumbaryRecord.objects.filter(payment__isnull=False, holder_of_privilege__issuance_date__isnull=False)
+            .annotate(month=TruncMonth("holder_of_privilege__issuance_date"))
             .values("month")
             .annotate(total_earnings=Sum("total_amount"))
             .order_by("month")
@@ -146,31 +214,25 @@ class DashboardView(TemplateView):
         earnings_labels = [
             entry["month"].strftime("%b %Y") for entry in earnings_by_month if entry["month"] is not None
         ]
-        earnings_data = [float(entry["total_earnings"]) for entry in earnings_by_month]
+        earnings_data = [float(entry["total_earnings"]) if entry["total_earnings"] else 0 for entry in earnings_by_month]
 
-        # Debugging: Print earnings data
-        print("Earnings Labels:", earnings_labels)
-        print("Earnings Data:", earnings_data)
+        # Convert payment method data
+        payment_labels = ["Full Payment", "Installment"]
+        payment_data = [full_payment_count, installment_count]
 
         # Add data to context
         context.update({
             'customer_status_counts': customer_status_counts,
-            #'inquiry_counts': inquiry_counts,
-            'pending_counts': Customer.objects.filter(status="pending").count(),
+            'pending_counts': pending_counts,
             'pending_customers': Customer.objects.filter(status="pending"),
-            'unissued_columbaries': ColumbaryRecord.objects.filter(issuance_date__isnull=True, customer__isnull=False).count(),
-            'vacant_columbaries': ColumbaryRecord.objects.filter(status="Vacant"),
-            'vacant_columbaries_count': ColumbaryRecord.objects.filter(status="Vacant").count(),  # Returns an int
-            'occupied_columbaries': ColumbaryRecord.objects.filter(status="Occupied"),
-            'occupied_columbaries_count': ColumbaryRecord.objects.filter(status="Occupied").count(),
-            'unissued_columbary_records' : unissued_columbary_records,
+            'unissued_columbaries': unissued_columbaries,
+            'vacant_columbaries_count': vacant_columbaries_count,
+            'occupied_columbaries_count': occupied_columbaries_count,
+            'unissued_columbary_records': unissued_columbary_records,  
             "payment_labels": mark_safe(json.dumps(payment_labels)),
             "payment_data": mark_safe(json.dumps(payment_data)),
-            "earnings_labels": mark_safe(json.dumps(earnings_labels)),  # Labels (months)
-            "earnings_data": mark_safe(json.dumps(earnings_data)),  # Earnings
-            "start_date": start_date.strftime("%Y-%m-%d") if start_date else "",
-            "end_date": end_date.strftime("%Y-%m-%d") if end_date else "",
-
+            "earnings_labels": mark_safe(json.dumps(earnings_labels)),  
+            "earnings_data": mark_safe(json.dumps(earnings_data)),  
         })
 
         return context
@@ -209,90 +271,118 @@ def update_letter_of_intent_status(request, loi_id):
             
 def send_letter_of_intent(request):
     if request.method == 'POST':
-
-        full_name = request.POST['full_name']
-        permanent_address = request.POST['permanent_address']
-        landline_number = request.POST.get('landline_number', '')
+        first_name = request.POST['first_name']
+        last_name = request.POST['last_name']
         mobile_number = request.POST['mobile_number']
         email_address = request.POST['email_address']
-        # Save the form data with a pending status
-        intent = Customer.objects.create(
-            full_name=full_name,
-            permanent_address=permanent_address,
-            landline_number=landline_number,
+        section = request.POST['section']
+        level = request.POST['level']
+
+        # Ensure selected vault is vacant
+        try:
+            vault = ColumbaryRecord.objects.get(section=section, level=level, status="Vacant")
+        except ColumbaryRecord.DoesNotExist:
+            return JsonResponse({"error": "Selected vault is already occupied or does not exist!"}, status=400)
+
+        # Save the customer record with a pending status
+        customer = Customer.objects.create(
+            first_name=first_name,
+            last_name=last_name,
             mobile_number=mobile_number,
             email_address=email_address,
+            status="pending"
         )
-        
-        # Send email to admin
-        accept_url = request.build_absolute_uri(f'/accept/{intent.customer_id}/')
-        decline_url = request.build_absolute_uri(f'/decline/{intent.customer_id}/')
-        email_body = f"""
-Dear Rev. Bobby
-    
-I hope this message finds you well. I am writing to formally submit my letter of intent for Acquiring a Columbary find my details below:
 
-Full Name: {full_name}
-Permanent Address: {permanent_address}
-Landline Number: {landline_number if landline_number else 'N/A'}
+        # Assign the selected ColumbaryRecord to this customer but keep it Vacant until approval
+        vault.customer = customer  
+        vault.save()  
+
+        # Generate accept & decline URLs dynamically
+        accept_url = request.build_absolute_uri(reverse('accept_letter_of_intent', args=[customer.customer_id]))
+        decline_url = request.build_absolute_uri(reverse('decline_letter_of_intent', args=[customer.customer_id]))
+
+        email_body = f"""
+Dear Rev. Bobby,
+
+A new Letter of Intent has been submitted:
+
+First Name: {first_name}
+Last Name: {last_name}
 Mobile Number: {mobile_number}
 Email Address: {email_address}
+Requested Vault: Section {section}, Level {level}
 
-I would appreciate your time and attention to this matter. Please feel free to reach out to me if any further information or clarification is needed.
+[✅ Accept]({accept_url})
+[❌ Decline]({decline_url})
 
-Thank you for considering my submission.
+Please review this request.
 
 Best regards,
-
-        Accept: {accept_url}
-        Decline: {decline_url}
+St. Alphonsus Parish
         """
+
         send_mail(
             'New Letter of Intent',
             email_body,
             settings.DEFAULT_FROM_EMAIL,
             [settings.ADMIN_EMAIL],
+            fail_silently=False,
         )
 
-        return render(request, 'Success.html', {'intent': intent})
+        return render(request, 'success.html')
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
     
 
 def accept_letter_of_intent(request, intent_id):
     intent = get_object_or_404(Customer, customer_id=intent_id)
-    intent.status = 'approved'
+    intent.status = "approved"
     intent.save()
-    
+
+    # Find the ColumbaryRecord assigned to this customer (set during Letter of Intent submission)
+    columbary = ColumbaryRecord.objects.filter(customer=intent, status="Vacant").first()
+
+    if columbary:
+        columbary.status = "Occupied"  # Change status to Occupied
+        columbary.save()
+    else:
+        return HttpResponse("No available columbary assigned for this customer.", status=400)
+
+    # Send acceptance email
     send_mail(
         subject="Your Letter of Intent has been Accepted",
-        message=(
-            f"Dear {intent.full_name},\n\n"
-            "We are pleased to inform you that your letter of intent has been accepted.\n\n"
-            "Best regards,\nThe Team"
-        ),
-        from_email='stalphonsusmakati@gmail.com',
+        message=f"Dear {intent.first_name} {intent.last_name},\n\n"
+                f"We are pleased to inform you that your letter of intent has been accepted.\n"
+                f"You have been assigned to Columbary: {columbary.section}-{columbary.level}.\n\n"
+                "Best regards,\nSt. Alphonsus Parish",
+        from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[intent.email_address],
         fail_silently=False,
     )
 
-    return render(request, 'pages/accept_success.html', {'intent': intent})
+    return render(request, 'success.html', {'intent': intent, 'columbary': columbary})
+
+
 
 
 def decline_letter_of_intent(request, intent_id):
     intent = get_object_or_404(Customer, customer_id=intent_id)
     intent.status = 'declined'
-    intent.delete()
-        
+    intent.save()  # Keep the record instead of deleting it
+
+    # Send rejection email
     send_mail(
         subject="Your Letter of Intent has been Declined",
-        message=(
-            f"Dear {intent.full_name},\n\n"
-            "We regret to inform you that your letter of intent has been declined.\n\n"
-            "Best regards,\nThe Team"
-        ),
-        from_email='stalphonsusmakati@gmail.com',
+        message=f"Dear {intent.first_name} {intent.last_name},\n\n"
+                "We regret to inform you that your letter of intent has been declined.\n\n"
+                "Best regards,\n St. Alphonsus Parish",
+        from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[intent.email_address],
         fail_silently=False,
     )
+
+    return redirect('some_rejection_page')
 
 
 class RecordsDetailsView(TemplateView):
@@ -415,9 +505,27 @@ class CustomerDeleteView(DeleteView):
         return get_object_or_404(Customer, customer_id=customer_id)
 
     def delete(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        self.object.delete()
-        messages.success(request, "Customer and all related records deleted successfully.")
+        customer = self.get_object()
+
+        # Unlink ColumbaryRecord (keep the vault ID, but remove associations)
+        columbary_records = ColumbaryRecord.objects.filter(customer=customer)
+        for record in columbary_records:
+            record.customer = None
+            record.payment = None
+            record.holder_of_privilege = None
+            record.beneficiary = None
+            record.status = 'Vacant'  # Mark as Vacant if necessary
+            record.save()
+
+        # Delete all related records
+        Payment.objects.filter(customer=customer).delete()
+        HolderOfPrivilege.objects.filter(customer=customer).delete()
+        Beneficiary.objects.filter(customer=customer).delete()
+
+        # Delete the customer
+        customer.delete()
+
+        messages.success(request, "Customer and related records deleted successfully, but Vault ID remains intact.")
         return redirect(self.success_url)
 
 
@@ -484,35 +592,6 @@ def verify_otp(request):
 
 def success(request):
     return render(request, 'pages/success.html')
-
-#chatbot env
-env = environ.Env(
-    DEBUG=(bool, False) #default value for DEBUG = False
-)
-
-openai.api_key = env("OPEN_AI_API_KEY")
-class ChatbotAPIView(APIView):
-    def get(self, request, *args, **kwargs):
-        return Response({"message": "Chatbot API is running! Use POST to send messages."}, status=status.HTTP_200_OK)
-    
-    def post(self, request, *args, **kwargs):
-        user_message = request.data.get('message')
-
-        if not user_message:
-            return Response({'error': 'Message is required'}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            response = openai.chat.completions.create(
-                model="gpt-3.5-turbo",  # Using GPT-3.5 model
-                messages=[{"role": "user", "content": user_message}],
-                max_tokens=150
-            )
-            bot_reply = response.choices[0].message.content.strip()  # Get the response from GPT-3.5
-            return Response({'response': bot_reply}, status=status.HTTP_200_OK)
-
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
 
       
 def preprocess_image(image):
@@ -615,39 +694,81 @@ def parse_text_to_dict(text):
 
     return data
 
-
+#chatbot env
 env = environ.Env(
     DEBUG=(bool, False) #default value for DEBUG = False
 )
-
-
-
+        
 openai.api_key = env("OPEN_AI_API_KEY")
 class ChatbotAPIView(APIView):
     def get(self, request, *args, **kwargs):
         return Response({"message": "Chatbot API is running! Use POST to send messages."}, status=status.HTTP_200_OK)
     
-    def post(self, request, *args, **kwargs):
-        user_message = request.data.get('message')
-
-        if not user_message:
-            return Response({'error': 'Message is required'}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            response = openai.chat.completions.create(
-                model="gpt-3.5-turbo",  # Using GPT-3.5 models
-                messages=[{"role": "user", "content": user_message}],
-                max_tokens=150
+    def get_relevant_info(self, query):
+        """
+        Retrieves relevant data from the database using full-text search.
+        """
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT content FROM parish_knowledge "
+                "WHERE MATCH(content) AGAINST (%s IN NATURAL LANGUAGE MODE) "
+                "LIMIT 3;", [query]
             )
-            bot_reply = response.choices[0].message.content.strip()  # Get the response from GPT-3.5
-            #save to database
-            ChatQuery.objects.create(user_message=user_message, bot_response=bot_reply)
+            results = cursor.fetchall()
+        if results:
+            return " ".join([row[0] for row in results]) if results else ""
+        return "I'm not sure about that. Please check with the parish office or refer to the official guidelines."
+        
+    def post(self, request, *args, **kwargs):
+        database_data  = get_data_from_db()
+        ai_response = self.query_openai(database_data)
+        user_query = request.data.get("message", "")
+        context_data = self.get_relevant_info(self.query_openai)
+        logger.info(f"User query: {user_query}")
+        
+        messages = [
+            {"role": "system", "content": "You are a knowledgeable assistant helping parish staff."},
+            {"role": "assistant", "content": f"Relevant Data from Database: {database_data}"},
+            {"role": "user", "content": f"{user_query}"},  # Include user query in OpenAI request
+        ]
+        response = openai.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=messages,
+            temperature=0.7,
+           )
 
-            return Response({'response': bot_reply}, status=status.HTTP_200_OK)
+        return JsonResponse({
+            "query": user_query,  
+            "context": context_data,  
+            "ai_insights": ai_response,
+            "response": response.choices[0].message.content  
+        })
+   # def chatbot_view(request):
+       # """Handle AJAX request and return chatbot response."""
+       # db_data = get_data_from_db()
+        #ai_response = query_openai(db_data)
+      #  return JsonResponse({"response": ai_response})
+    
+    def query_openai(self, data):
+        try:
+            formatted_data = json.dumps(data, indent=2)
+        except (TypeError, ValueError) as e:
+            return f"Error formatting data: {str(e)}"
 
+        prompt = (
+            "You are an AI assistant analyzing parish data. "
+            "Here is the structured database information:\n\n"
+            f"{formatted_data}\n\n"
+            "Please provide insights, trends, and any important observations."
+        )
 
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        response = openai.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "system", "content": "You are an AI assistant."},
+                    {"role": "user", "content": prompt}]
+        )
+        return response.choices[0].message.content
+
 
 def get_crypt_status(request, section):
     # Get all vaults belonging to the given section
@@ -671,30 +792,36 @@ def get_section_details(request, section_id):
     columbaries = ColumbaryRecord.objects.filter(section=section_id).values("level", "vault_id", "status")
     return JsonResponse({"section": section_id, "columbaries": list(columbaries)})
 
+#def get_data_from_db():
+#    data = Customer.objects.all().values()  # Fetch all fields
+#    return list(data)
 def get_data_from_db():
-    data = Customer.objects.all().values()  # Fetch all fields
-    return list(data)
+    """Fetch relevant data from the database, excluding the 'customer' table."""
+    from django.db import connection
 
-def query_openai(data):
-    """Send database data to OpenAI and get a response."""
-    formatted_data = json.dumps(data, indent=2)
-    prompt = f"Here is the database data: {formatted_data}\nAnalyze it and provide insights."
+    data = {}
 
-    response = openai.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "system", "content": "You are an AI assistant."},
-                {"role": "user", "content": prompt}]
-    )
-    return response["choices"][0]["message"]["content"]
+    try:
+        with connection.cursor() as cursor:
+            # List of tables to query (EXCLUDE 'customer' TABLE)
+            tables = ["parish_knowledge", "parish_staff", "pages_account", "pages_customer", "pages_beneficiary"]  # Add only safe tables
 
-def chatbot_view(request):
-    """Handle AJAX request and return chatbot response."""
-    db_data = get_data_from_db()
-    ai_response = query_openai(db_data)
-    return JsonResponse({"response": ai_response})
+            for table in tables:
+                try:
+                    cursor.execute(f"SELECT * FROM {table} LIMIT 10;")
+                    columns = [col[0] for col in cursor.description]
+                    rows = cursor.fetchall()
+                    data[table] = [dict(zip(columns, row)) for row in rows]
+                except Exception as e:
+                    print(f"Skipping {table}: {e}")  # Avoid crashing on missing tables
 
+    except Exception as e:
+        print(f"Database error: {e}")
+
+    return data  # Returns a dictionary of database contents
 
 def addnewrecord(request):
+    
     if request.method == 'POST':
         customer_form = CustomerForm(request.POST)
         payment_form = PaymentForm(request.POST)
@@ -743,3 +870,87 @@ def addnewrecord(request):
         'holder_form': holder_form,
         'beneficiary_form': beneficiary_form
     })
+
+def get_vault_data(request, section_id):
+    vaults = ColumbaryRecord.objects.filter(section=section_id)
+    levels = {vault.level: vault.status == "Occupied" for vault in vaults}
+    
+    response_data = {'levels': levels}
+    print(json.dumps(response_data, indent=4))  # Debugging output
+    
+    return JsonResponse(response_data)
+
+
+def addnewcustomer(request):
+    vault_id = request.GET.get('vault_id')
+    vault = None
+
+    if vault_id:
+        vault = get_object_or_404(ColumbaryRecord, vault_id=vault_id, customer__isnull=True)
+
+    if request.method == 'POST':
+        customer_form = CustomerForm(request.POST)
+        payment_form = PaymentForm(request.POST)
+        holder_form = HolderOfPrivilegeForm(request.POST)
+        beneficiary_form = BeneficiaryForm(request.POST)
+
+        if customer_form.is_valid():
+            customer = customer_form.save()
+            
+            # Save payment only if valid
+            payment = None
+            if payment_form.is_valid():
+                payment = payment_form.save(commit=False)
+                payment.customer = customer
+                payment.save()
+            
+            # Save holder of privilege only if valid
+            holder = None
+            if holder_form.is_valid():
+                holder = holder_form.save(commit=False)
+                holder.customer = customer
+                holder.save()
+            
+            # Save beneficiary only if valid
+            beneficiary = None
+            if beneficiary_form.is_valid():
+                beneficiary = beneficiary_form.save(commit=False)
+                beneficiary.customer = customer
+                beneficiary.save()
+
+            if vault:
+                # Link the new customer and associated records to the existing vault
+                vault.customer = customer
+                vault.payment = payment if payment else None
+                vault.holder_of_privilege = holder if holder else None
+                vault.beneficiary = beneficiary if beneficiary else None
+                vault.save()
+            else:
+                # Create a new ColumbaryRecord
+                columbary_record = ColumbaryRecord(
+                    vault_id=vault_id,
+                    customer=customer,
+                    payment=payment if payment else None,
+                    holder_of_privilege=holder if holder else None,
+                    beneficiary=beneficiary if beneficiary else None,
+                    status='Occupied'
+                )
+                columbary_record.save()
+
+            return redirect('success')  # Redirect to success page
+
+    else:
+        customer_form = CustomerForm()
+        payment_form = PaymentForm()
+        holder_form = HolderOfPrivilegeForm()
+        beneficiary_form = BeneficiaryForm()
+
+    return render(request, 'pages/addcustomer.html', {
+        'customer_form': customer_form,
+        'payment_form': payment_form,
+        'holder_form': holder_form,
+        'beneficiary_form': beneficiary_form,
+        'vault_id': vault_id
+    })
+
+

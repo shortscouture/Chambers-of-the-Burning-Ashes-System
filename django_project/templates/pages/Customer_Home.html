@@ -1,105 +1,345 @@
 <!DOCTYPE html>
-{% include 'Headers_Customers.html' %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Main Page</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="../../static/css/Customer.css">
-</head>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>St. Alphonsus Mary de Liguori Parish</title>
+        <link rel="icon" type="image/x-icon" href="../../static/images/logo.ico">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+        <link rel="stylesheet" href="../../static/css/bootstrap.min.css">
+        <link rel="stylesheet" href="../../static/css/fontAwesome.css">
+        <link rel="stylesheet" href="../../static/css/hero-slider.css">
+        <link rel="stylesheet" href="../../static/css/templatemo-main.css">
+        <link rel="stylesheet" href="../../static/css/owl-carousel.css">
+
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800" rel="stylesheet">
+
+        <script src="../../static/js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
+    </head>
+<!--
+Vanilla Template
+https://templatemo.com/tm-526-vanilla
+-->
 <body>
-    <img src="../../static/images/BGM.jpg" alt="Background" class="background">
-    <div id="header">
-    </div>
-    <div class="content" id = '1'>
-        <h1>Avail a Columbary now!</h1>
-        <button class="btn" onclick="window.location.href='{% url 'Columbary_Map' %}';">Avail Now!</button>
-    </div>
-    <div class="modal" id="modal">
-        <div class="modal-content">
-            <form method="post" action="{% url 'send_letter_of_intent' %}">
 
-                <!-- csrf_token %}
-                
-                <!-- Full Name 
-                <input type="text" name="full_name" placeholder="Full Name" required id="fn" class="form-control">
-                
-                <!-- Permanent Address 
-                <textarea name="permanent_address" placeholder="Permanent Address" required class="form-control" rows="3"></textarea>
-                
-                <!-- Landline Number 
-                <input type="tel" name="landline_number" placeholder="Landline Number" class="form-control">
-                
-                <!-- Mobile Number 
-                <input type="tel" name="mobile_number" placeholder="Mobile Number" required class="form-control">
-                
-                <!-- Email Address 
-                <input type="email" name="email_address" placeholder="Email Address" required class="form-control">
-                
-                <button type="submit" class="btn btn-primary">Send Letter of Intent</button>-->
-            </form>
-            
-        </div>
+    <div class="fixed-side-navbar">
+        <ul class="nav flex-column">
+            <li class="nav-item"><a class="nav-link" href="#home"><span>Intro</span></a></li>
+            <li class="nav-item"><a class="nav-link" href="#services"><span>Services</span></a></li>
+            <li class="nav-item"><a class="nav-link" href="#portfolio"><span>Gallery</span></a></li>
+            <li class="nav-item"><a class="nav-link" href="#our-story"><span>Memorials</span></a></li>
+            <li class="nav-item"><a class="nav-link" href="#contact-us"><span>Contact Us</span></a></li>
+        </ul>
     </div>
-    <div class="tour">
-        <h1 id="txt">
-            Discover the splendor of the <br> Shrine and Columbarium.
-            <span id="txt2">
-                <br>Embark on a serene journey with our immersive
-                <br>360° Virtual Tour of the Shrine and Columbarium.<br> Explore the sacred spaces and stunning architecture of<br>
-                this revered site, all from the comfort of your device.
-            </span>
-        </h1>
-        <a href= 'https://stalphonsusarcam.netlify.app/'>
-        <img src="../../static/images/360.png" id="tour">
-        </a>
-        <div class="about">
-            <h1>Know More About Us!</h1>
-        </div>
-        <div class = "abt">
-            <div class="card">
-                <img src="../../static/images/history.png" id="History" alt="History Image">
-                <p class="card-title">Our History</p>
-                <p class="card-subtitle">Click the button to learn about our History</p>
-                <div class="card-footer">
-                <p class="order-button" onclick="showPopup(
-        'Our History',
-        'St. Alphonsus Mary de Liguori Parish, also known as the Magallanes Church, was established on June 7, 1967, following the initiative of the first residents of Magallanes Village and the endorsement of Msgr. Ferdinand Mempin. Built on a lot donated by Ayala y Compañía, the church\'s cornerstone was laid by Rufino Cardinal Santos on August 2, 1967. The original structure, designed by National Artist Leandro Locsin, was known for its modernist style. Over the years, the parish flourished under various pastors and became a hub of community activity, hosting events like concerts and fundraisers. A significant event in its history was the devastating fire on September 9, 2004, which destroyed much of the church but left a large wooden image of the crucified Christ intact. The community rallied to rebuild the church, with the new structure designed by Architect Dominic Galicia and completed by 2007. The parish faced another challenge in 2009 when Typhoon Ondoy caused flooding, but once again, the community came together to restore it. In 2017, the parish celebrated its 50th anniversary, marking a major milestone in its history. Throughout its journey, St. Alphonsus Mary de Liguori Parish has played a significant role in the spiritual and cultural life of its community, offering a range of spiritual services and participating in various social and charitable activities. The history of the parish is a testament to the faith, resilience, and unity of its community.',
-        '../../static/images/History.jpg'
-            )">Explore Now</p>
 
+    <div class="parallax-content baner-content" id="home">
+        <div class="container">
+            <div class="first-content">
+                <h1>St. Alph<em>onsus</em></h1>
+                <span><em>Mary de Ligu</em>ori Parish</span>
+                <div class="primary-button">
+                    <a href="#services">Come Inside</a>
                 </div>
-            </div>
-            <div class="card">
-                <img src="../../static/images/Service.png" id="History" alt="Services Image">
-                <p class="card-title">Our Services</p>
-                <p class="card-subtitle">We offer a variety of services!</p>
-                <div class="card-footer">
-                    <p class="order-button" onclick="showPopup('Our Services', 'This is a detailed description of our services.')">Explore Now</p>
-                </div>
-            </div>
-            <div class="card">
-                <img src="../../static/images/who.png" id="History" alt="Who Are We Image">
-                <p class="card-title">Who are We?</p>
-                <p class="card-subtitle">One of Kind & Unique Plants Collection Here at SMKY.</p>
-                <div class="card-footer">
-                    <p class="order-button"onclick="showPopup('Who Are We?', 'This is a detailed description about who we are.')">Explore Now</p>
-                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="#fff" id = "door" onclick="showInfoBox(event)" class="bi bi-door-open-fill" viewBox="0 0 16 16">
+                    <path d="M1.5 15a.5.5 0 0 0 0 1h13a.5.5 0 0 0 0-1H13V2.5A1.5 1.5 0 0 0 11.5 1H11V.5a.5.5 0 0 0-.57-.495l-7 1A.5.5 0 0 0 3 1.5V15zM11 2h.5a.5.5 0 0 1 .5.5V15h-1zm-2.5 8c-.276 0-.5-.448-.5-1s.224-1 .5-1 .5.448.5 1-.224 1-.5 1"/>
+                    <div id="infobox" style="display: none;">
+                        <iframe width="90%" height="500px" allowFullScreen="true" allow="accelerometer; magnetometer; gyroscope" style="display:block; margin:20px auto; border:0 none; max-width:950px;border-radius:8px; box-shadow: 0 1px 1px rgba(0,0,0,0.11),0 2px 2px rgba(0,0,0,0.11),0 4px 4px rgba(0,0,0,0.11),0 6px 8px rgba(0,0,0,0.11),0 8px 16px rgba(0,0,0,0.11);" src="https://panoraven.com/fr/embed/ODfH5luaho"></iframe>
+                    </div>    
+                </svg>
             </div>
         </div>
     </div>
-    <div id="popup" class="popup hidden">
-        <div class="popup-content">
-            <span class="close-button" onclick="closePopup()">&times;</span>
-            <h2 id="popup-title"></h2>
-            <p id="popup-description"></p>
+
+
+    <div class="service-content" id="services">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="left-text">
+                        <h4>More About Us</h4>
+                        <div class="line-dec"></div>
+                        <p>St. Alphonsus Mary de Liguori Parish, commonly known as Magallanes Church, is a prominent 
+                            Catholic church located in Magallanes Village, Makati City, Philippines. 
+                            Established in 1967, the original structure was designed by National Artist Architect Leandro Locsin</p>
+                        <ul>
+                            <li>-  Praesent porta urna id eros</li>
+                            <li>-  Curabitur consectetur malesuada</li>
+                            <li>-  Nam pretium imperdiet enim</li>
+                            <li>-  Sed viverra arcu non nisi efficitur</li>
+                        </ul>
+                        <div class="primary-button">
+                            <a href="#portfolio">Learn More About Us</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="service-item">
+                                <h4>Weddings Service</h4>
+                                <div class="line-dec"></div>
+                                <p>Create lasting memories as you celebrate your sacred union in our beautiful sanctuary, where our experienced clergy will guide you through a personalized ceremony that reflects your faith and love story.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="service-item">
+                                <h4>Holy Mass</h4>
+                                <div class="line-dec"></div>
+                                <p>Join our welcoming community for reverent worship services that combine traditional liturgy with uplifting music and meaningful homilies to nourish your spiritual journey.<br> </br></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="service-item">
+                                <h4>Baptism</h4>
+                                <div class="line-dec"></div>
+                                <p>Begin your child's faith journey with this sacred sacrament in a joyful ceremony supported by thorough preparation for parents and godparents.<br> </br></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="service-item">
+                                <h4>Columbary Services</h4>
+                                <div class="line-dec"></div>
+                                <p>Honor your loved ones in our peaceful columbarium, offering a dignified final resting place within our thoughtfully maintained sacred grounds for permanent remembrance and reflection.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>                
+            </div>
         </div>
     </div>
 
     
+    <div class="parallax-content projects-content" id="portfolio">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="owl-testimonials" class="owl-carousel owl-theme">
+                        <div class="item">
+                            <div class="testimonials-item">
+                                <a href="../../static/images/1st-item.jpg" data-lightbox="image-1"><img src="../../static/images/1st-item.jpg" alt=""></a>
+                                <div class="text-content">
+                                    <h4>Christmas Eve Mass </h4>
+                                    <span>Dec. 24, 2024</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="testimonials-item">
+                                <a href="../../static/images/2nd-item.jpg" data-lightbox="image-1"><img src="../../static/images/2nd-item.jpg" alt=""></a>
+                                <div class="text-content">
+                                    <h4>Christmas Eve Mass </h4>
+                                    <span>Dec. 24, 2024</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="testimonials-item">
+                                <a href="../../static/images/3rd-item.jpg" data-lightbox="image-1"><img src="../../static/images/3rd-item.jpg" alt=""></a>
+                                <div class="text-content">
+                                    <h4>Christmas Eve Mass </h4>
+                                    <span>Dec. 24, 2024</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="testimonials-item">
+                                <a href="../../static/images/4th-item.jpg" data-lightbox="image-1"><img src="../../static/images/4th-item.jpg" alt=""></a>
+                                <div class="text-content">
+                                    <h4>Solemn Easter Vigil Serviceh</h4>
+                                    <span>March 30, 2024</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="testimonials-item">
+                                <a href="../../static/images/5th-item.jpg" data-lightbox="image-1"><img src="../../static/images/5th-item.jpg" alt=""></a>
+                                <div class="text-content">
+                                    <h4>Solemn Easter Vigil Service</h4>
+                                    <span>March 30, 2024</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="testimonials-item">
+                                <a href="../../static/images/6th-item.jpg" data-lightbox="image-1"><img src="../../static/images/6th-item.jpg" alt=""></a>
+                                <div class="text-content">
+                                    <h4>Way of the Cross &amp; Procession</h4>
+                                    <span>Good Friday 2024</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="testimonials-item">
+                                <a href="../../static/images/7th-item.jpg" data-lightbox="image-1"><img src="../../static/images/7th-item.jpg" alt=""></a>
+                                <div class="text-content">
+                                    <h4>Way of the Cross &amp; Procession</h4>
+                                    <span>Good Friday 2024</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="testimonials-item">
+                                <a href="../../static/images/8th-item.jpg" data-lightbox="image-1"><img src="../../static/images/8th-item.jpg" alt=""></a>
+                                <div class="text-content">
+                                    <h4>Exhibit: St Alphonsus</h4>
+                                    <span>His Life and Works 2023</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
-    <script src="../../static/js/Customer.js"></script>
+    <div class="tabs-content" id="our-story">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 mx-auto">
+                    <div class="wrapper">
+                    <section id="first-tab-group" class="tabgroup">
+                      <div id="tab1">        
+                        <div style="position: relative; width: 100%; height: 0; padding-top: 56.2500%;
+                        padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden;
+                        border-radius: 8px; will-change: transform;">
+                         <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
+                           src="https://www.canva.com/design/DAGSxDPvYjU/5nn9ldVh9MHa10a-0CInxg/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
+                         </iframe>
+                       </div>
+                       <a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAGSxDPvYjU&#x2F;5nn9ldVh9MHa10a-0CInxg&#x2F;view?utm_content=DAGSxDPvYjU&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">
+                       </div>
+                       <a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAGf7HED--8&#x2F;aj-H7yHGiWN-pVasylWIqQ&#x2F;view?utm_content=DAGf7HED--8&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener"></a> 
+                      </div>
+                    <ul class="tabs clearfix" data-tabgroup="first-tab-group">
+                      <li class = "button"><a href ="{% url 'Columbary_Map' %}"> AVAIL NOW</a></li>
+                      <li class = "button"><a href ="{% url 'Memorials' %}">Retrieve vault</a></li>
+                    </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="parallax-content contact-content" id="contact-us">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="contact-form">
+                        <div class="row">
+                            <form id="contact" action="" method="post">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                      <fieldset>
+                                        <input name="name" type="text" class="form-control" id="name" placeholder="Your name..." required="">
+                                      </fieldset>
+                                    </div>
+                                    <div class="col-md-12">
+                                      <fieldset>
+                                        <input name="email" type="email" class="form-control" id="email" placeholder="Your email..." required="">
+                                      </fieldset>
+                                    </div>
+                                    <div class="col-md-12">
+                                      <fieldset>
+                                        <textarea name="message" rows="6" class="form-control" id="message" placeholder="Your message..." required=""></textarea>
+                                      </fieldset>
+                                    </div>
+                                    <div class="col-md-12">
+                                      <fieldset>
+                                        <button type="submit" id="form-submit" class="btn">Send Message</button>
+                                      </fieldset>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="map">
+                    <!-- How to change your own map point
+                           1. Go to Google Maps
+                           2. Click on your location point
+                           3. Click "Share" and choose "Embed map" tab
+                           4. Copy only URL and paste it within the src="" field below
+                    -->
+
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1976.3642213833928!2d121.01971569678747!3d14.530094957901879!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397c930242cea63%3A0xa01a909508772593!2sSt.%20Alphonsus%20Mary%20de%20Liguori%20Parish%20Church!5e1!3m2!1sen!2sph!4v1740234645849!5m2!1sen!2sph" width="100%" height="390" frameborder="0" style="border:0" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="primary-button">
+                        <a href="#home">Back To Top</a>
+                    </div>
+                    <ul>
+                        <li><a href="#"><i class="fa fa-facebook"></i></a></li>
+                        <li><a href="#"><i class="fa fa-twitter"></i></a></li>
+                        <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
+                        <li><a href="#"><i class="fa fa-google"></i></a></li>
+                        <li><a href="#"><i class="fa fa-dribbble"></i></a></li>
+                    </ul>
+                    <p>Copyright &copy; 2025 Team Phishda
+            
+            		- Design: <a rel="nofollow noopener" href="https://templatemo.com"><em>TemplateMo</em></a></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../static/js/vendor/jquery-1.11.2.min.js"><\/script>')</script>
+    <script src="../../static/js/vendor/bootstrap.min.js"></script>
+    <script src="../../static/js/plugins.js"></script>
+    <script src="../../static/js/main.js"></script>
+    <script>
+        function openCity(cityName) {
+            var i;
+            var x = document.getElementsByClassName("city");
+            for (i = 0; i < x.length; i++) {
+               x[i].style.display = "none";  
+            }
+            document.getElementById(cityName).style.display = "block";  
+        }
+    </script>
+
+    <script>
+        $(document).ready(function(){
+          // Add smooth scrolling to all links
+          $(".fixed-side-navbar a, .primary-button a").on('click', function(event) {
+
+            // Make sure this.hash has a value before overriding default behavior
+            if (this.hash !== "") {
+              // Prevent default anchor click behavior
+              event.preventDefault();
+
+              // Store hash
+              var hash = this.hash;
+
+              // Using jQuery's animate() method to add smooth page scroll
+              // The optional number (800) specifies the number of milliseconds it takes to scroll to the specified area
+              $('html, body').animate({
+                scrollTop: $(hash).offset().top
+              }, 800, function(){
+           
+                // Add hash (#) to URL when done scrolling (default click behavior)
+                window.location.hash = hash;
+              });
+            } // End if
+          });
+        });
+    </script>
+
 </body>
 </html>
