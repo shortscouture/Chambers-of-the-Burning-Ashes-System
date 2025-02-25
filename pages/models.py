@@ -207,11 +207,18 @@ class ColumbaryRecord(models.Model):
                 'status': self.status,
             }
         }
-        
+
         if self.customer:
             data['customer_info'] = {
                 'full_name': self.customer.full_name(),
-                'address': self.customer.permanent_address,
+                'address': ", ".join(filter(None, [
+                    self.customer.address_line_1,
+                    self.customer.address_line_2,
+                    self.customer.city,
+                    self.customer.province_or_state,
+                    self.customer.postal_code,
+                    self.customer.country
+                ])),  # Manually combining address fields
                 'mobile': self.customer.mobile_number,
                 'email': self.customer.email_address,
             }
@@ -234,18 +241,19 @@ class ColumbaryRecord(models.Model):
             data['payment_info'] = {
                 'mode_of_payment': self.payment.mode_of_payment,
                 'full_payment_receipt': self.payment.Full_payment_receipt_1,
-                'six_month_receipts': [
+                'six_month_receipts': list(filter(None, [
                     self.payment.six_month_receipt_1,
                     self.payment.six_month_receipt_2,
                     self.payment.six_month_receipt_3,
                     self.payment.six_month_receipt_4,
                     self.payment.six_month_receipt_5,
                     self.payment.six_month_receipt_6
-                ],
+                ])),  # Removes None values
                 'total_amount': self.payment.total_amount,
             }
-            
+
         return data
+
 
 
     def send_record_email(self):
@@ -254,48 +262,57 @@ class ColumbaryRecord(models.Model):
             return False
 
         data = self.get_record_data()
-        
-        message = f"Dear {self.customer.full_name},\n\nHere are your columbary record details:\n\n"
-        
-        # Add vault information
-        message += f"""
-VAULT INFORMATION
-----------------
-Vault ID: {data['vault_info']['vault_id']}
-Issuance Date: {data['vault_info']['issuance_date']}
-Expiration Date: {data['vault_info']['expiration_date']}
-Inurnment Date: {data['vault_info']['inurnment_date']}
-Urns Per Columbary: {data['vault_info']['urns_per_columbary']}
-Issuing Parish Priest: {data['vault_info']['issuing_parish_priest']}
+        message = f"Dear {self.customer.full_name()},\n\nHere are your columbary record details:\n\n"
 
-"""
-        # Add beneficiary information if available
+        # Vault Information
+        message += f"""
+    VAULT INFORMATION
+    ----------------
+    Vault ID: {data['vault_info']['vault_id']}
+    Inurnment Date: {data['vault_info']['inurnment_date']}
+    Urns Per Columbary: {data['vault_info']['urns_per_columbary']}
+    Status: {data['vault_info']['status']}
+    """
+        
+        # Holder of Privilege Information
+        if 'holder_of_privilege_info' in data:
+            message += f"""
+    HOLDER OF PRIVILEGE
+    ------------------
+    Issuance Date: {data['holder_of_privilege_info']['issuance_date']}
+    Expiration Date: {data['holder_of_privilege_info']['expiration_date']}
+    Issuing Parish Priest: {data['holder_of_privilege_info']['issuing_parish_priest']}
+    """
+        
+        # Beneficiary Information
         if 'beneficiary_info' in data:
             message += f"""
-BENEFICIARY INFORMATION
-----------------------
-First Beneficiary: {data['beneficiary_info']['first_beneficiary']}
-Second Beneficiary: {data['beneficiary_info']['second_beneficiary']}
-Third Beneficiary: {data['beneficiary_info']['third_beneficiary']}
-
-"""
-        # Add payment information if available
+    BENEFICIARY INFORMATION
+    ----------------------
+    First Beneficiary: {data['beneficiary_info']['first_beneficiary']}
+    Second Beneficiary: {data['beneficiary_info']['second_beneficiary']}
+    Third Beneficiary: {data['beneficiary_info']['third_beneficiary']}
+    """
+        
+        # Payment Information
         if 'payment_info' in data:
             message += f"""
-PAYMENT INFORMATION
-------------------
-Full Contribution: {'Yes' if data['payment_info']['full_contribution'] else 'No'}
-Six Month Installment: {'Yes' if data['payment_info']['six_month_installment'] else 'No'}
-Official Receipt Number: {data['payment_info']['official_receipt']}
-"""
-
+    PAYMENT INFORMATION
+    ------------------
+    Mode of Payment: {data['payment_info']['mode_of_payment']}
+    Full Payment Receipt: {data['payment_info']['full_payment_receipt']}
+    Six Month Installment Receipts: {', '.join(filter(None, map(str, data['payment_info']['six_month_receipts'])))}
+    Total Amount: {data['payment_info']['total_amount']}
+    """
+        
         message += "\n\nBest regards,\nParish Administration"
-
+        
         subject = 'Your Columbary Record Details'
         from_email = settings.EMAIL_HOST_USER
         recipient_list = [self.customer.email_address]
         
         return send_mail(subject, message, from_email, recipient_list)
+
 
 class TwoFactorAuth(models.Model):
     email = models.EmailField(max_length=45)
@@ -314,7 +331,7 @@ class TwoFactorAuth(models.Model):
             
         subject = 'Columbary System - Verification Code'
         message = f'''
-        Dear {customer.full_name},
+        Dear {customer.first_name} {customer.last_name},
         
         Your verification code is: {self.otp}
         
