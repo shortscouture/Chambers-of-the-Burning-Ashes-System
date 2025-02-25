@@ -13,7 +13,7 @@ from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Custom
 from django.views.generic import TemplateView, DeleteView
 from django.forms import modelformset_factory
 from django.urls import reverse_lazy, reverse
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.views.generic.base import TemplateView
 from django.db.models import Count, Sum
@@ -164,6 +164,10 @@ def send_letter_of_intent(request):
             status="pending"
         )
 
+        # Assign the selected ColumbaryRecord to this customer but keep it Vacant until approval
+        vault.customer = customer  
+        vault.save()  
+
         # Generate accept & decline URLs dynamically
         accept_url = request.build_absolute_uri(reverse('accept_letter_of_intent', args=[customer.customer_id]))
         decline_url = request.build_absolute_uri(reverse('decline_letter_of_intent', args=[customer.customer_id]))
@@ -174,7 +178,7 @@ Dear Rev. Bobby,
 A new Letter of Intent has been submitted:
 
 First Name: {first_name}
-Last Name:{last_name}
+Last Name: {last_name}
 Mobile Number: {mobile_number}
 Email Address: {email_address}
 Requested Vault: Section {section}, Level {level}
@@ -196,9 +200,10 @@ St. Alphonsus Parish
             fail_silently=False,
         )
 
-        return JsonResponse({"message": "Letter of Intent submitted successfully!"})
+        return render(request, 'success.html')
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
+
     
 
 def accept_letter_of_intent(request, intent_id):
@@ -206,24 +211,30 @@ def accept_letter_of_intent(request, intent_id):
     intent.status = "approved"
     intent.save()
 
-    # Find the assigned vault
-    columbary = ColumbaryRecord.objects.filter(customer=intent).first()
+    # Find the ColumbaryRecord assigned to this customer (set during Letter of Intent submission)
+    columbary = ColumbaryRecord.objects.filter(customer=intent, status="Vacant").first()
+
     if columbary:
-        columbary.status = "Occupied"
+        columbary.status = "Occupied"  # Change status to Occupied
         columbary.save()
+    else:
+        return HttpResponse("No available columbary assigned for this customer.", status=400)
 
     # Send acceptance email
     send_mail(
         subject="Your Letter of Intent has been Accepted",
         message=f"Dear {intent.first_name} {intent.last_name},\n\n"
-                "We are pleased to inform you that your letter of intent has been accepted.\n\n"
+                f"We are pleased to inform you that your letter of intent has been accepted.\n"
+                f"You have been assigned to Columbary: {columbary.section}-{columbary.level}.\n\n"
                 "Best regards,\nSt. Alphonsus Parish",
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[intent.email_address],
         fail_silently=False,
     )
 
-    return render(request, 'success.html', {'intent': intent})
+    return render(request, 'success.html', {'intent': intent, 'columbary': columbary})
+
+
 
 
 def decline_letter_of_intent(request, intent_id):
