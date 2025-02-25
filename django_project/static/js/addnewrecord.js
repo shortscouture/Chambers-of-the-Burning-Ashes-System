@@ -139,7 +139,7 @@ document.getElementById('processWebcamButton').addEventListener('click', functio
 
 // Process uploaded file
 document.getElementById('processOCR').addEventListener('click', function () {
-    console.log('Process OCR button clicked');
+    console.log('Processing uploaded file...');
     const fileInput = document.getElementById('ocrInput');
     if (!fileInput.files.length) {
         alert('Please select a file first');
@@ -151,61 +151,53 @@ document.getElementById('processOCR').addEventListener('click', function () {
 
 // Common image processing function
 function processImage(imageBlob) {
-    console.log('Processing image...');
+    console.log('Sending image to OCR API...');
     const formData = new FormData();
     formData.append('document', imageBlob);
-    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
-
-    // Show processing overlay
-    document.getElementById('processingOverlay').style.display = 'flex';
 
     fetch('/process-ocr/', {
         method: 'POST',
         body: formData
     })
-        .then(response => {
-            console.log('Received response:', response);
-            return response.json();
-        })
-        .then(data => {
-            console.log('Parsed data:', data);
-            if (data.success) {
-                // Populate form fields with extracted data
-                document.querySelector('[name="first_name"]').value = data.data.first_name || '';
-                document.querySelector('[name="middle_name"]').value = data.data.middle_name || '';
-                document.querySelector('[name="last_name"]').value = data.data.last_name || '';
-                document.querySelector('[name="suffix"]').value = data.data.suffix || '';
-                document.querySelector('[name="country"]').value = data.data.country || 'Philippines';
-                document.querySelector('[name="address_line_1"]').value = data.data.address_line_1 || '';
-                document.querySelector('[name="address_line_2"]').value = data.data.address_line_2 || '';
-                document.querySelector('[name="city"]').value = data.data.city || '';
-                document.querySelector('[name="province_or_state"]').value = data.data.province_or_state || '';
-                document.querySelector('[name="postal_code"]').value = data.data.postal_code || '';
-                document.querySelector('[name="landline_number"]').value = data.data.landline_number || '';
-                document.querySelector('[name="mobile_number"]').value = data.data.mobile_number || '';
-                document.querySelector('[name="email_address"]').value = data.data.email_address || '';
-                
-                // Populate Beneficiary fields
-                document.querySelector('[name="first_beneficiary_name"]').value = data.data.first_beneficiary_name || '';
-                document.querySelector('[name="second_beneficiary_name"]').value = data.data.second_beneficiary_name || '';
-                document.querySelector('[name="third_beneficiary_name"]').value = data.data.third_beneficiary_name || '';
-                
-                // Populate ColumbaryRecord fields
-                document.querySelector('[name="vault_id"]').value = data.data.vault_id || '';
-                document.querySelector('[name="inurnment_date"]').value = data.data.inurnment_date || '';
-                document.querySelector('[name="urns_per_columbary"]').value = data.data.urns_per_columbary || '';
-            } else {
-                alert('Error processing document: ' + data.error);
-            }
-        })
-        .catch(error => {
-            console.error('Fetch error:', error);
-            alert('Error: ' + error);
-        })
-        .finally(() => {
-            // Hide processing overlay
-            document.getElementById('processingOverlay').style.display = 'none';
-        });
+    .then(response => response.json())
+    .then(data => {
+        console.log('OCR Response:', data);
+        if (data.success) {
+            populateFields(data.data);
+        } else {
+            alert('OCR processing failed: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('OCR Fetch error:', error);
+        alert('Error: ' + error);
+    });
+}
+
+function populateFields(data) {
+    document.querySelector('[name="first_name"]').value = data.first_name || '';
+    document.querySelector('[name="middle_name"]').value = data.middle_name || '';
+    document.querySelector('[name="last_name"]').value = data.last_name || '';
+    document.querySelector('[name="suffix"]').value = data.suffix || '';
+    document.querySelector('[name="country"]').value = data.country || 'Philippines';
+    document.querySelector('[name="address_line_1"]').value = data.address_line_1 || '';
+    document.querySelector('[name="address_line_2"]').value = data.address_line_2 || '';
+    document.querySelector('[name="city"]').value = data.city || '';
+    document.querySelector('[name="province_or_state"]').value = data.province_or_state || '';
+    document.querySelector('[name="postal_code"]').value = data.postal_code || '';
+    document.querySelector('[name="landline_number"]').value = data.landline_number || '';
+    document.querySelector('[name="mobile_number"]').value = data.mobile_number || '';
+    document.querySelector('[name="email_address"]').value = data.email_address || '';
+
+    // Populate Beneficiary fields
+    document.querySelector('[name="first_beneficiary_name"]').value = data.first_beneficiary_name || '';
+    document.querySelector('[name="second_beneficiary_name"]').value = data.second_beneficiary_name || '';
+    document.querySelector('[name="third_beneficiary_name"]').value = data.third_beneficiary_name || '';
+
+    // Populate ColumbaryRecord fields
+    document.querySelector('[name="vault_id"]').value = data.vault_id || '';
+    document.querySelector('[name="inurnment_date"]').value = data.inurnment_date || '';
+    document.querySelector('[name="urns_per_columbary"]').value = data.urns_per_columbary || '';
 }
 
 // Clean up on page unload
