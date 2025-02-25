@@ -23,48 +23,88 @@ function togglePaymentFields() {
 // Initialize payment fields on page load
 document.addEventListener('DOMContentLoaded', function () {
     console.log('DOM fully loaded and parsed');
-    togglePaymentFields();
 
-    // Add event listener for payment mode change
+    // Initialize payment fields
+    togglePaymentFields();
     const paymentModeSelect = document.getElementById('id_mode_of_payment');
     if (paymentModeSelect) {
         paymentModeSelect.addEventListener('change', togglePaymentFields);
     } else {
         console.error('Payment mode select element not found!');
     }
+
+    // Initialize OCR UI elements
+    setupOcrUI();
 });
+
+function setupOcrUI() {
+    // Set up OCR option toggles if elements exist
+    const webcamOption = document.getElementById('webcamOption');
+    const uploadOption = document.getElementById('uploadOption');
+
+    if (webcamOption) {
+        webcamOption.addEventListener('click', function () {
+            console.log('Webcam option clicked');
+            document.getElementById('webcam-container').style.display = 'block';
+            document.getElementById('fileUploadContainer').style.display = 'none';
+            initializeWebcam();
+        });
+    }
+
+    if (uploadOption) {
+        uploadOption.addEventListener('click', function () {
+            console.log('Upload option clicked');
+            document.getElementById('webcam-container').style.display = 'none';
+            document.getElementById('fileUploadContainer').style.display = 'block';
+            stopWebcam();
+        });
+    }
+
+    // Set up webcam capture buttons
+    const captureButton = document.getElementById('captureButton');
+    if (captureButton) {
+        captureButton.addEventListener('click', captureWebcamImage);
+    }
+
+    const retakeButton = document.getElementById('retakeButton');
+    if (retakeButton) {
+        retakeButton.addEventListener('click', retakeWebcamImage);
+    }
+
+    const processWebcamButton = document.getElementById('processWebcamButton');
+    if (processWebcamButton) {
+        processWebcamButton.addEventListener('click', processWebcamImage);
+    }
+
+    // Set up file upload processing
+    const processOCRButton = document.getElementById('processOCR');
+    if (processOCRButton) {
+        processOCRButton.addEventListener('click', processUploadedFile);
+    }
+}
 
 // Webcam and OCR variables
 let stream = null;
 let capturedImage = null;
 
-// Toggle between webcam and file upload
-document.getElementById('webcamOption').addEventListener('click', function () {
-    console.log('Webcam option clicked');
-    document.getElementById('webcam-container').style.display = 'block';
-    document.getElementById('fileUploadContainer').style.display = 'none';
-    initializeWebcam();
-});
-
-document.getElementById('uploadOption').addEventListener('click', function () {
-    console.log('Upload option clicked');
-    document.getElementById('webcam-container').style.display = 'none';
-    document.getElementById('fileUploadContainer').style.display = 'block';
-    stopWebcam();
-});
-
 // Initialize webcam
 async function initializeWebcam() {
     console.log('Initializing webcam...');
     try {
+        const webcamView = document.getElementById('webcam-view');
+        if (!webcamView) {
+            console.error('Webcam view element not found!');
+            return;
+        }
+
         stream = await navigator.mediaDevices.getUserMedia({
             video: {
-                facingMode: 'environment', // Use the rear camera
+                facingMode: 'environment',
                 width: { ideal: 1920 },
                 height: { ideal: 1080 }
             }
         });
-        document.getElementById('webcam-view').srcObject = stream;
+        webcamView.srcObject = stream;
     } catch (err) {
         console.error('Error accessing webcam:', err);
         alert('Could not access webcam. Please ensure you have granted camera permissions.');
@@ -81,124 +121,273 @@ function stopWebcam() {
 }
 
 // Capture image from webcam
-document.getElementById('captureButton').addEventListener('click', function () {
-    console.log('Capture button clicked');
+function captureWebcamImage() {
+    console.log('Capturing image from webcam...');
     const video = document.getElementById('webcam-view');
     const canvas = document.getElementById('captured-image');
+    const captureButton = document.getElementById('captureButton');
+    const retakeButton = document.getElementById('retakeButton');
+    const processWebcamButton = document.getElementById('processWebcamButton');
+
+    if (!video || !canvas || !captureButton || !retakeButton || !processWebcamButton) {
+        console.error('One or more required elements not found!');
+        return;
+    }
+
     const context = canvas.getContext('2d');
 
-    // Set canvas size to match video
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-
-    // Draw video frame to canvas
     context.drawImage(video, 0, 0);
 
-    // Show captured image
     canvas.style.display = 'block';
     video.style.display = 'none';
-
-    // Update buttons
-    this.style.display = 'none';
-    document.getElementById('retakeButton').style.display = 'inline-block';
-    document.getElementById('processWebcamButton').style.display = 'inline-block';
+    captureButton.style.display = 'none';
+    retakeButton.style.display = 'inline-block';
+    processWebcamButton.style.display = 'inline-block';
 
     capturedImage = canvas.toDataURL('image/jpeg');
-});
+}
 
 // Retake photo
-document.getElementById('retakeButton').addEventListener('click', function () {
-    console.log('Retake button clicked');
+function retakeWebcamImage() {
+    console.log('Retaking webcam image...');
     const video = document.getElementById('webcam-view');
     const canvas = document.getElementById('captured-image');
+    const captureButton = document.getElementById('captureButton');
+    const retakeButton = document.getElementById('retakeButton');
+    const processWebcamButton = document.getElementById('processWebcamButton');
 
-    // Show video stream again
+    if (!video || !canvas || !captureButton || !retakeButton || !processWebcamButton) {
+        console.error('One or more required elements not found!');
+        return;
+    }
+
     video.style.display = 'block';
     canvas.style.display = 'none';
-
-    // Reset buttons
-    document.getElementById('captureButton').style.display = 'inline-block';
-    this.style.display = 'none';
-    document.getElementById('processWebcamButton').style.display = 'none';
+    captureButton.style.display = 'inline-block';
+    retakeButton.style.display = 'none';
+    processWebcamButton.style.display = 'none';
 
     capturedImage = null;
-});
+}
 
-// Process captured image from webcam
-document.getElementById('processWebcamButton').addEventListener('click', function () {
-    console.log('Process webcam button clicked');
-    if (!capturedImage) return;
+// Process webcam image
+function processWebcamImage() {
+    console.log('Processing webcam image...');
+    if (!capturedImage) {
+        console.error('No image captured!');
+        return;
+    }
 
-    // Convert base64 to blob
+    // Show loading indicator
+    showLoading('Processing image...');
+
     fetch(capturedImage)
         .then(res => res.blob())
         .then(blob => {
-            processImage(blob);
+            // Create a file from the blob
+            const imageFile = new File([blob], "webcam-capture.jpg", { type: "image/jpeg" });
+            uploadImageToS3(imageFile);
+        })
+        .catch(error => {
+            hideLoading();
+            console.error('Error processing webcam image:', error);
+            alert('Failed to process the captured image.');
         });
-});
+}
 
 // Process uploaded file
-document.getElementById('processOCR').addEventListener('click', function () {
+function processUploadedFile() {
     console.log('Processing uploaded file...');
     const fileInput = document.getElementById('ocrInput');
+
+    if (!fileInput) {
+        console.error('File input element not found!');
+        return;
+    }
+
     if (!fileInput.files.length) {
         alert('Please select a file first');
         return;
     }
 
-    processImage(fileInput.files[0]);
-});
+    // Show loading indicator
+    showLoading('Uploading document...');
 
-// Common image processing function
-function processImage(imageBlob) {
-    console.log('Sending image to OCR API...');
+    uploadImageToS3(fileInput.files[0]);
+}
+
+// Show loading indicator
+function showLoading(message = 'Loading...') {
+    // Create loading element if it doesn't exist
+    let loadingEl = document.getElementById('ocr-loading');
+
+    if (!loadingEl) {
+        loadingEl = document.createElement('div');
+        loadingEl.id = 'ocr-loading';
+        loadingEl.style.position = 'fixed';
+        loadingEl.style.top = '0';
+        loadingEl.style.left = '0';
+        loadingEl.style.width = '100%';
+        loadingEl.style.height = '100%';
+        loadingEl.style.backgroundColor = 'rgba(0,0,0,0.5)';
+        loadingEl.style.display = 'flex';
+        loadingEl.style.alignItems = 'center';
+        loadingEl.style.justifyContent = 'center';
+        loadingEl.style.zIndex = '9999';
+
+        const spinner = document.createElement('div');
+        spinner.style.backgroundColor = 'white';
+        spinner.style.padding = '20px';
+        spinner.style.borderRadius = '5px';
+        spinner.style.textAlign = 'center';
+
+        const spinnerImg = document.createElement('div');
+        spinnerImg.style.border = '5px solid #f3f3f3';
+        spinnerImg.style.borderTop = '5px solid #3498db';
+        spinnerImg.style.borderRadius = '50%';
+        spinnerImg.style.width = '50px';
+        spinnerImg.style.height = '50px';
+        spinnerImg.style.animation = 'spin 2s linear infinite';
+        spinnerImg.style.margin = '0 auto 10px auto';
+
+        const style = document.createElement('style');
+        style.textContent = '@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
+        document.head.appendChild(style);
+
+        const spinnerText = document.createElement('p');
+        spinnerText.id = 'loading-message';
+        spinnerText.textContent = message;
+
+        spinner.appendChild(spinnerImg);
+        spinner.appendChild(spinnerText);
+        loadingEl.appendChild(spinner);
+        document.body.appendChild(loadingEl);
+    } else {
+        document.getElementById('loading-message').textContent = message;
+        loadingEl.style.display = 'flex';
+    }
+}
+
+// Hide loading indicator
+function hideLoading() {
+    const loadingEl = document.getElementById('ocr-loading');
+    if (loadingEl) {
+        loadingEl.style.display = 'none';
+    }
+}
+
+// Upload image to S3 and process with Textract
+async function uploadImageToS3(imageFile) {
+    console.log('Starting S3 upload for file:', imageFile.name, 'Size:', imageFile.size, 'Type:', imageFile.type);
+
     const formData = new FormData();
-    formData.append('document', imageBlob);
+    formData.append('document', imageFile);
 
-    fetch('/process-ocr/', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('OCR Response:', data);
-        if (data.success) {
-            populateFields(data.data);
-        } else {
-            alert('OCR processing failed: ' + data.error);
+    try {
+        showLoading('Uploading to S3...');
+
+        const response = await fetch('/upload_and_process/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'), // Ensure CSRF token is included
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
-    })
-    .catch(error => {
-        console.error('OCR Fetch error:', error);
-        alert('Error: ' + error);
-    });
+
+        const result = await response.json();
+        console.log('Response JSON:', result);
+
+        if (result.success) {
+            console.log('Upload and processing successful! Data:', result.data);
+            populateFields(result.data); // Populate form fields with extracted data
+        } else {
+            console.error('Upload failed with error:', result.error);
+            alert('Failed to upload image: ' + result.error);
+        }
+    } catch (error) {
+        console.error('S3 Upload Error:', error);
+        alert('An error occurred while uploading the document: ' + error.message);
+    } finally {
+        hideLoading();
+    }
 }
 
+// Populate form fields with OCR data
 function populateFields(data) {
-    document.querySelector('[name="first_name"]').value = data.first_name || '';
-    document.querySelector('[name="middle_name"]').value = data.middle_name || '';
-    document.querySelector('[name="last_name"]').value = data.last_name || '';
-    document.querySelector('[name="suffix"]').value = data.suffix || '';
-    document.querySelector('[name="country"]').value = data.country || 'Philippines';
-    document.querySelector('[name="address_line_1"]').value = data.address_line_1 || '';
-    document.querySelector('[name="address_line_2"]').value = data.address_line_2 || '';
-    document.querySelector('[name="city"]').value = data.city || '';
-    document.querySelector('[name="province_or_state"]').value = data.province_or_state || '';
-    document.querySelector('[name="postal_code"]').value = data.postal_code || '';
-    document.querySelector('[name="landline_number"]').value = data.landline_number || '';
-    document.querySelector('[name="mobile_number"]').value = data.mobile_number || '';
-    document.querySelector('[name="email_address"]').value = data.email_address || '';
+    console.log('Populating fields with data:', data);
 
-    // Populate Beneficiary fields
-    document.querySelector('[name="first_beneficiary_name"]').value = data.first_beneficiary_name || '';
-    document.querySelector('[name="second_beneficiary_name"]').value = data.second_beneficiary_name || '';
-    document.querySelector('[name="third_beneficiary_name"]').value = data.third_beneficiary_name || '';
+    // Helper function to set value if field exists
+    function setValue(fieldId, value) {
+        if (!value) return;
 
-    // Populate ColumbaryRecord fields
-    document.querySelector('[name="vault_id"]').value = data.vault_id || '';
-    document.querySelector('[name="inurnment_date"]').value = data.inurnment_date || '';
-    document.querySelector('[name="urns_per_columbary"]').value = data.urns_per_columbary || '';
+        const element = document.getElementById(fieldId) ||
+            document.getElementsByName(fieldId)[0];
+
+        if (element) {
+            console.log(`Setting ${fieldId} to "${value}"`);
+            element.value = value;
+
+            // Trigger change event for any listeners
+            const event = new Event('change', { bubbles: true });
+            element.dispatchEvent(event);
+        } else {
+            console.warn(`Field not found: ${fieldId}`);
+        }
+    }
+
+    // Set values for each field
+    setValue('id_first_name', data.first_name);
+    setValue('id_middle_name', data.middle_name);
+    setValue('id_last_name', data.last_name);
+    setValue('id_suffix', data.suffix);
+    setValue('id_address_line_1', data.address_line_1);
+    setValue('id_address_line_2', data.address_line_2);
+    setValue('id_city', data.city);
+    setValue('id_province_or_state', data.province_or_state);
+    setValue('id_postal_code', data.postal_code);
+    setValue('id_country', data.country || 'Philippines');
+    setValue('id_landline_number', data.landline_number);
+    setValue('id_mobile_number', data.mobile_number);
+    setValue('id_email_address', data.email_address);
+
+    // Beneficiary fields
+    if (data.first_beneficiary_name) {
+        setValue('id_beneficiary_set-0-name', data.first_beneficiary_name);
+    }
+    if (data.second_beneficiary_name) {
+        setValue('id_beneficiary_set-1-name', data.second_beneficiary_name);
+    }
+    if (data.third_beneficiary_name) {
+        setValue('id_beneficiary_set-2-name', data.third_beneficiary_name);
+    }
+
+    // Other fields
+    setValue('id_vault_id', data.vault_id);
+    setValue('id_inurnment_date', data.inurnment_date);
+    setValue('id_urns_per_columbary', data.urns_per_columbary);
 }
 
-// Clean up on page unload
+// Function to get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === name + '=') {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Clean up webcam when leaving the page
 window.addEventListener('beforeunload', stopWebcam);
