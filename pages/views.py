@@ -29,6 +29,15 @@ import environ
 from django.db.models.functions import TruncMonth
 from django.contrib.auth.mixins import LoginRequiredMixin
 import logging
+from django.views.generic import TemplateView
+from django.core.paginator import Paginator
+from django.db.models import Q
+from .models import ColumbaryRecord
+from django.utils.safestring import mark_safe
+from django.db.models import Count, Sum
+from django.db.models.functions import TruncMonth
+import json
+
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +66,6 @@ class CustomerHomeView(TemplateView):
     template_name = "pages/Customer_Home.html"
 
 
-from django.db.models import Q
 
 class ColumbaryRecordsView(TemplateView):
     template_name = "pages/columbaryrecords.html"
@@ -65,19 +73,31 @@ class ColumbaryRecordsView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        columbary_records = ColumbaryRecord.objects.all()
-        records_data = []
+        # Get search query & selected filters
+        search_query = self.request.GET.get("search", "").strip()
+        selected_filters = self.request.GET.getlist("filter")  # Multiple selections
 
+        # Fetch all records
+        columbary_records = ColumbaryRecord.objects.select_related("customer").all()
+
+        # Apply search filter
+        if search_query:
+            columbary_records = columbary_records.filter(
+                Q(vault_id__icontains=search_query) | 
+                Q(customer__first_name__icontains=search_query) | 
+                Q(customer__last_name__icontains=search_query)
+            )
+
+        records_data = []
         for record in columbary_records:
-            customer = record.customer  # This may be None if no customer is linked
+            customer = getattr(record, "customer", None)  # Avoid NoneType errors
 
             has_beneficiary = (
-                customer.beneficiaries.filter(first_beneficiary_name__isnull=False).exists()
-                if customer else False
+                customer and customer.beneficiaries.filter(first_beneficiary_name__isnull=False).exists()
             )
 
             has_payment = (
-                customer.payments.filter(
+                customer and customer.payments.filter(
                     mode_of_payment__isnull=False
                 ).filter(
                     Q(mode_of_payment="Full Payment", Full_payment_receipt_1__isnull=False, Full_payment_amount_1__isnull=False) |
@@ -89,25 +109,53 @@ class ColumbaryRecordsView(TemplateView):
                       six_month_receipt_5__isnull=False, six_month_amount_5__isnull=False, 
                       six_month_receipt_6__isnull=False, six_month_amount_6__isnull=False)
                 ).exists()
-                if customer else False
             )
 
             has_holder_of_privilege = (
-                customer.privileges.filter(issuance_date__isnull=False).exists()
-                if customer else False
+                customer and customer.privileges.filter(issuance_date__isnull=False).exists()
             )
 
-            records_data.append({
+            record_entry = {
                 "vault_id": record.vault_id,
-                "customer_name": customer.full_name if customer else "No Customer",
+                "customer_name": customer.full_name() if customer else "No Customer",
                 "has_beneficiary": has_beneficiary,
                 "has_payment": has_payment,
                 "has_holder_of_privilege": has_holder_of_privilege,
                 "customer_id": customer.customer_id if customer else None,
-            })
+            }
 
-        context["records_data"] = records_data
+            records_data.append(record_entry)
+
+        # Apply filter logic
+        if selected_filters:
+            if len(selected_filters) == 3:
+                # Show only fully completed records if all three filters are selected
+                records_data = [
+                    record for record in records_data
+                    if record["has_beneficiary"] and record["has_payment"] and record["has_holder_of_privilege"]
+                ]
+            else:
+                # Show records that match at least one selected filter
+                records_data = [
+                    record for record in records_data
+                    if (
+                        ("beneficiary" in selected_filters and record["has_beneficiary"]) or
+                        ("payment" in selected_filters and record["has_payment"]) or
+                        ("holder" in selected_filters and record["has_holder_of_privilege"])
+                    )
+                ]
+
+        # Apply pagination (10 records per page)
+        page = self.request.GET.get("page", 1)
+        paginator = Paginator(records_data, 10)  # Show 10 per page
+        paginated_records = paginator.get_page(page)
+
+        # Add to context
+        context["records_data"] = paginated_records
+        context["search_query"] = search_query  # Keep search input filled
+        context["selected_filters"] = selected_filters  # Keep selected filters
         return context
+
 
 
 
@@ -115,11 +163,6 @@ class ColumbaryRecordsView(TemplateView):
 class MemorialView(TemplateView):
     template_name = "pages/Memorials.html"
 
-
-from django.utils.safestring import mark_safe
-from django.db.models import Count, Sum
-from django.db.models.functions import TruncMonth
-import json
 
 class DashboardView(TemplateView):
     template_name = "dashboard.html"
@@ -428,9 +471,27 @@ class CustomerDeleteView(DeleteView):
         return get_object_or_404(Customer, customer_id=customer_id)
 
     def delete(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        self.object.delete()
-        messages.success(request, "Customer and all related records deleted successfully.")
+        customer = self.get_object()
+
+        # Unlink ColumbaryRecord (keep the vault ID, but remove associations)
+        columbary_records = ColumbaryRecord.objects.filter(customer=customer)
+        for record in columbary_records:
+            record.customer = None
+            record.payment = None
+            record.holder_of_privilege = None
+            record.beneficiary = None
+            record.status = 'Vacant'  # Mark as Vacant if necessary
+            record.save()
+
+        # Delete all related records
+        Payment.objects.filter(customer=customer).delete()
+        HolderOfPrivilege.objects.filter(customer=customer).delete()
+        Beneficiary.objects.filter(customer=customer).delete()
+
+        # Delete the customer
+        customer.delete()
+
+        messages.success(request, "Customer and related records deleted successfully, but Vault ID remains intact.")
         return redirect(self.success_url)
 
 
@@ -798,62 +859,64 @@ def addnewcustomer(request):
         payment_form = PaymentForm(request.POST)
         holder_form = HolderOfPrivilegeForm(request.POST)
         beneficiary_form = BeneficiaryForm(request.POST)
-        columbary_form = ColumbaryRecordForm(request.POST)
 
-        if (
-            customer_form.is_valid() and 
-            payment_form.is_valid() and 
-            holder_form.is_valid() and 
-            beneficiary_form.is_valid() and 
-            columbary_form.is_valid()
-        ):
+        if customer_form.is_valid():
             customer = customer_form.save()
-
-            payment = payment_form.save(commit=False)
-            payment.customer = customer
-            payment.save()
-
-            holder = holder_form.save(commit=False)
-            holder.customer = customer
-            holder.save()
-
-            beneficiary = beneficiary_form.save(commit=False)
-            beneficiary.customer = customer
-            beneficiary.save()
+            
+            # Save payment only if valid
+            payment = None
+            if payment_form.is_valid():
+                payment = payment_form.save(commit=False)
+                payment.customer = customer
+                payment.save()
+            
+            # Save holder of privilege only if valid
+            holder = None
+            if holder_form.is_valid():
+                holder = holder_form.save(commit=False)
+                holder.customer = customer
+                holder.save()
+            
+            # Save beneficiary only if valid
+            beneficiary = None
+            if beneficiary_form.is_valid():
+                beneficiary = beneficiary_form.save(commit=False)
+                beneficiary.customer = customer
+                beneficiary.save()
 
             if vault:
-                # Update the existing vault
+                # Link the new customer and associated records to the existing vault
                 vault.customer = customer
-                vault.payment = payment
-                vault.holder_of_privilege = holder
-                vault.beneficiary = beneficiary
-                vault.inurnment_date = columbary_form.cleaned_data['inurnment_date']
-                vault.urns_per_columbary = columbary_form.cleaned_data['urns_per_columbary']
+                vault.payment = payment if payment else None
+                vault.holder_of_privilege = holder if holder else None
+                vault.beneficiary = beneficiary if beneficiary else None
                 vault.save()
             else:
                 # Create a new ColumbaryRecord
-                columbary_record = columbary_form.save(commit=False)
-                columbary_record.customer = customer
-                columbary_record.payment = payment
-                columbary_record.holder_of_privilege = holder
-                columbary_record.beneficiary = beneficiary
-                columbary_record.save()  # **Now properly saving the ColumbaryRecord**
+                columbary_record = ColumbaryRecord(
+                    vault_id=vault_id,
+                    customer=customer,
+                    payment=payment if payment else None,
+                    holder_of_privilege=holder if holder else None,
+                    beneficiary=beneficiary if beneficiary else None,
+                    status='Occupied'
+                )
+                columbary_record.save()
 
-            return redirect('success')  # Redirect after successful save
+            return redirect('success')  # Redirect to success page
 
     else:
         customer_form = CustomerForm()
         payment_form = PaymentForm()
         holder_form = HolderOfPrivilegeForm()
         beneficiary_form = BeneficiaryForm()
-        columbary_form = ColumbaryRecordForm()
 
     return render(request, 'pages/addcustomer.html', {
         'customer_form': customer_form,
         'payment_form': payment_form,
         'holder_form': holder_form,
         'beneficiary_form': beneficiary_form,
-        'columbary_form': columbary_form,
         'vault_id': vault_id
     })
+
 

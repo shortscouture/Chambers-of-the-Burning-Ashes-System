@@ -44,12 +44,19 @@
         <header class="top-nav">
             <h2>Columbary Records</h2>
             <div class="search-bar">
-                <input type="text" placeholder="Insert Name" id="search-name" aria-label="Search by Name">
-                <input type="text" placeholder="Insert Crypt No." id="search-crypt" aria-label="Search by Crypt Number">
-                <button id="search-button" aria-label="Search">Search</button>
-                <a href="{% url 'addnewrecord' %}">
-                    <button id="add-new-button" aria-label="Add New Record">Add New</button>
-                </a>
+                <form method="GET">
+                    <input type="text" name="search" value="{{ search_query }}" placeholder="Search by Name or Vault ID" aria-label="Search">
+                    
+                    <!-- Checklist Filter -->
+                    <label><input type="checkbox" name="filter" value="beneficiary" {% if "beneficiary" in selected_filters %}checked{% endif %}> Beneficiary</label>
+                    <label><input type="checkbox" name="filter" value="payment" {% if "payment" in selected_filters %}checked{% endif %}> Payment</label>
+                    <label><input type="checkbox" name="filter" value="holder" {% if "holder" in selected_filters %}checked{% endif %}> Holder of Privilege</label>
+                    
+                    <button type="submit">Search</button>
+                    <a href="{% url 'addnewrecord' %}">
+                        <button type="button" id="add-new-button">Add New</button>
+                    </a>
+                </form>
             </div>
         </header>
 
@@ -92,7 +99,6 @@
                                         </a>
                                     {% endif %}
                                 </td>
-                                
                             </tr>
                         {% endfor %}
                     {% else %}
@@ -101,9 +107,23 @@
                         </tr>
                     {% endif %}
                 </tbody>
-                
             </table>
         </section>
+
+        <!-- Pagination Controls -->
+        <div class="pagination">
+            {% if records_data.has_previous %}
+                <a href="?search={{ search_query }}&filter={{ filter_selected }}&page=1">First</a>
+                <a href="?search={{ search_query }}&filter={{ filter_selected }}&page={{ records_data.previous_page_number }}">Previous</a>
+            {% endif %}
+
+            Page {{ records_data.number }} of {{ records_data.paginator.num_pages }}
+
+            {% if records_data.has_next %}
+                <a href="?search={{ search_query }}&filter={{ filter_selected }}&page={{ records_data.next_page_number }}">Next</a>
+                <a href="?search={{ search_query }}&filter={{ filter_selected }}&page={{ records_data.paginator.num_pages }}">Last</a>
+            {% endif %}
+        </div>
 
     </div>
 
