@@ -38,9 +38,13 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function setupOcrUI() {
-    // Set up OCR option toggles if elements exist
     const webcamOption = document.getElementById('webcamOption');
     const uploadOption = document.getElementById('uploadOption');
+    const processOCRButton = document.getElementById('processOCR');
+
+    console.log('webcamOption:', webcamOption);
+    console.log('uploadOption:', uploadOption);
+    console.log('processOCRButton:', processOCRButton);
 
     if (webcamOption) {
         webcamOption.addEventListener('click', function () {
@@ -60,28 +64,20 @@ function setupOcrUI() {
         });
     }
 
-    // Set up webcam capture buttons
-    const captureButton = document.getElementById('captureButton');
-    if (captureButton) {
-        captureButton.addEventListener('click', captureWebcamImage);
-    }
-
-    const retakeButton = document.getElementById('retakeButton');
-    if (retakeButton) {
-        retakeButton.addEventListener('click', retakeWebcamImage);
-    }
-
-    const processWebcamButton = document.getElementById('processWebcamButton');
-    if (processWebcamButton) {
-        processWebcamButton.addEventListener('click', processWebcamImage);
-    }
-
-    // Set up file upload processing
-    const processOCRButton = document.getElementById('processOCR');
     if (processOCRButton) {
         processOCRButton.addEventListener('click', processUploadedFile);
     }
 }
+    // Set up file upload processing
+const processOCRButton = document.getElementById('processOCR');
+console.log('Process OCR button found:', processOCRButton); // Debug log
+
+if (processOCRButton) {
+    processOCRButton.addEventListener('click', processUploadedFile);
+} else {
+    console.error('Process OCR button not found!');
+}
+
 
 // Webcam and OCR variables
 let stream = null;
@@ -199,6 +195,7 @@ function processWebcamImage() {
 
 // Process uploaded file
 function processUploadedFile() {
+    console.log('Process Document button clicked!');
     console.log('Processing uploaded file...');
     const fileInput = document.getElementById('ocrInput');
 
@@ -318,6 +315,7 @@ async function uploadImageToS3(imageFile) {
     }
 }
 
+
 // Populate form fields with OCR data
 function populateFields(data) {
     console.log('Populating fields with data:', data);
@@ -341,36 +339,37 @@ function populateFields(data) {
         }
     }
 
-    // Set values for each field
-    setValue('id_first_name', data.first_name);
-    setValue('id_middle_name', data.middle_name);
-    setValue('id_last_name', data.last_name);
-    setValue('id_suffix', data.suffix);
-    setValue('id_address_line_1', data.address_line_1);
-    setValue('id_address_line_2', data.address_line_2);
-    setValue('id_city', data.city);
-    setValue('id_province_or_state', data.province_or_state);
-    setValue('id_postal_code', data.postal_code);
-    setValue('id_country', data.country || 'Philippines');
-    setValue('id_landline_number', data.landline_number);
-    setValue('id_mobile_number', data.mobile_number);
-    setValue('id_email_address', data.email_address);
+    // Extract first, middle, and last name from the "Name" field
+    const fullName = data.Name || '';
+    const nameParts = fullName.split(' ');
+    const firstName = nameParts[0] || '';
+    const middleName = nameParts.slice(1, -1).join(' ') || '';
+    const lastName = nameParts[nameParts.length - 1] || '';
+
+    // Map OCR data to form fields
+    setValue('id_first_name', firstName);
+    setValue('id_middle_name', middleName);
+    setValue('id_last_name', lastName);
+    setValue('id_suffix', ''); 
+    setValue('id_country', 'Philippines'); 
+    setValue('id_address_line_1', data.Address || data.Addres || ''); 
+    setValue('id_address_line_2', ''); 
+    setValue('id_city', ''); 
+    setValue('id_province_or_state', ''); 
+    setValue('id_postal_code', ''); 
+    setValue('id_landline_number', data['Landline No.'] || '');
+    setValue('id_mobile_number', data['Mobile No.'] || '');
+    setValue('id_email_address', ''); 
 
     // Beneficiary fields
-    if (data.first_beneficiary_name) {
-        setValue('id_beneficiary_set-0-name', data.first_beneficiary_name);
-    }
-    if (data.second_beneficiary_name) {
-        setValue('id_beneficiary_set-1-name', data.second_beneficiary_name);
-    }
-    if (data.third_beneficiary_name) {
-        setValue('id_beneficiary_set-2-name', data.third_beneficiary_name);
-    }
+    setValue('id_first_beneficiary_name', data['1'] || ''); 
+    setValue('id_second_beneficiary_name', data['2'] || ''); 
+    setValue('id_third_beneficiary_name', data['3'] || ''); 
 
     // Other fields
-    setValue('id_vault_id', data.vault_id);
-    setValue('id_inurnment_date', data.inurnment_date);
-    setValue('id_urns_per_columbary', data.urns_per_columbary);
+    setValue('id_vault_id', ''); 
+    setValue('id_inurnment_date', ''); 
+    setValue('id_urns_per_columbary', '1'); 
 }
 
 // Function to get CSRF token
