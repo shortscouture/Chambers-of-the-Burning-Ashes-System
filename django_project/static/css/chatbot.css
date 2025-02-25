@@ -1,14 +1,14 @@
 /* Chat container */
 .chat-wrapper {
-    position: fixed;
-    bottom: 80px; /* Adjust as needed to be above .Bot */
-    right: 20px; /* Or adjust as needed */
-    width: 300px; /* Or adjust as needed */
-    background-color: #fff; /* Ensure a background color */
+    position: fixed; /* Keep it fixed in the viewport */
+    bottom: 20px;
+    right: 20px;
+    width: 300px;
+    background-color: #fff;
     border: 1px solid #ccc;
     border-radius: 5px;
-    display: none;
-    flex-direction: column;
+    display: none; /* Initially hidden */
+    z-index: 21; /* Ensure it's on top */
 }
 
 .chat-header {
@@ -97,14 +97,14 @@ body {
 /* Bot button (fixed position) */
 .Bot {
     position: fixed;
-    bottom: 20px; /* Adjust as needed */
+    bottom: 20px;
     right: 20px;
     background-color: #007bff;
     color: white;
     padding: 15px;
     border-radius: 50%;
     cursor: pointer;
-    z-index: 20; /* Make sure it's above the chatbox */
+    z-index: 20; /* Ensure the button is below the chatbox */
 }
 
 .Bot svg {
