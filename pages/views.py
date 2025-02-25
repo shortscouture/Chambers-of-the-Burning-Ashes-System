@@ -1,4 +1,4 @@
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, DeleteView
 from django.shortcuts import render, redirect, get_object_or_404,  HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail
@@ -6,18 +6,15 @@ from django.conf import settings
 from django.contrib import messages
 from django.utils import timezone
 from django.utils.safestring import mark_safe
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, Q
 from datetime import datetime, timedelta
-from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm, PaymentForm, HolderOfPrivilegeForm
-from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, Payment, ChatQuery, ParishAdministrator, HolderOfPrivilege
-from django.views.generic import TemplateView, DeleteView
-from django.urls import reverse_lazy
-from django.http import HttpResponseRedirect, JsonResponse
+from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm, PaymentForm, HolderOfPrivilegeForm, DocumentUploadForm
+from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, ChatQuery, ParishAdministrator, HolderOfPrivilege
+from django.forms import modelformset_factory
+from django.urls import reverse_lazy, reverse
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.views.generic.base import TemplateView
-from django.db.models import Count, Sum, Q
-from .models import Customer, ColumbaryRecord, Beneficiary, Payment
-from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, PaymentForm, DocumentUploadForm
 from django.db import transaction, connection
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -29,7 +26,6 @@ import openai
 from django.db import transaction
 import json
 import environ
-from django.views.decorators.csrf import csrf_exempt
 from django.db.models.functions import TruncMonth
 from django.contrib.auth.mixins import LoginRequiredMixin
 import logging
@@ -241,90 +237,118 @@ class DashboardView(TemplateView):
             
 def send_letter_of_intent(request):
     if request.method == 'POST':
-
-        full_name = request.POST['full_name']
-        permanent_address = request.POST['permanent_address']
-        landline_number = request.POST.get('landline_number', '')
+        first_name = request.POST['first_name']
+        last_name = request.POST['last_name']
         mobile_number = request.POST['mobile_number']
         email_address = request.POST['email_address']
-        # Save the form data with a pending status
-        intent = Customer.objects.create(
-            full_name=full_name,
-            permanent_address=permanent_address,
-            landline_number=landline_number,
+        section = request.POST['section']
+        level = request.POST['level']
+
+        # Ensure selected vault is vacant
+        try:
+            vault = ColumbaryRecord.objects.get(section=section, level=level, status="Vacant")
+        except ColumbaryRecord.DoesNotExist:
+            return JsonResponse({"error": "Selected vault is already occupied or does not exist!"}, status=400)
+
+        # Save the customer record with a pending status
+        customer = Customer.objects.create(
+            first_name=first_name,
+            last_name=last_name,
             mobile_number=mobile_number,
             email_address=email_address,
+            status="pending"
         )
-        
-        # Send email to admin
-        accept_url = request.build_absolute_uri(f'/accept/{intent.customer_id}/')
-        decline_url = request.build_absolute_uri(f'/decline/{intent.customer_id}/')
-        email_body = f"""
-Dear Rev. Bobby
-    
-I hope this message finds you well. I am writing to formally submit my letter of intent for Acquiring a Columbary find my details below:
 
-Full Name: {full_name}
-Permanent Address: {permanent_address}
-Landline Number: {landline_number if landline_number else 'N/A'}
+        # Assign the selected ColumbaryRecord to this customer but keep it Vacant until approval
+        vault.customer = customer  
+        vault.save()  
+
+        # Generate accept & decline URLs dynamically
+        accept_url = request.build_absolute_uri(reverse('accept_letter_of_intent', args=[customer.customer_id]))
+        decline_url = request.build_absolute_uri(reverse('decline_letter_of_intent', args=[customer.customer_id]))
+
+        email_body = f"""
+Dear Rev. Bobby,
+
+A new Letter of Intent has been submitted:
+
+First Name: {first_name}
+Last Name: {last_name}
 Mobile Number: {mobile_number}
 Email Address: {email_address}
+Requested Vault: Section {section}, Level {level}
 
-I would appreciate your time and attention to this matter. Please feel free to reach out to me if any further information or clarification is needed.
+[✅ Accept]({accept_url})
+[❌ Decline]({decline_url})
 
-Thank you for considering my submission.
+Please review this request.
 
 Best regards,
-
-        Accept: {accept_url}
-        Decline: {decline_url}
+St. Alphonsus Parish
         """
+
         send_mail(
             'New Letter of Intent',
             email_body,
             settings.DEFAULT_FROM_EMAIL,
             [settings.ADMIN_EMAIL],
+            fail_silently=False,
         )
 
-        return render(request, 'Success.html', {'intent': intent})
+        return render(request, 'success.html')
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
     
 
 def accept_letter_of_intent(request, intent_id):
     intent = get_object_or_404(Customer, customer_id=intent_id)
-    intent.status = 'approved'
+    intent.status = "approved"
     intent.save()
-    
+
+    # Find the ColumbaryRecord assigned to this customer (set during Letter of Intent submission)
+    columbary = ColumbaryRecord.objects.filter(customer=intent, status="Vacant").first()
+
+    if columbary:
+        columbary.status = "Occupied"  # Change status to Occupied
+        columbary.save()
+    else:
+        return HttpResponse("No available columbary assigned for this customer.", status=400)
+
+    # Send acceptance email
     send_mail(
         subject="Your Letter of Intent has been Accepted",
-        message=(
-            f"Dear {intent.full_name},\n\n"
-            "We are pleased to inform you that your letter of intent has been accepted.\n\n"
-            "Best regards,\nThe Team"
-        ),
-        from_email='stalphonsusmakati@gmail.com',
+        message=f"Dear {intent.first_name} {intent.last_name},\n\n"
+                f"We are pleased to inform you that your letter of intent has been accepted.\n"
+                f"You have been assigned to Columbary: {columbary.section}-{columbary.level}.\n\n"
+                "Best regards,\nSt. Alphonsus Parish",
+        from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[intent.email_address],
         fail_silently=False,
     )
 
-    return render(request, 'pages/accept_success.html', {'intent': intent})
+    return render(request, 'success.html', {'intent': intent, 'columbary': columbary})
+
+
 
 
 def decline_letter_of_intent(request, intent_id):
     intent = get_object_or_404(Customer, customer_id=intent_id)
     intent.status = 'declined'
-    intent.delete()
-        
+    intent.save()  # Keep the record instead of deleting it
+
+    # Send rejection email
     send_mail(
         subject="Your Letter of Intent has been Declined",
-        message=(
-            f"Dear {intent.full_name},\n\n"
-            "We regret to inform you that your letter of intent has been declined.\n\n"
-            "Best regards,\nThe Team"
-        ),
-        from_email='stalphonsusmakati@gmail.com',
+        message=f"Dear {intent.first_name} {intent.last_name},\n\n"
+                "We regret to inform you that your letter of intent has been declined.\n\n"
+                "Best regards,\n St. Alphonsus Parish",
+        from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[intent.email_address],
         fail_silently=False,
     )
+
+    return redirect('some_rejection_page')
 
 
 class RecordsDetailsView(TemplateView):
@@ -812,6 +836,16 @@ def addnewrecord(request):
         'holder_form': holder_form,
         'beneficiary_form': beneficiary_form
     })
+
+def get_vault_data(request, section_id):
+    vaults = ColumbaryRecord.objects.filter(section=section_id)
+    levels = {vault.level: vault.status == "Occupied" for vault in vaults}
+    
+    response_data = {'levels': levels}
+    print(json.dumps(response_data, indent=4))  # Debugging output
+    
+    return JsonResponse(response_data)
+
 
 def addnewcustomer(request):
     vault_id = request.GET.get('vault_id')
