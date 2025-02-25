@@ -676,14 +676,37 @@ class ChatbotAPIView(APIView):
         """
         with connection.cursor() as cursor:
             cursor.execute(
-                "SELECT content FROM parish_knowledge "
-                "WHERE MATCH(question, answer) AGAINST (%s IN NATURAL LANGUAGE MODE) "
-                "LIMIT 3;", [query]
+                "SHOW TABLES;"
+                #"WHERE MATCH(question, answer) AGAINST (%s IN NATURAL LANGUAGE MODE) "
+                #"LIMIT 3;", [query]
             )
-            results = cursor.fetchall()
-        if results:
-            return " ".join([row[0] for row in results]) if results else ""
+            tables = [row[0] for row in cursor.fetchall()]
+        all_results = []
+        for table in tables:
+            with connection.cursor() as cursor:
+                # Get the first column's name
+                cursor.execute(f"SHOW COLUMNS FROM {table};")
+                first_column = cursor.fetchone()[0]  # Get the first column name
+
+                # Fetch data from this table (first column only)
+                cursor.execute(f"SELECT {first_column} FROM {table} LIMIT 3;")
+                results = cursor.fetchall()
+
+                all_results.extend([str(row[0]) for row in results]) 
+            if all_results:
+                answer = " ".join(all_results)
+
+                # Store the answer in parish_knowledge
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        "INSERT INTO parish_knowledge (question, answer) VALUES (%s, %s);",
+                        [query, answer]
+                    )
+
+                return answer
         return "I'm not sure about that. Please check with the parish office or refer to the official guidelines."
+
+        
         
     def post(self, request, *args, **kwargs):
         database_data  = get_data_from_db()
