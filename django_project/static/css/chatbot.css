@@ -1,14 +1,32 @@
 /* Chat container */
+@media (max-width: 768px) { /* Example breakpoint */
+    .chat-wrapper, .Bot {
+        left: 10px; /* Adjust for smaller screens */
+    }
+}
 .chat-wrapper {
     position: fixed; /* Keep it fixed in the viewport */
     bottom: 20px;
-    right: 40px;
+    left: 20px;
     width: 300px;
     background-color: #fff;
     border: 1px solid #ccc;
     border-radius: 5px;
     display: none; /* Initially hidden */
     z-index: 21; /* Ensure it's on top */
+}
+.chat-title-container {
+    text-align: center; /* Center the title */
+    margin-bottom: 10px; /* Add some space below */
+}
+
+.chat-title-container h3 {
+    color: #333; /* Example color */
+}
+.chat-title {
+    font-weight: bold;
+    margin-right: auto; /* Push the title to the left */
+    /* Add any other styling you want for the title */
 }
 
 .chat-header {
@@ -99,7 +117,7 @@ body {
 .Bot {
     position: fixed;
     bottom: 20px;
-    right: 20px;
+    left: 20px;
     background-color: #007bff;
     color: white;
     padding: 15px;
