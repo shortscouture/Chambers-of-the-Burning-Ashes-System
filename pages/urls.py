@@ -34,5 +34,7 @@ urlpatterns = [
     path('delete_customer/<int:customer_id>/', CustomerDeleteView.as_view(), name='delete_customer'),
     path('process-ocr/', views.process_ocr, name='process_ocr'),
     path('get_vault_data/<str:section_id>/', get_vault_data, name='get_vault_data'),
-   
+  
+    path('addnewcustomer/', views.addnewcustomer, name='addnewcustomer'),
+
 ]

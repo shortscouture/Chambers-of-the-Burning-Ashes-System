@@ -1,0 +1,72 @@
+/* Sidebar Styles */
+.sidebar {
+  width: 200px; /* Adjust width to avoid making it too wide */
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: rgba(21, 124, 215, 0.9);
+  border-right: 3px solid white; /* Keeps the outline */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 20px;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Sidebar Header (Logo) */
+.sidebar-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.logohead {
+  width: 150px;
+}
+
+/* Navigation Menu */
+.sidebar-nav {
+  width: 100%;
+}
+
+.sidebar-nav ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar-nav ul li {
+  width: 100%;
+  text-align: center;
+  margin: 15px 0;
+}
+
+.sidebar-nav ul li a {
+  display: block;
+  padding: 10px;
+  font-size: 18px;
+  color: white;
+  text-decoration: none;
+  transition: background 0.3s ease;
+}
+
+.sidebar-nav ul li a:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+}
+
+/* Logout Button */
+#logoutBtn {
+  background-color: rgb(39, 94, 246);
+  border: 2px solid white;
+  border-radius: 30px;
+  padding: 5px 15px;
+  color: white;
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 20px;
+  transition: background 0.3s ease;
+}
+
+#logoutBtn:hover {
+  background-color: rgba(199, 5, 5, 0.9);
+}
