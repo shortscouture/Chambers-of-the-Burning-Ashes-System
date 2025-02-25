@@ -25,6 +25,7 @@ import re
 import numpy as np
 import cv2
 import openai
+from openai import OpenAI
 from django.db import transaction
 import json
 import environ
@@ -39,6 +40,11 @@ from django.utils.safestring import mark_safe
 from django.db.models import Count, Sum
 from django.db.models.functions import TruncMonth
 import json
+import io
+import base64
+import os
+
+env = environ.Env()
 
 
 logger = logging.getLogger(__name__)
@@ -613,95 +619,7 @@ def extract_name_components(full_name):
         'suffix': suffix
     }
 
-def parse_text_to_form_data(text):
-    """
-    Enhanced parsing function specifically matched to your form structure
-    """
-    data = {
-        'first_name': '',
-        'middle_name': '',
-        'last_name': '',
-        'suffix': '',
-        'country': 'Philippines',
-        'address_line_1': '',
-        'address_line_2': '',
-        'city': '',
-        'province_or_state': '',
-        'postal_code': '',
-        'landline_number': '',
-        'mobile_number': '',
-        'email_address': '',
-        'first_beneficiary_name': '',
-        'second_beneficiary_name': '',
-        'third_beneficiary_name': '',
-        'vault_id': '',
-        'inurnment_date': None,
-        'urns_per_columbary': '1'
-    }
-
-    # Define detailed patterns for each field
-    patterns = {
-        'full_name': r'Full\s*name:?\s*([^\n]*)',
-        'permanent_address': r'Permanent\s*Address:?\s*([^\n]*)',
-        'current_address': r'Current\s*Address:?\s*([^\n]*)',
-        'email': r'Email\s*Address:?\s*([^\n]*)',
-        'landline': r'Landline\s*Number:?\s*([^\n]*)',
-        'mobile': r'Mobile\s*Number:?\s*([^\n]*)',
-        'first_priority': r'FIRST\s*PRIORITY\s*Full\s*name:?\s*([^\n]*)',
-        'second_priority': r'SECOND\s*PRIORITY\s*Full\s*name:?\s*([^\n]*)',
-        'third_priority': r'THIRD\s*PRIORITY\s*Full\s*name:?\s*([^\n]*)',
-    }
-
-    # Extract and process main name
-    main_name_match = re.search(patterns['full_name'], text, re.IGNORECASE)
-    if main_name_match:
-        name_components = extract_name_components(main_name_match.group(1))
-        data.update(name_components)
-
-    # Process address
-    address_match = re.search(patterns['permanent_address'], text, re.IGNORECASE)
-    if address_match:
-        address = address_match.group(1).strip()
-        # Split address into components
-        address_parts = address.split(',')
-        data['address_line_1'] = address_parts[0].strip()
-        if len(address_parts) > 1:
-            data['address_line_2'] = address_parts[1].strip()
-        if len(address_parts) > 2:
-            data['city'] = address_parts[2].strip()
-        if len(address_parts) > 3:
-            data['province_or_state'] = address_parts[3].strip()
-
-    # Extract email
-    email_match = re.search(patterns['email'], text, re.IGNORECASE)
-    if email_match:
-        data['email_address'] = email_match.group(1).strip().lower()
-
-    # Extract phone numbers
-    landline_match = re.search(patterns['landline'], text, re.IGNORECASE)
-    if landline_match:
-        data['landline_number'] = ''.join(filter(str.isdigit, landline_match.group(1)))
-
-    mobile_match = re.search(patterns['mobile'], text, re.IGNORECASE)
-    if mobile_match:
-        mobile = mobile_match.group(1)
-        # Handle multiple mobile numbers
-        numbers = mobile.split('or')
-        data['mobile_number'] = ''.join(filter(str.isdigit, numbers[0]))
-
-    # Process beneficiaries
-    for priority in ['first_priority', 'second_priority', 'third_priority']:
-        match = re.search(patterns[priority], text, re.IGNORECASE)
-        if match:
-            beneficiary_name = match.group(1).strip()
-            if priority == 'first_priority':
-                data['first_beneficiary_name'] = beneficiary_name
-            elif priority == 'second_priority':
-                data['second_beneficiary_name'] = beneficiary_name
-            elif priority == 'third_priority':
-                data['third_beneficiary_name'] = beneficiary_name
-
-    return data
+logger = logging.getLogger(__name__)
 
 @csrf_exempt
 def process_ocr(request):
@@ -709,154 +627,157 @@ def process_ocr(request):
         try:
             image = request.FILES['document']
             extracted_text = extract_text_openai(image)
+            parsed_data = parse_text_to_dict(extracted_text)
 
-            return JsonResponse({'success': True, 'extracted_text': extracted_text})
+            print("Extracted Text:", extracted_text)  # Debug extracted text
+            print("Parsed Data:", parsed_data)  # Debug parsed data
+            
+            return JsonResponse({'success': True, 'parsed_data': parsed_data})
         except Exception as e:
+            print("Error in OCR:", str(e))  # Log error in server console
             return JsonResponse({'success': False, 'error': str(e)})
-    
+
     return JsonResponse({'success': False, 'error': 'Invalid request'})
+
 
 def extract_text_openai(image):
     """
-    Extract text using OpenAI's OCR API.
+    Extract text using OpenAI's GPT-4 with vision capabilities.
     """
-    response = openai.images.create_variation(
-        image=image.read(),
-        model="gpt-4-vision-preview"
-    )
-    return response.data['text']  # Extract text from response
+    try:
+        # Open and convert image to base64
+        img = Image.open(image)
+        img_byte_array = io.BytesIO()
+        img.save(img_byte_array, format='PNG')
+        img_byte_array.seek(0)
+        
+        # Correctly encode as base64
+        base64_image = base64.b64encode(img_byte_array.getvalue()).decode('utf-8')
+        
+        # Use the API key from environment variable
+        client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+        
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": "Extract all text from this form. Format as key-value pairs."},
+                        {"type": "image_url", "image_url": f"data:image/png;base64,{base64_image}"}
+                    ]
+                }
+            ],
+            max_tokens=500
+        )
+        
+        # Access content correctly with the new client
+        extracted_text = response.choices[0].message.content.strip()
+        
+        if not extracted_text:
+            raise ValueError("No text extracted from OpenAI response")
+            
+        return extracted_text
+        
+    except Exception as e:
+        # Raise the exception rather than returning it as a string
+        raise Exception(f"OpenAI extraction error: {str(e)}")
 
-def extract_text(image):
-    """
-    Extract text from image using pytesseract
-    """
-    img = Image.open(image).convert('L')  # Convert to grayscale
-    text = pytesseract.image_to_string(img)
-    return text
-
-def parse_extracted_text(text):
-    """
-    Parse extracted text into structured form fields.
-    Modify this function to fit your document structure.
-    """
-    structured_data = {
-        "first_name": "",
-        "middle_name": "",
-        "last_name": "",
-        "suffix": "",
-        "country": "Philippines",
-        "address_line_1": "",
-        "address_line_2": "",
-        "city": "",
-        "province_or_state": "",
-        "postal_code": "",
-        "landline_number": "",
-        "mobile_number": "",
-        "email_address": "",
-        "first_beneficiary_name": "",
-        "second_beneficiary_name": "",
-        "third_beneficiary_name": "",
-        "vault_id": "",
-        "inurnment_date": "",
-        "urns_per_columbary": ""
-    }
-
-    lines = text.split("\n")
-    for line in lines:
-        if "First Name" in line:
-            structured_data["first_name"] = line.split(":")[1].strip()
-        elif "Middle Name" in line:
-            structured_data["middle_name"] = line.split(":")[1].strip()
-        elif "Last Name" in line:
-            structured_data["last_name"] = line.split(":")[1].strip()
-        elif "Suffix" in line:
-            structured_data["suffix"] = line.split(":")[1].strip()
-        elif "City" in line:
-            structured_data["city"] = line.split(":")[1].strip()
-        elif "Province" in line:
-            structured_data["province_or_state"] = line.split(":")[1].strip()
-        elif "Postal Code" in line:
-            structured_data["postal_code"] = line.split(":")[1].strip()
-        elif "Landline" in line:
-            structured_data["landline_number"] = line.split(":")[1].strip()
-        elif "Mobile" in line:
-            structured_data["mobile_number"] = line.split(":")[1].strip()
-        elif "Email" in line:
-            structured_data["email_address"] = line.split(":")[1].strip()
-        elif "Vault ID" in line:
-            structured_data["vault_id"] = line.split(":")[1].strip()
-        elif "Inurnment Date" in line:
-            structured_data["inurnment_date"] = line.split(":")[1].strip()
-
-    return structured_data
+openai.api_key = env("OPEN_AI_API_KEY")
 
 def parse_text_to_dict(text):
     """
-    Parse extracted text into a dictionary matching model fields.
+    Parse extracted text into a structured dictionary.
     """
+    if not text:
+        logger.error("OCR extracted text is empty.")
+        return {"error": "No text extracted"}
+
     data = {
-        # Customer fields
-        'first_name': None,
-        'middle_name': None,
-        'last_name': None,
-        'suffix': None,
-        'country': 'Philippines',  # Default value
-        'address_line_1': None,
-        'address_line_2': None,
-        'city': None,
-        'province_or_state': None,
-        'postal_code': None,
-        'landline_number': None,
-        'mobile_number': None,
-        'email_address': None,
-        
-        # Beneficiary fields
-        'first_beneficiary_name': None,
-        'second_beneficiary_name': None,
-        'third_beneficiary_name': None,
-        
-        # ColumbaryRecord fields
-        'vault_id': None,
-        'inurnment_date': None,
-        'urns_per_columbary': None,
+        "first_name": None,
+        "middle_name": None,
+        "last_name": None,
+        "suffix": None,
+        "country": "Philippines",
+        "address_line_1": None,
+        "address_line_2": None,
+        "city": None,
+        "province_or_state": None,
+        "postal_code": None,
+        "landline_number": None,
+        "mobile_number": None,
+        "email_address": None,
+        "first_beneficiary_name": None,
+        "second_beneficiary_name": None,
+        "third_beneficiary_name": None,
+        "vault_id": None,
+        "inurnment_date": None,
+        "urns_per_columbary": None
     }
 
-    # Example patterns (adjust based on your document structure)
-    patterns = {
-        # Customer patterns
-        'full_name': r'Full name:[\s]*([^\n]*)',
-        'permanent_address': r'Permanent Address:[\s]*([^\n]*)',
-        'mobile_number': r'Mobile Number:[\s]*([^\n]*)',
-        'email_address': r'Email Address:[\s]*([^\n]*)',
-        
-        # Beneficiary patterns
-        'first_beneficiary_name': r'FIRST PRIORITY[\s]*Full name:[\s]*([^\n]*)',
-        'second_beneficiary_name': r'SECOND PRIORITY[\s]*Full name:[\s]*([^\n]*)',
-        'third_beneficiary_name': r'THIRD PRIORITY[\s]*Full name:[\s]*([^\n]*)',
-        
-        # ColumbaryRecord patterns
-        'vault_id': r'Vault ID:[\s]*([^\n]*)',
-        'inurnment_date': r'Inurnment Date:[\s]*([^\n]*)',
-        'urns_per_columbary': r'Urns Per Columbary:[\s]*([^\n]*)',
-    }
-
-    # Extract all fields using patterns
-    for field, pattern in patterns.items():
-        match = re.search(pattern, text)
-        if match:
-            data[field] = match.group(1).strip()
-
-    # Split full name into first, middle, and last names
-    if data.get('full_name'):
-        name_parts = data['full_name'].split()
-        if len(name_parts) >= 1:
-            data['first_name'] = name_parts[0]
+    # Extract full name
+    full_name_match = re.search(r"Full\s*name:\s*([^\n]*)", text, re.IGNORECASE)
+    if full_name_match:
+        full_name = full_name_match.group(1).strip()
+        # Parse name - assuming format is "MIGUEL ROSENDO SR CRUZ MONTEMAYOR"
+        name_parts = full_name.split()
         if len(name_parts) >= 2:
-            data['last_name'] = name_parts[-1]
-        if len(name_parts) > 2:
-            data['middle_name'] = ' '.join(name_parts[1:-1])
+            data["first_name"] = name_parts[0]
+            data["last_name"] = name_parts[-1]
+            if len(name_parts) > 2:
+                # Check for common suffixes
+                if name_parts[-2].upper() in ["SR", "JR", "II", "III", "IV"]:
+                    data["suffix"] = name_parts[-2]
+                    data["last_name"] = name_parts[-1]
+                    if len(name_parts) > 3:
+                        data["middle_name"] = " ".join(name_parts[1:-2])
+                else:
+                    data["middle_name"] = " ".join(name_parts[1:-1])
+
+    # Extract address
+    address_match = re.search(r"Permanent\s*Address:\s*([^\n]*)", text, re.IGNORECASE)
+    if address_match:
+        address = address_match.group(1).strip()
+        data["address_line_1"] = address
+        
+        # Try to parse out city/state
+        address_parts = address.split()
+        if "CITY" in [p.upper() for p in address_parts]:
+            city_index = [p.upper() for p in address_parts].index("CITY")
+            if city_index > 0:
+                data["city"] = address_parts[city_index-1]
+
+    # Extract phone numbers
+    landline_match = re.search(r"Landline\s*Number:?\s*([0-9()\s\-+]*)", text, re.IGNORECASE)
+    if landline_match:
+        data["landline_number"] = landline_match.group(1).strip()
+
+    mobile_match = re.search(r"Mobile\s*Number:?\s*([0-9()\s\-+]*)", text, re.IGNORECASE)
+    if mobile_match:
+        data["mobile_number"] = mobile_match.group(1).strip()
+
+    # Extract email
+    email_match = re.search(r"Email\s*Address:?\s*([^\s\n]*@[^\s\n]*)", text, re.IGNORECASE)
+    if email_match:
+        data["email_address"] = email_match.group(1).strip()
+        
+    # Extract beneficiary information
+    beneficiary_section = False
+    for line in text.split('\n'):
+        if "BENEFICIARIES" in line.upper():
+            beneficiary_section = True
+            continue
+            
+        if beneficiary_section and "FIRST PRIORITY" in line.upper():
+            # Try to get first beneficiary from the next line
+            continue
+            
+        if beneficiary_section and re.search(r"Full\s*name:", line, re.IGNORECASE):
+            data["first_beneficiary_name"] = re.search(r"Full\s*name:\s*([^\n]*)", line, re.IGNORECASE).group(1).strip()
+            break
 
     return data
+
 
 #chatbot env
 env = environ.Env(
