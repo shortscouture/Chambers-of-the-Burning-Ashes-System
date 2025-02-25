@@ -351,22 +351,43 @@ def decline_letter_of_intent(request, intent_id):
     return redirect('some_rejection_page')
 
 
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views.generic import TemplateView
+from .models import Customer, ColumbaryRecord, HolderOfPrivilege, Beneficiary, Payment, CustomerFile
+from .forms import CustomerFileForm
+
 class RecordsDetailsView(TemplateView):
     template_name = "pages/recordsdetails.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        customer_id = self.kwargs.get('customer_id')
-        
+        customer_id = self.kwargs.get("customer_id")
+
         customer = get_object_or_404(Customer, customer_id=customer_id)
         
-        context['customer'] = customer
-        context['columbary_records'] = ColumbaryRecord.objects.filter(customer=customer)
-        context['holderofprivilege'] = HolderOfPrivilege.objects.filter(customer=customer)
-        context['beneficiaries'] = Beneficiary.objects.filter(customer=customer)
-        context['payments'] = Payment.objects.filter(customer=customer)
-        
+        context["customer"] = customer
+        context["columbary_records"] = ColumbaryRecord.objects.filter(customer=customer)
+        context["holderofprivilege"] = HolderOfPrivilege.objects.filter(customer=customer)
+        context["beneficiaries"] = Beneficiary.objects.filter(customer=customer)
+        context["payments"] = Payment.objects.filter(customer=customer)
+        context["files"] = CustomerFile.objects.filter(customer=customer)
+        context["file_form"] = CustomerFileForm()
+
         return context
+
+    def post(self, request, *args, **kwargs):
+        customer_id = self.kwargs.get("customer_id")
+        customer = get_object_or_404(Customer, customer_id=customer_id)
+
+        file_form = CustomerFileForm(request.POST, request.FILES)
+        if file_form.is_valid():
+            file_instance = file_form.save(commit=False)
+            file_instance.customer = customer
+            file_instance.save()
+            return redirect("recordsdetails", customer_id=customer.customer_id)
+
+        return self.get(request, *args, **kwargs)
+
 
 
 class CustomerEditView(TemplateView):
