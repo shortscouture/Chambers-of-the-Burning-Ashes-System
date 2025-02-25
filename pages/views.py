@@ -220,6 +220,12 @@ class DashboardView(TemplateView):
             .order_by("holder_of_privilege__issuance_date")
         )
 
+        class DashboardView(TemplateView):
+            template_name = "dashboard.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
         # Get filter parameters from the request
         request = self.request
         start_date = request.GET.get("start_date")
@@ -232,24 +238,38 @@ class DashboardView(TemplateView):
             start_date = None
             end_date = None
 
-        # Always include unissued columbaries and pending letters (no filtering on them)
+        # Always include **unissued** columbaries (no filtering on them)
         unissued_columbaries = ColumbaryRecord.objects.filter(
             holder_of_privilege__issuance_date__isnull=True, 
             customer__isnull=False
         )
+
+        # Always include **pending** customers
         pending_customers = Customer.objects.filter(status="pending")
 
-        # Filter only issued columbaries and payments
-        payments = Payment.objects.all()
-        issued_columbaries = ColumbaryRecord.objects.exclude(holder_of_privilege__issuance_date__isnull=True)
+        # Fetch all columbaries without filtering first
+        all_columbaries = ColumbaryRecord.objects.all()
 
+        # Apply filtering **only to columbaries with issuance dates**  
+        if start_date and end_date:
+            filtered_columbaries = all_columbaries.filter(holder_of_privilege__issuance_date__range=[start_date, end_date])
+        else:
+            filtered_columbaries = all_columbaries  # No filter if no date selected
+
+        # Separate vacant and occupied columbaries
+        vacant_columbaries = filtered_columbaries.filter(status="Vacant")
+        occupied_columbaries = filtered_columbaries.filter(status="Occupied")
+
+        # Count filtered columbaries
+        vacant_columbaries_count = vacant_columbaries.count()
+        occupied_columbaries_count = occupied_columbaries.count()
+
+        # Get Payments & Apply Date Filter
+        payments = Payment.objects.all()
         if start_date and end_date:
             payments = payments.filter(created_at__date__range=[start_date, end_date])
-            issued_columbaries = issued_columbaries.filter(holder_of_privilege__issuance_date__range=[start_date, end_date])
 
-        # Count filtered data
-        vacant_columbaries_count = issued_columbaries.filter(status="Vacant").count()
-        occupied_columbaries_count = issued_columbaries.filter(status="Occupied").count()
+        # Count Payments
         full_payment_count = payments.filter(mode_of_payment="Full Payment").count()
         installment_count = payments.filter(mode_of_payment="6-Month Installment").count()
 
@@ -268,14 +288,16 @@ class DashboardView(TemplateView):
         payment_labels = ["Full Payment", "Installment"]
         payment_data = [full_payment_count, installment_count]
 
-        # Update context with filtered & unfiltered data
+        # Update context with ALL columbaries (ensures they are always passed)
         context.update({
+            "vacant_columbaries": vacant_columbaries,  # ✅ Fix: Always pass available columbaries
+            "occupied_columbaries": occupied_columbaries,  # ✅ Fix: Always pass occupied columbaries
             "vacant_columbaries_count": vacant_columbaries_count,
             "occupied_columbaries_count": occupied_columbaries_count,
-            "unissued_columbaries": unissued_columbaries.count(),  # Fix unissued count
-            "pending_counts": pending_customers.count(),  # Fix pending count
-            "unissued_columbary_records": unissued_columbaries,  # Ensure records are passed
-            "pending_customers": pending_customers,  # Ensure customers are passed
+            "unissued_columbaries": unissued_columbaries.count(),
+            "pending_counts": pending_customers.count(),
+            "unissued_columbary_records": unissued_columbaries,
+            "pending_customers": pending_customers,
             "payment_labels": mark_safe(json.dumps(payment_labels)),
             "payment_data": mark_safe(json.dumps(payment_data)),
             "earnings_labels": mark_safe(json.dumps(earnings_labels)),
@@ -285,6 +307,7 @@ class DashboardView(TemplateView):
         })
 
         return context
+
 
             
 def send_letter_of_intent(request):

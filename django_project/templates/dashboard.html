@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
     <style>
- 
+
     </style>
 </head>
 
@@ -27,12 +27,12 @@
         <form id="dateFilterForm" method="GET" action="{% url 'dashboard' %}">
             <label for="start_date">Start Date:</label>
             <input type="date" id="start_date" name="start_date" value="{{ start_date }}">
-        
+
             <label for="end_date">End Date:</label>
             <input type="date" id="end_date" name="end_date" value="{{ end_date }}">
-        
+
             <button type="submit">Filter</button>
-        </form>        
+        </form>
     </div>
 
 
@@ -83,7 +83,7 @@
             </table>
         </div>
 
-        <!-- Available Columbaries Table (Initially Hidden) -->
+        <!-- Available Columbaries Table -->
         <div id="availableTableContainer" class="table-container hidden">
             <h3>AVAILABLE COLUMBARIES</h3>
             <table>
@@ -103,12 +103,17 @@
                         <td>{{ columbary.urns_per_columbary }}</td>
                         <td>{{ columbary.status }}</td>
                     </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">No available columbaries found.</td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
 
-        <!-- Occupied Columbaries Table (Initially Hidden) -->
+
+        <!-- Occupied Columbaries Table -->
         <div id="occupiedTableContainer" class="table-container hidden">
             <h3>OCCUPIED COLUMBARIES</h3>
             <table>
@@ -130,10 +135,15 @@
                         <td>{{ columbary.customer.full_name|default:"Unassigned" }}</td>
                         <td>{{ columbary.status }}</td>
                     </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">No occupied columbaries found.</td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+
 
         <!-- Unissued Columbaries Table (Initially Hidden) -->
         <div id="unissuedTableContainer" class="table-container hidden">
@@ -419,7 +429,7 @@
                     }
                 }
 
-                
+
 
                 // Add event listeners AFTER the page loads
                 document.querySelector(".info-box:nth-child(1)").addEventListener("click", function () {
