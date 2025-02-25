@@ -1,7 +1,7 @@
 from django.views.generic import TemplateView, DeleteView
 from django.shortcuts import render, redirect, get_object_or_404,  HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
 from django.contrib import messages
 from django.utils import timezone
@@ -947,4 +947,19 @@ def addnewcustomer(request):
         'vault_id': vault_id
     })
 
+@csrf_exempt  # Only use if CSRF token isn't included in the form
+def send_email(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        message = request.POST.get('message')
 
+        subject = f"New Contact Form Submission from {name}"
+        body = f"Name: {name}\nEmail: {email}\nMessage:\n{message}"
+
+        email_message = EmailMessage(subject, body, 'jamesnaldo376@gmail.com', ['recipient_email@gmail.com'])
+        email_message.send()
+
+        return JsonResponse({'success': True, 'message': 'Email sent successfully'})
+
+    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
