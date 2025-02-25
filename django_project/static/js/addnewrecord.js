@@ -315,10 +315,31 @@ async function uploadImageToS3(imageFile) {
     }
 }
 
+function normalizeKey(key) {
+    return key
+        .replace(/::/g, '') // Remove double colons
+        .replace(/\./g, '') // Remove periods
+        .replace(/\s+/g, ''); // Remove spaces
+}
+
+function normalizeOcrData(data) {
+    const normalizedData = {};
+    for (const key in data) {
+        if (data.hasOwnProperty(key)) {
+            const normalizedKey = normalizeKey(key);
+            normalizedData[normalizedKey] = data[key];
+        }
+    }
+    return normalizedData;
+}
 
 // Populate form fields with OCR data
 function populateFields(data) {
     console.log('Populating fields with data:', data);
+
+    // Normalize OCR data keys
+    const normalizedData = normalizeOcrData(data);
+    console.log('Normalized OCR data:', normalizedData);
 
     // Helper function to set value if field exists
     function setValue(fieldId, value) {
@@ -340,7 +361,7 @@ function populateFields(data) {
     }
 
     // Extract first, middle, and last name from the "Name" field
-    const fullName = data.Name || '';
+    const fullName = normalizedData.Name || '';
     const nameParts = fullName.split(' ');
     const firstName = nameParts[0] || '';
     const middleName = nameParts.slice(1, -1).join(' ') || '';
@@ -350,29 +371,28 @@ function populateFields(data) {
     setValue('id_first_name', firstName);
     setValue('id_middle_name', middleName);
     setValue('id_last_name', lastName);
-    setValue('id_suffix', ''); 
-    setValue('id_country', 'Philippines'); 
-    setValue('id_address_line_1', data.Address || data.Addres || ''); 
-    setValue('id_address_line_2', ''); 
-    setValue('id_city', ''); 
-    setValue('id_province_or_state', ''); 
-    setValue('id_postal_code', ''); 
-    setValue('id_landline_number', data['Landline No.'] || '');
-    setValue('id_mobile_number', data['Mobile No.'] || '');
-    setValue('id_email_address', ''); 
+    setValue('id_suffix', ''); // Suffix not available in OCR data
+    setValue('id_country', 'Philippines'); // Default value
+    setValue('id_address_line_1', normalizedData.Address || '');
+    setValue('id_address_line_2', ''); // Address Line 2 not available in OCR data
+    setValue('id_city', ''); // City not available in OCR data
+    setValue('id_province_or_state', ''); // Province/State not available in OCR data
+    setValue('id_postal_code', ''); // Postal Code not available in OCR data
+    setValue('id_landline_number', normalizedData.LandlineNo || '');
+    setValue('id_mobile_number', normalizedData.MobileNo || '');
+    setValue('id_email_address', ''); // Email not available in OCR data
 
     // Beneficiary fields
-    setValue('id_first_beneficiary_name', data['1'] || ''); 
-    setValue('id_second_beneficiary_name', data['2'] || ''); 
-    setValue('id_third_beneficiary_name', data['3'] || ''); 
+    setValue('id_first_beneficiary_name', normalizedData['1'] || ''); // First beneficiary
+    setValue('id_second_beneficiary_name', normalizedData['2'] || ''); // Second beneficiary
+    setValue('id_third_beneficiary_name', normalizedData['3'] || ''); // Third beneficiary
 
     // Other fields
-    setValue('id_vault_id', ''); 
-    setValue('id_inurnment_date', ''); 
-    setValue('id_urns_per_columbary', '1'); 
+    setValue('id_vault_id', ''); // Vault ID not available in OCR data
+    setValue('id_inurnment_date', ''); // Inurnment date not available in OCR data
+    setValue('id_urns_per_columbary', '1'); // Default value
 }
 
-// Function to get CSRF token
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
