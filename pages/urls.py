@@ -1,6 +1,8 @@
 from django.urls import path
 from django.core.management.base import BaseCommand
 from pages import views
+from django.conf import settings  # Import settings
+from django.conf.urls.static import static  # Import static
 from .views import (
     HomePageView, AboutPageView, MainDashView, ColumbaryRecordsView,
     CustomerHomeView, MemorialView, send_letter_of_intent, verify_otp,
@@ -33,4 +35,8 @@ urlpatterns = [
     path('get_vault_data/<str:section_id>/', get_vault_data, name='get_vault_data'),
     path('upload_and_process/', views.upload_and_process, name='upload_and_process'),  
     path('addnewcustomer/', views.addnewcustomer, name='addnewcustomer'),
+
 ]
+
+if settings.DEBUG:  
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

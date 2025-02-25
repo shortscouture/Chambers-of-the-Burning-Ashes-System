@@ -110,20 +110,22 @@
             </table>
         </section>
 
+
         <!-- Pagination Controls -->
         <div class="pagination">
             {% if records_data.has_previous %}
-                <a href="?search={{ search_query }}&filter={{ filter_selected }}&page=1">First</a>
-                <a href="?search={{ search_query }}&filter={{ filter_selected }}&page={{ records_data.previous_page_number }}">Previous</a>
+                <a href="?search={{ search_query }}{% for f in selected_filters %}&filter={{ f }}{% endfor %}&page=1">First</a>
+                <a href="?search={{ search_query }}{% for f in selected_filters %}&filter={{ f }}{% endfor %}&page={{ records_data.previous_page_number }}">Previous</a>
             {% endif %}
 
             Page {{ records_data.number }} of {{ records_data.paginator.num_pages }}
 
             {% if records_data.has_next %}
-                <a href="?search={{ search_query }}&filter={{ filter_selected }}&page={{ records_data.next_page_number }}">Next</a>
-                <a href="?search={{ search_query }}&filter={{ filter_selected }}&page={{ records_data.paginator.num_pages }}">Last</a>
+                <a href="?search={{ search_query }}{% for f in selected_filters %}&filter={{ f }}{% endfor %}&page={{ records_data.next_page_number }}">Next</a>
+                <a href="?search={{ search_query }}{% for f in selected_filters %}&filter={{ f }}{% endfor %}&page={{ records_data.paginator.num_pages }}">Last</a>
             {% endif %}
         </div>
+
 
     </div>
 

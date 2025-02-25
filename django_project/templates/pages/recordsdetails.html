@@ -184,6 +184,29 @@
                 <p class="no-records">No Beneficiary Details found for this customer.</p>
             {% endif %}
 
+
+        
+        <!-- File Upload Section -->
+        <h3 class="sub-header">Upload Files</h3>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ file_form.as_p }}
+            <button type="submit">Upload</button>
+        </form>
+
+        <!-- Display Uploaded Files -->
+        <h3 class="sub-header">Uploaded Files</h3>
+        <ul>
+            {% for file in files %}
+                <li>
+                    <a href="{{ file.file.url }}" target="_blank">{{ file.file.name }}</a> (Uploaded: {{ file.uploaded_at }})
+                </li>
+            {% empty %}
+                <p>No files uploaded.</p>
+            {% endfor %}
+        </ul>
+
+
             <!-- Buttons Section -->
             <div class="back-button" style="display: flex; justify-content: center; margin-top: 20px;">
                 <a href="{% url 'columbaryrecords' %}" style="margin-right: 10px;">
