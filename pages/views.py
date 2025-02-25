@@ -669,48 +669,93 @@ openai.api_key = env("OPEN_AI_API_KEY")
 logger = logging.getLogger(__name__)
 class ChatbotAPIView(APIView):
     def get(self, request, *args, **kwargs):
-        return Response({"message": "Chatbot API is running! Use POST to send messages."}, status=status.HTTP_200_OK)
+        return Response({"message": "Chatbot API is running! Use POST to send messages."}, status=200)
 
+    
     def post(self, request, *args, **kwargs):
-        """Handles chatbot queries by retrieving answers from parish_knowledge and logging unanswered queries."""
-
-        # Extract user query
         user_query = request.data.get("message", "").strip()
         if not user_query:
             return JsonResponse({"error": "No query provided"}, status=400)
 
-        # Check if an answer exists in parish_knowledge
-        answer = self.get_answer_from_parish_knowledge(user_query)
+        db_answer = self.get_answer_from_parish_knowledge(user_query)
 
-        if answer:
-            response_text = answer  # Return the relevant answer
-        else:
-            response_text = (
-                "I'm sorry, I couldn't find an answer to your question. "
-                "For further assistance, please contact St. Alphonsus Parish: "
-                "[Facebook 📘](https://www.facebook.com/stalphonsusparishmagallanes) | "
-                "[Instagram 📸](https://www.instagram.com/stalphonsusparishmagallanes)"
-            )
-
-            # Save the unanswered question to pages_chatquery
-            self.save_unanswered_query(user_query)
+        ai_response = self.query_openai(user_query, db_answer)
 
         return JsonResponse({
             "query": user_query,
-            "response": response_text,
+            "response": ai_response,
         })
 
+
     def get_answer_from_parish_knowledge(self, query):
-        """Searches the parish_knowledge table for a matching question and returns the answer."""
+        """Uses FULLTEXT search to find the best matching answer in parish_knowledge."""
         with connection.cursor() as cursor:
-            cursor.execute("SELECT answer FROM parish_knowledge WHERE question = %s LIMIT 1;", [query])
+            cursor.execute("""
+                SELECT answer, MATCH(question) AGAINST (%s IN NATURAL LANGUAGE MODE) AS relevance 
+                FROM parish_knowledge 
+                WHERE MATCH(question) AGAINST (%s IN NATURAL LANGUAGE MODE) 
+                ORDER BY relevance DESC LIMIT 1;
+                """, [query, query])
             result = cursor.fetchone()
-            return result[0] if result else None  # Return answer if found, otherwise None
+            return result[0] if result else None
+
+
+    def get_all_knowledge(self):
+        """Retrieves all questions and answers from parish_knowledge for AI context."""
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT question, answer FROM parish_knowledge;")
+            rows = cursor.fetchall()
+        return [{"question": q, "answer": a} for q, a in rows]
+
+
+
+    def query_openai(self, user_query, db_answer=None):
+        """Uses OpenAI while incorporating database knowledge."""
+        try:
+            # Construct the AI prompt to guide behavior
+            system_prompt = (
+                "You are a helpful chatbot for church visitors. "
+                "If there is relevant information from the church database, use it, "
+                "Only answer questions about the columbarium, and if they answer things such as baptism or wedding, or funeral services, direct them to the contact information, it's found in the parish_questions database"
+                "but if the user gives you specific instructions on how to respond, follow them."
+            )
+
+            # Prepare messages with context  
+            messages = [{"role": "system", "content": system_prompt}]
+
+            if db_answer:
+                messages.append({"role": "assistant", "content": f"Database says: {db_answer}"})
+
+            messages.append({"role": "user", "content": user_query})
+
+            response = openai.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=messages,
+                temperature=0.7
+            )
+
+            if response and response.choices:
+                return response.choices[0].message.content.strip()
+        
+        except Exception as e:
+            print(f"OpenAI API error: {e}")
+
+        return "I'm not sure how to answer that. Please contact St. Alphonsus Parish for further assistance."
+
 
     def save_unanswered_query(self, query):
-        """Saves unanswered queries to pages_chatquery for future review."""
+        """Logs unanswered queries to pages_chatquery."""
         with connection.cursor() as cursor:
-            cursor.execute("INSERT INTO pages_chatquery (user_message, bot_response) VALUES (%s, NOW());", [query])
+            cursor.execute("INSERT INTO pages_chatquery (query, created_at) VALUES (%s, NOW());", [query])
+
+    
+    def get_related_parish_knowledge(self, query):
+        """Finds questions in parish_knowledge that contain keywords from the user's query."""
+        search_query = f"%{query}%"
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT question, answer FROM parish_knowledge WHERE question LIKE %s LIMIT 5;", [search_query])
+            return cursor.fetchall()  # Returns a list of (question, answer) tuples
+
 
 
 def get_crypt_status(request, section):
