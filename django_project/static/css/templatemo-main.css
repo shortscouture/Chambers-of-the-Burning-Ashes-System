@@ -801,3 +801,15 @@ body.lb-disable-scrolling {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
   opacity: 1;
 }
+.bot-contatainer{
+  background: white;
+}
+.Bot{
+  position: fixed;
+  width: 50px;
+  height: 50px;
+  z-index: 100;
+  margin-top: 200px;
+  margin-left: 650px;
+  fill: #2891d2; 
+}
