@@ -160,6 +160,8 @@ class ColumbaryRecordsView(TemplateView):
 
 
 
+
+
 class MemorialView(TemplateView):
     template_name = "pages/Memorials.html"
 
@@ -351,22 +353,43 @@ def decline_letter_of_intent(request, intent_id):
     return redirect('some_rejection_page')
 
 
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views.generic import TemplateView
+from .models import Customer, ColumbaryRecord, HolderOfPrivilege, Beneficiary, Payment, CustomerFile
+from .forms import CustomerFileForm
+
 class RecordsDetailsView(TemplateView):
     template_name = "pages/recordsdetails.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        customer_id = self.kwargs.get('customer_id')
-        
+        customer_id = self.kwargs.get("customer_id")
+
         customer = get_object_or_404(Customer, customer_id=customer_id)
         
-        context['customer'] = customer
-        context['columbary_records'] = ColumbaryRecord.objects.filter(customer=customer)
-        context['holderofprivilege'] = HolderOfPrivilege.objects.filter(customer=customer)
-        context['beneficiaries'] = Beneficiary.objects.filter(customer=customer)
-        context['payments'] = Payment.objects.filter(customer=customer)
-        
+        context["customer"] = customer
+        context["columbary_records"] = ColumbaryRecord.objects.filter(customer=customer)
+        context["holderofprivilege"] = HolderOfPrivilege.objects.filter(customer=customer)
+        context["beneficiaries"] = Beneficiary.objects.filter(customer=customer)
+        context["payments"] = Payment.objects.filter(customer=customer)
+        context["files"] = CustomerFile.objects.filter(customer=customer)
+        context["file_form"] = CustomerFileForm()
+
         return context
+
+    def post(self, request, *args, **kwargs):
+        customer_id = self.kwargs.get("customer_id")
+        customer = get_object_or_404(Customer, customer_id=customer_id)
+
+        file_form = CustomerFileForm(request.POST, request.FILES)
+        if file_form.is_valid():
+            file_instance = file_form.save(commit=False)
+            file_instance.customer = customer
+            file_instance.save()
+            return redirect("recordsdetails", customer_id=customer.customer_id)
+
+        return self.get(request, *args, **kwargs)
+
 
 
 class CustomerEditView(TemplateView):
@@ -887,25 +910,26 @@ def addnewcustomer(request):
         payment_form = PaymentForm(request.POST)
         holder_form = HolderOfPrivilegeForm(request.POST)
         beneficiary_form = BeneficiaryForm(request.POST)
+        columbary_form = ColumbaryRecordForm(request.POST, instance=vault)  # ✅ Load existing vault record
 
-        if customer_form.is_valid():
+        if customer_form.is_valid() and columbary_form.is_valid():
             customer = customer_form.save()
+
             
-            # Save payment only if valid
             payment = None
             if payment_form.is_valid():
                 payment = payment_form.save(commit=False)
                 payment.customer = customer
                 payment.save()
+
             
-            # Save holder of privilege only if valid
             holder = None
             if holder_form.is_valid():
                 holder = holder_form.save(commit=False)
                 holder.customer = customer
                 holder.save()
+
             
-            # Save beneficiary only if valid
             beneficiary = None
             if beneficiary_form.is_valid():
                 beneficiary = beneficiary_form.save(commit=False)
@@ -913,38 +937,38 @@ def addnewcustomer(request):
                 beneficiary.save()
 
             if vault:
-                # Link the new customer and associated records to the existing vault
+                
                 vault.customer = customer
                 vault.payment = payment if payment else None
                 vault.holder_of_privilege = holder if holder else None
                 vault.beneficiary = beneficiary if beneficiary else None
-                vault.save()
-            else:
-                # Create a new ColumbaryRecord
-                columbary_record = ColumbaryRecord(
-                    vault_id=vault_id,
-                    customer=customer,
-                    payment=payment if payment else None,
-                    holder_of_privilege=holder if holder else None,
-                    beneficiary=beneficiary if beneficiary else None,
-                    status='Occupied'
-                )
-                columbary_record.save()
 
-            return redirect('success')  # Redirect to success page
+                
+                vault.inurnment_date = columbary_form.cleaned_data.get("inurnment_date")
+                vault.urns_per_columbary = columbary_form.cleaned_data.get("urns_per_columbary")
+                vault.status = 'Occupied'
+                
+                vault.save()
+
+            return redirect('columbaryrecords')  
 
     else:
         customer_form = CustomerForm()
         payment_form = PaymentForm()
         holder_form = HolderOfPrivilegeForm()
         beneficiary_form = BeneficiaryForm()
+        columbary_form = ColumbaryRecordForm(instance=vault)  
 
     return render(request, 'pages/addcustomer.html', {
         'customer_form': customer_form,
         'payment_form': payment_form,
         'holder_form': holder_form,
         'beneficiary_form': beneficiary_form,
+        'columbary_form': columbary_form,  
         'vault_id': vault_id
     })
+
+
+
 
 

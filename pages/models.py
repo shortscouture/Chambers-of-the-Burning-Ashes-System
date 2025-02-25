@@ -349,3 +349,13 @@ class ChatQuery(models.Model):
 
     def __str__(self):
         return f"Query at {self.created_at}"
+
+
+
+class CustomerFile(models.Model):
+    customer = models.ForeignKey("Customer", on_delete=models.CASCADE, related_name="files")
+    file = models.FileField(upload_to="customer_files/")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.customer.full_name()} - {self.file.name}"
