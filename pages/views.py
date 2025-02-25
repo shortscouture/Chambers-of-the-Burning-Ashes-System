@@ -19,10 +19,11 @@ from django.db import transaction, connection
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-import pytesseract
 from PIL import Image
 import re
+import numpy as np
 import openai
+from openai import OpenAI
 from django.db import transaction
 import json
 import environ
@@ -37,13 +38,26 @@ from django.utils.safestring import mark_safe
 from django.db.models import Count, Sum
 from django.db.models.functions import TruncMonth
 import json
-from django.http import JsonResponse
-from .models import Customer, Payment
-from datetime import datetime
-from django.contrib.auth.mixins import LoginRequiredMixin
-import logging
+import io
+import base64
+from django.core.files.uploadedfile import InMemoryUploadedFile
+import boto3
+
+env = environ.Env()
+textract_client = boto3.client("textract", region_name="us-east-1")
 
 logger = logging.getLogger(__name__)
+AWS_S3_BUCKET_NAME = env("AWS_S3_BUCKET_NAME")
+AWS_REGION = env("AWS_REGION")
+s3_client = boto3.client("s3")
+
+try:
+    print(f"Testing AWS S3 connection to bucket: {AWS_S3_BUCKET_NAME}")
+    response = s3_client.list_objects_v2(Bucket=AWS_S3_BUCKET_NAME, MaxKeys=1)
+    print(f"S3 connection successful. Found {response.get('KeyCount', 0)} objects")
+except Exception as e:
+    print(f"AWS S3 connection error: {str(e)}")
+    logger.error(f"AWS S3 connection error: {e}")
 
 
 class SuccesView(TemplateView):
@@ -619,6 +633,38 @@ def memorials_verification(request):
 
 
 @csrf_exempt
+def upload_to_s3_and_extract_text(request):
+    if request.method == "POST" and request.FILES.get("file"):
+        uploaded_file = request.FILES["file"]
+        s3_client = boto3.client(
+            "s3",
+            aws_access_key_id=env("AWS_ACCESS_KEY_ID"),
+            aws_secret_access_key=env("AWS_SECRET_ACCESS_KEY"),
+        )
+        bucket_name = env("AWS_S3_BUCKET_NAME")
+        file_name = uploaded_file.name
+        
+        # Upload file to S3
+        s3_client.upload_fileobj(uploaded_file, bucket_name, file_name)
+        
+        # Call AWS Textract
+        textract_client = boto3.client(
+            "textract",
+            aws_access_key_id=env("AWS_ACCESS_KEY_ID"),
+            aws_secret_access_key=env("AWS_SECRET_ACCESS_KEY"),
+        )
+        response = textract_client.detect_document_text(
+            Document={"S3Object": {"Bucket": bucket_name, "Name": file_name}}
+        )
+        
+        # Extract text from Textract response
+        extracted_text = "".join([block["Text"] for block in response.get("Blocks", []) if block["BlockType"] == "LINE"])
+        
+        return JsonResponse({"text": extracted_text})
+    
+    return render(request, "upload.html")
+
+@csrf_exempt
 def verify_otp(request):
     if 'verification_email' not in request.session:
         return redirect('Memorials')
@@ -655,106 +701,143 @@ def verify_otp(request):
 def success(request):
     return render(request, 'pages/success.html')
 
-      
-def preprocess_image(image):
-    """
-    Preprocess the image to improve OCR accuracy
-    """
-    img = Image.open(image).convert('L')
-    img = img.point(lambda x: 0 if x < 128 else 255)
-    return img
+@csrf_exempt
+def upload_and_process(request):
+    if request.method == "POST" and request.FILES.get("document"):
+        uploaded_file = request.FILES["document"]
+        s3_client = boto3.client("s3")
+        bucket_name = env("AWS_S3_BUCKET_NAME")
+        file_key = f"uploads/{uploaded_file.name}"
 
-@csrf_exempt 
-def process_ocr(request):
-    if request.method == 'POST' and request.FILES.get('document'):
-        try:
-            # Extract text from the uploaded image
-            image = request.FILES['document']
-            extracted_text = extract_text(image)
-            
-            # Parse the extracted text into a dictionary
-            data = parse_text_to_dict(extracted_text)
-            
-            return JsonResponse({'success': True, 'data': data})
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
-    return JsonResponse({'success': False, 'error': 'Invalid request'})
+        # Upload file to S3
+        s3_client.upload_fileobj(uploaded_file, bucket_name, file_key)
 
-def extract_text(image):
-    """
-    Extract text from image using pytesseract
-    """
-    img = Image.open(image).convert('L')  # Convert to grayscale
-    text = pytesseract.image_to_string(img)
-    return text
+        # Process with Textract
+        textract_client = boto3.client("textract")
+        response = textract_client.analyze_document(
+            Document={"S3Object": {"Bucket": bucket_name, "Name": file_key}},
+            FeatureTypes=["FORMS"]
+        )
+
+        extracted_data = {}
+        for block in response.get("Blocks", []):
+            if block["BlockType"] == "KEY_VALUE_SET" and "KEY" in block.get("EntityTypes", []):
+                key_text = ""
+                value_text = ""
+                for rel in block.get("Relationships", []):
+                    if rel["Type"] == "CHILD":
+                        key_text = " ".join([w["Text"] for w in response["Blocks"] if w["Id"] in rel["Ids"]])
+                    if rel["Type"] == "VALUE":
+                        for value_block in response["Blocks"]:
+                            if value_block["Id"] in rel["Ids"]:
+                                for value_rel in value_block.get("Relationships", []):
+                                    if value_rel["Type"] == "CHILD":
+                                        value_text = " ".join([w["Text"] for w in response["Blocks"] if w["Id"] in value_rel["Ids"]])
+                if key_text and value_text:
+                    extracted_data[key_text] = value_text
+
+        # Return extracted data as JSON
+        return JsonResponse({"success": True, "data": extracted_data})
+
+    return JsonResponse({"success": False, "error": "Invalid request"})
 
 def parse_text_to_dict(text):
     """
-    Parse extracted text into a dictionary matching model fields.
+    Parse extracted text into a structured dictionary.
     """
+    if not text:
+        logger.error("OCR extracted text is empty.")
+        return {"error": "No text extracted"}
+    
     data = {
-        # Customer fields
-        'first_name': None,
-        'middle_name': None,
-        'last_name': None,
-        'suffix': None,
-        'country': 'Philippines',  # Default value
-        'address_line_1': None,
-        'address_line_2': None,
-        'city': None,
-        'province_or_state': None,
-        'postal_code': None,
-        'landline_number': None,
-        'mobile_number': None,
-        'email_address': None,
-        
-        # Beneficiary fields
-        'first_beneficiary_name': None,
-        'second_beneficiary_name': None,
-        'third_beneficiary_name': None,
-        
-        # ColumbaryRecord fields
-        'vault_id': None,
-        'inurnment_date': None,
-        'urns_per_columbary': None,
+        "first_name": None,
+        "middle_name": None,
+        "last_name": None,
+        "suffix": None,
+        "country": "Philippines",
+        "address_line_1": None,
+        "address_line_2": None,
+        "city": None,
+        "province_or_state": None,
+        "postal_code": None,
+        "landline_number": None,
+        "mobile_number": None,
+        "email_address": None,
+        "first_beneficiary_name": None,
+        "second_beneficiary_name": None,
+        "third_beneficiary_name": None,
+        "vault_id": None,
+        "inurnment_date": None,
+        "urns_per_columbary": None
     }
-
-    # Example patterns (adjust based on your document structure)
-    patterns = {
-        # Customer patterns
-        'full_name': r'Full name:[\s]*([^\n]*)',
-        'permanent_address': r'Permanent Address:[\s]*([^\n]*)',
-        'mobile_number': r'Mobile Number:[\s]*([^\n]*)',
-        'email_address': r'Email Address:[\s]*([^\n]*)',
-        
-        # Beneficiary patterns
-        'first_beneficiary_name': r'FIRST PRIORITY[\s]*Full name:[\s]*([^\n]*)',
-        'second_beneficiary_name': r'SECOND PRIORITY[\s]*Full name:[\s]*([^\n]*)',
-        'third_beneficiary_name': r'THIRD PRIORITY[\s]*Full name:[\s]*([^\n]*)',
-        
-        # ColumbaryRecord patterns
-        'vault_id': r'Vault ID:[\s]*([^\n]*)',
-        'inurnment_date': r'Inurnment Date:[\s]*([^\n]*)',
-        'urns_per_columbary': r'Urns Per Columbary:[\s]*([^\n]*)',
-    }
-
-    # Extract all fields using patterns
-    for field, pattern in patterns.items():
-        match = re.search(pattern, text)
-        if match:
-            data[field] = match.group(1).strip()
-
-    # Split full name into first, middle, and last names
-    if data.get('full_name'):
-        name_parts = data['full_name'].split()
-        if len(name_parts) >= 1:
-            data['first_name'] = name_parts[0]
+    
+    # Extract full name
+    full_name_match = re.search(r"Full\s*name:\s*([^\n]*)", text, re.IGNORECASE)
+    if full_name_match:
+        full_name = full_name_match.group(1).strip()
+        name_parts = full_name.split()
         if len(name_parts) >= 2:
-            data['last_name'] = name_parts[-1]
-        if len(name_parts) > 2:
-            data['middle_name'] = ' '.join(name_parts[1:-1])
-
+            data["first_name"] = name_parts[0]
+            data["last_name"] = name_parts[-1]
+            if len(name_parts) > 2:
+                if name_parts[-1].upper() in ["SR", "JR", "II", "III", "IV"]:
+                    data["suffix"] = name_parts[-1]
+                    data["last_name"] = name_parts[-2]
+                    if len(name_parts) > 3:
+                        data["middle_name"] = " ".join(name_parts[1:-2])
+                else:
+                    data["middle_name"] = " ".join(name_parts[1:-1])
+    
+    # Extract address
+    address_match = re.search(r"Address:\s*([^\n]*)", text, re.IGNORECASE)
+    if address_match:
+        address = address_match.group(1).strip()
+        
+        # Try to extract city, province, and postal code from address
+        postal_code_match = re.search(r"(\d{4,})", address)
+        if postal_code_match:
+            data["postal_code"] = postal_code_match.group(1)
+        
+        # Simplified address parsing
+        address_parts = address.split(',')
+        if len(address_parts) >= 1:
+            data["address_line_1"] = address_parts[0].strip()
+        if len(address_parts) >= 2:
+            data["city"] = address_parts[-2].strip()
+        if len(address_parts) >= 3:
+            data["province_or_state"] = address_parts[-1].strip()
+    
+    # Extract phone numbers
+    landline_match = re.search(r"Landline\s*Number:?\s*([0-9()\s\-+]*)", text, re.IGNORECASE)
+    if landline_match:
+        data["landline_number"] = landline_match.group(1).strip()
+    
+    mobile_match = re.search(r"Mobile\s*Number:?\s*([0-9()\s\-+]*)", text, re.IGNORECASE)
+    if mobile_match:
+        data["mobile_number"] = mobile_match.group(1).strip()
+    
+    # Extract email
+    email_match = re.search(r"Email\s*Address:?\s*([^\s\n]*@[^\s\n]*)", text, re.IGNORECASE)
+    if email_match:
+        data["email_address"] = email_match.group(1).strip()
+    
+    # Extract beneficiary information
+    beneficiary_match = re.search(r"Beneficiary\s*Name:?\s*([^\n]*)", text, re.IGNORECASE)
+    if beneficiary_match:
+        data["first_beneficiary_name"] = beneficiary_match.group(1).strip()
+    
+    # Extract vault ID if present
+    vault_match = re.search(r"Vault\s*ID:?\s*([^\n\s]*)", text, re.IGNORECASE)
+    if vault_match:
+        data["vault_id"] = vault_match.group(1).strip()
+    
+    # Extract inurnment date if present
+    date_match = re.search(r"Inurnment\s*Date:?\s*(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})", text, re.IGNORECASE)
+    if date_match:
+        data["inurnment_date"] = date_match.group(1).strip()
+    
     return data
+
 
 #chatbot env
 env = environ.Env(

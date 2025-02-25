@@ -13,37 +13,44 @@
 <body>
     <div class="container">
         <h2>Add New Columbary Record</h2>
-        <div class="ocr-section">
-            <h3>Document Capture</h3>
+<!-- OCR Capture Section -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Document OCR</h5>
+    </div>
+    <div class="card-body">
+        <p class="text-muted">Scan a document to automatically fill out customer information.</p>
+        
+        <!-- OCR Options -->
+        <div class="btn-group mb-3" role="group">
+            <button id="uploadOption" type="button" class="btn btn-outline-primary active">Upload Image</button>
+            <button id="webcamOption" type="button" class="btn btn-outline-primary">Use Camera</button>
+        </div>
+        
+        <div id="fileUploadContainer" class="mb-3">
+            <div class="input-group">
+                <input type="file" class="form-control" id="ocrInput" accept="image/*">
+                <button class="btn btn-primary" type="button" id="processOCR">Process Document</button>
+            </div>
+            <div class="form-text">Upload a clear image of your document</div>
+        </div>
+        
+        <!-- Webcam Option -->
+        <div id="webcam-container" style="display: none;">
+            <div class="mb-3">
+                <video id="webcam-view" autoplay playsinline style="width: 100%; max-width: 500px;"></video>
+                <canvas id="captured-image" style="display: none; width: 100%; max-width: 500px;"></canvas>
+            </div>
             
-            <div class="capture-options">
-                <button type="button" class="capture-option" id="webcamOption">Use Webcam</button>
-                <button type="button" class="capture-option" id="uploadOption">Upload File</button>
-            </div>
-
-            <!-- Webcam Interface -->
-            <div id="webcam-container" style="display: none;">
-                <video id="webcam-view" autoplay playsinline></video>
-                <div id="capture-controls">
-                    <button type="button" class="camera-button" id="captureButton">Take Photo</button>
-                    <button type="button" class="camera-button" id="retakeButton" style="display: none;">Retake</button>
-                    <button type="button" class="camera-button" id="processWebcamButton" style="display: none;">Process Image</button>
-                </div>
-                <canvas id="captured-image"></canvas>
-            </div>
-
-            <!-- File Upload Interface -->
-            <div class="file-upload" id="fileUploadContainer">
-                <input type="file" id="ocrInput" accept="image/*" class="ocr-input">
-                <button type="button" id="processOCR" class="capture-option">Process File</button>
+            <div class="mb-3">
+                <button id="captureButton" class="btn btn-primary me-2">Take Photo</button>
+                <button id="retakeButton" class="btn btn-secondary me-2" style="display: none;">Retake</button>
+                <button id="processWebcamButton" class="btn btn-success" style="display: none;">Process Photo</button>
             </div>
         </div>
+    </div>
+</div>
 
-        <div id="processingOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000;">
-            <div style="background: white; padding: 20px; border-radius: 8px; text-align: center;">
-                <p>Processing image...</p>
-            </div>
-        </div>
         
         <!-- Display Form Errors -->
         {% if customer_form.errors or payment_form.errors or columbary_form.errors or holder_form.errors or beneficiary_form.errors %}
@@ -133,7 +140,6 @@
         </form>
     </div>
 
-    <!-- Include the JavaScript file -->
     <script src="{% static 'js/addnewrecord.js' %}"></script>
 </body>
 </html>
