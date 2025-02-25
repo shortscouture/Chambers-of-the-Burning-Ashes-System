@@ -316,24 +316,26 @@ async function uploadImageToS3(imageFile) {
 }
 
 function normalizeKey(key) {
+    // First remove the trailing colons, then other special characters
     return key
-        .replace(/::/g, '') // Remove double colons
-        .replace(/\./g, '') // Remove periods
-        .replace(/\s+/g, ''); // Remove spaces
+        .replace(/:+$/, '')        // Remove trailing colons (one or more)
+        .replace(/[^\w\d]/g, '')   // Remove all non-alphanumeric characters
+        .toLowerCase();            // Convert to lowercase for consistent matching
 }
 
+// Normalize OCR data with cleaned keys
 function normalizeOcrData(data) {
     const normalizedData = {};
     for (const key in data) {
         if (data.hasOwnProperty(key)) {
-            const normalizedKey = normalizeKey(key);
+            // Make sure to trim the key before normalizing
+            const normalizedKey = normalizeKey(key.trim());
             normalizedData[normalizedKey] = data[key];
         }
     }
     return normalizedData;
 }
 
-// Populate form fields with OCR data
 function populateFields(data) {
     console.log('Populating fields with data:', data);
 
@@ -360,37 +362,97 @@ function populateFields(data) {
         }
     }
 
-    // Extract first, middle, and last name from the "Name" field
-    const fullName = normalizedData.Name || '';
-    const nameParts = fullName.split(' ');
-    const firstName = nameParts[0] || '';
-    const middleName = nameParts.slice(1, -1).join(' ') || '';
-    const lastName = nameParts[nameParts.length - 1] || '';
+    // Map for field names (normalized key -> form field id)
+    const fieldMap = {
+        'fullname': 'id_first_name',
+        'firstname': 'id_first_name',
+        'middlename': 'id_middle_name',
+        'lastname': 'id_last_name',
+        'address': 'id_address_line_1',
+        'permanentaddress': 'id_address_line_1',
+        'currentaddress': 'id_address_line_2',
+        'emailaddress': 'id_email_address',
+        'landlinenumbers': 'id_landline_number',
+        'landlinemobilenumbers': 'id_mobile_number',
+        'mobileno': 'id_mobile_number',
+        'telno': 'id_landline_number',
+        'beneficiaries': 'id_first_beneficiary_name',
+        'citizenship': 'id_citizenship'
+    };
 
-    // Map OCR data to form fields
+    // Process the full name
+    let firstName = '';
+    let middleName = '';
+    let lastName = '';
+
+    // Try to extract name from various possible fields
+    const fullName = normalizedData.fullname || normalizedData.name || '';
+    
+    if (fullName) {
+        const nameParts = fullName.split(' ');
+        
+        if (nameParts.length >= 1) {
+            firstName = nameParts[0] || '';
+        }
+        
+        if (nameParts.length >= 3) {
+            // If we have at least 3 parts, assume last name is the last part
+            // and middle name is everything in between
+            lastName = nameParts[nameParts.length - 1] || '';
+            middleName = nameParts.slice(1, -1).join(' ') || '';
+        } else if (nameParts.length === 2) {
+            // If we have only 2 parts, assume it's first and last name
+            lastName = nameParts[1] || '';
+        }
+    }
+
+    // Set name fields
     setValue('id_first_name', firstName);
     setValue('id_middle_name', middleName);
     setValue('id_last_name', lastName);
     setValue('id_suffix', ''); // Suffix not available in OCR data
+    
+    // Set default values
     setValue('id_country', 'Philippines'); // Default value
-    setValue('id_address_line_1', normalizedData.Address || '');
-    setValue('id_address_line_2', ''); // Address Line 2 not available in OCR data
-    setValue('id_city', ''); // City not available in OCR data
-    setValue('id_province_or_state', ''); // Province/State not available in OCR data
-    setValue('id_postal_code', ''); // Postal Code not available in OCR data
-    setValue('id_landline_number', normalizedData.LandlineNo || '');
-    setValue('id_mobile_number', normalizedData.MobileNo || '');
-    setValue('id_email_address', ''); // Email not available in OCR data
+    
+    // Map fields from normalized data to form fields
+    for (const key in normalizedData) {
+        if (fieldMap[key]) {
+            setValue(fieldMap[key], normalizedData[key]);
+        }
+    }
 
-    // Beneficiary fields
-    setValue('id_first_beneficiary_name', normalizedData['1'] || ''); // First beneficiary
-    setValue('id_second_beneficiary_name', normalizedData['2'] || ''); // Second beneficiary
-    setValue('id_third_beneficiary_name', normalizedData['3'] || ''); // Third beneficiary
+    // Process beneficiaries
+    if (normalizedData.beneficiaries) {
+        const beneficiaries = normalizedData.beneficiaries.split('/');
+        
+        if (beneficiaries.length >= 1) {
+            setValue('id_first_beneficiary_name', beneficiaries[0].trim());
+        }
+        
+        if (beneficiaries.length >= 2) {
+            setValue('id_second_beneficiary_name', beneficiaries[1].trim());
+        }
+        
+        if (beneficiaries.length >= 3) {
+            setValue('id_third_beneficiary_name', beneficiaries[2].trim());
+        }
+    }
+
+    // Extract mobile number if available in combined format
+    if (normalizedData.landlinemobilenumbers) {
+        const mobilePattern = /(\d{4}[-\s]?\d{3}[-\s]?\d{4})/;
+        const mobileMatch = normalizedData.landlinemobilenumbers.match(mobilePattern);
+        
+        if (mobileMatch) {
+            setValue('id_mobile_number', mobileMatch[0]);
+        }
+    }
 
     // Other fields
-    setValue('id_vault_id', ''); // Vault ID not available in OCR data
-    setValue('id_inurnment_date', ''); // Inurnment date not available in OCR data
     setValue('id_urns_per_columbary', '1'); // Default value
+    
+    console.log('Field population complete');
 }
 
 function getCookie(name) {
