@@ -200,7 +200,7 @@ SITE_ID = 1
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
 LOGIN_URL = "login"
-LOGIN_REDIRECT_URL = "maindash"
+LOGIN_REDIRECT_URL = "dashboard"
 
 
 # https://django-allauth.readthedocs.io/en/latest/views.html#logout-account-logout

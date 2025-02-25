@@ -4,52 +4,42 @@ body {
     margin: 0;
     padding: 0;
     text-align: center;
-    background: url("/static/images/cloud.png") no-repeat center center fixed;
+    background: url("/static/images/church.jpg") no-repeat center center fixed;
     background-size: cover;
     color: #333;
 }
+  
 
 h1 {
-    color: #ffffff;
-    font-family: Impact, sans-serif;
-    font-size: 50px;
-    background: url("/static/images/BGM.jpg") no-repeat center center fixed;
     background-size: 100% 75%;
-    margin-top: 10px; /* Add space under the fixed header */
-    padding-top: 200px;
+    margin-top: 0px;
+    margin-bottom: -230px;
+    padding-top: -20px;
 }
 
 .container {
-    width: 80%;
+    width: 85%;
     margin: auto;
     padding: 20px;
-    background: white;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding-top: 80px;
-    /* Adjust based on header height */
-    background: rgba(255, 255, 255, 0.8);
-    /* Add slight transparency for readability */
-    border-radius: 10px;
 }
 
 /* Info Boxes */
 .info-box h2 {
-    font-size: 16px;
-    /* Make title smaller */
+    font-size: 17px;
     font-weight: normal;
+    font-family: sans-serif;
     color: #505050;
     margin-bottom: 5px;
 }
 
 .info-box p {
     font-size: 50px;
-    /* Make number larger */
     font-weight: bold;
     font-family: 'Impact', sans-serif;
-    /* Change font */
     color: #505050;
-    /* Make the number stand out */
     margin: 0;
 }
 
@@ -60,11 +50,13 @@ h1 {
     align-items: center;
     text-align: center;
     height: 120px;
-    /* Ensure consistent size */
+    background: rgba(90, 90, 90, 0.8); /* Slight transparency */
+    padding: 15px;
+    border-radius: 10px;
 }
 
 .info-box:hover {
-    background-color: #d1ecff;
+    background: rgba(209, 236, 255, 0.9);
     transform: scale(1.02);
 }
 
@@ -73,6 +65,11 @@ h1 {
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
     align-items: start;
+    width: 85%; /* Adjust width to create spacing on both sides */
+    margin: 0 auto; /* Centers it */
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
 
 .chart-container canvas {
@@ -87,11 +84,21 @@ h1 {
     }
 }
 
+.table-container h3 {
+    font-size: 17px;
+    /* Make title smaller */
+    font-weight: normal;
+    font-family: sans-serif;
+    color: #ffffff;
+    margin-bottom: 5px;
+}
+
 .table-container {
-    width: 98.5%;
+    width: 70%; /* Adjust width to create spacing on both sides */
+    margin: 0 auto; /* Centers it */
     margin-top: 20px;
     padding: 20px;
-    background: white;
+    background: rgba(90, 90, 90, 0.8);
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -104,6 +111,9 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
+    font-size: 17px;
+    font-family: sans-serif;
+    color: #ffffff;
 }
 
 th,
@@ -114,7 +124,7 @@ td {
 }
 
 th {
-    background-color: #007bff;
+    background-color: #0565cc;
     color: white;
 }
 
@@ -145,20 +155,81 @@ th {
 
 /* Chart Containers */
 .chart-container {
-    margin: 30px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* Aligns content at the top */
+    width: auto;
+    height: 450px; /* Ensure charts have the same height */
     padding: 20px;
-    background: #ffffff;
+    background: rgba(90, 90, 90, 0.8);
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    position: relative; /* Ensures absolute positioning works */
 }
 
 .chart-container h2 {
-    color: #007bff;
+    font-size: 17px;
+    font-weight: bold;
+    font-family: sans-serif;
+    color: #ffffff;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 10px; /* Ensures spacing is equal */
+}
+
+#paymentChart {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 85%;
+    max-height: 85%;
+    display: block;
+    margin-bottom: 10%;
+    margin-top: 1%;
+}
+
+#earningsChart {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100%;
+    max-height: 90%;
+    display: block;
+    margin-bottom: 100px;
+    margin-top: 0px;
 }
 
 canvas {
     max-width: 100%;
     height: auto;
+}
+
+#dashboard-title {
+    text-align: center; /* Center the image */
+    margin-top: -50px; /* Adjust spacing */
+}
+
+.dashboard-title-image {
+    width: 500px; /* Adjust image width */
+    height: auto; /* Maintain aspect ratio */
+}
+
+/* Ensures the overlay covers the entire dashboard */
+.overlay {
+    position: fixed; /* Keeps it covering the entire page */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%; /* Ensures it covers full content */
+    background: rgba(255, 255, 255, 0.651);
+    z-index: -1;
+}
+
+/* Make sure the dashboard container determines the height */
+.dashboard-container {
+    position: relative; /* Ensures it sits above the overlay */
+    z-index: 1; /* Places content above overlay */
+    padding: 20px;
 }
 
 /* Responsive Design */

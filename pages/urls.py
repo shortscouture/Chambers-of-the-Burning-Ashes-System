@@ -1,13 +1,14 @@
 from django.urls import path
-
+from django.core.management.base import BaseCommand
 from pages import views
 from .views import (
     HomePageView, AboutPageView, MainDashView, ColumbaryRecordsView,
     CustomerHomeView, MemorialView, send_letter_of_intent, verify_otp,
     memorials_verification, accept_letter_of_intent, decline_letter_of_intent,
     RecordsDetailsView, CustomerEditView, SuccesView, ChatbotAPIView, DashboardView, get_crypt_status, MapView, CustomerDeleteView,
-    process_ocr
+    process_ocr,get_vault_data
 )
+
 
 urlpatterns = [
     path("", HomePageView.as_view(), name="home"),
@@ -28,9 +29,12 @@ urlpatterns = [
     path('chatbot/', ChatbotAPIView.as_view(), name='chatbot'),
     path('get_crypt_status/<str:section>/', get_crypt_status, name='get_crypt_status'),
     path("Columbary_Map/    ", MapView.as_view(), name="Columbary_Map"),    
-    path('columbaryrecords/', views.ColumbaryRecord, name='columbaryrecords'),  # Define this view for your records page
+    path('columbaryrecords/', views.ColumbaryRecord, name='columbaryrecords'),
     path('addnewrecord/', views.addnewrecord, name='addnewrecord'),
     path('delete_customer/<int:customer_id>/', CustomerDeleteView.as_view(), name='delete_customer'),
     path('process-ocr/', views.process_ocr, name='process_ocr'),
+    path('get_vault_data/<str:section_id>/', get_vault_data, name='get_vault_data'),
+  
+    path('addnewcustomer/', views.addnewcustomer, name='addnewcustomer'),
 
 ]
