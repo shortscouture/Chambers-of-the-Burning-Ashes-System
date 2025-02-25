@@ -34,8 +34,14 @@ from django.db.models.functions import TruncMonth
 from django.contrib.auth.mixins import LoginRequiredMixin
 import logging
 from django.views.generic import TemplateView
+from django.core.paginator import Paginator
 from django.db.models import Q
 from .models import ColumbaryRecord
+from django.utils.safestring import mark_safe
+from django.db.models import Count, Sum
+from django.db.models.functions import TruncMonth
+import json
+
 
 logger = logging.getLogger(__name__)
 
@@ -64,10 +70,6 @@ class CustomerHomeView(TemplateView):
     template_name = "pages/Customer_Home.html"
 
 
-from django.views.generic import TemplateView
-from django.core.paginator import Paginator
-from django.db.models import Q
-from .models import ColumbaryRecord
 
 class ColumbaryRecordsView(TemplateView):
     template_name = "pages/columbaryrecords.html"
@@ -165,11 +167,6 @@ class ColumbaryRecordsView(TemplateView):
 class MemorialView(TemplateView):
     template_name = "pages/Memorials.html"
 
-
-from django.utils.safestring import mark_safe
-from django.db.models import Count, Sum
-from django.db.models.functions import TruncMonth
-import json
 
 class DashboardView(TemplateView):
     template_name = "dashboard.html"
