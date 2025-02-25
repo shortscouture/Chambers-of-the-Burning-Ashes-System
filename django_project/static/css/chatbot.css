@@ -1,4 +1,31 @@
 /* Chat container */
+.chat-wrapper {
+    position: fixed;
+    bottom: 80px; /* Adjust as needed to be above .Bot */
+    right: 20px; /* Or adjust as needed */
+    width: 300px; /* Or adjust as needed */
+    background-color: #fff; /* Ensure a background color */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-header {
+    display: flex;
+    justify-content: flex-end; /* Align close button to the right */
+    padding: 5px;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  .close-btn {
+    cursor: pointer;
+    padding: 5px 10px;
+    border: none;
+    background: none;
+    font-size: 16px;
+  }
+
 .chatbox {
     flex-grow: 1;
     padding: 10px;
@@ -6,7 +33,6 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    /* Remove bottom positioning, let flexbox handle it */
 }
 
 /* User message bubble (align right) */
@@ -35,19 +61,18 @@
 
 /* Input container */
 .input-container {
-    padding: 10px; /* Add padding for visual spacing */
+    display: flex; /* Keep the input and button in a row */
+    padding: 10px;
     background-color: #f8f8f8;
-    display: flex;
-    /* Remove relative positioning unless specifically needed */
 }
 
 /* Input field styling */
 .input-container input {
-    flex-grow: 1; /* Allow input to take up available space */
+    flex-grow: 1; /* Input takes up available space */
     padding: 10px;
     border-radius: 5px;
     border: 1px solid #ccc;
-    margin-right: 10px; /* Space between input and button */
+    margin-right: 10px;
 }
 
 /* Send button styling */
@@ -78,19 +103,6 @@
     height: 30px;
 }
 
-/* Styles to make the chatbox appear above the bot button */
-.chat-wrapper { /* A wrapper around the chatbox and input */
-    position: fixed;
-    bottom: 80px; /* Adjust as needed to be above .Bot */
-    left: 20px; /* Or adjust as needed */
-    width: 300px; /* Or adjust as needed */
-    background-color: #fff; /* Ensure a background color */
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    display: flex;
-    flex-direction: column;
-}
-
 /* Optional: Style the scrollbar */
 .chatbox::-webkit-scrollbar {
     width: 8px;
@@ -103,20 +115,4 @@
 .chatbox::-webkit-scrollbar-thumb {
     background: #888;
     border-radius: 4px;
-}
-
-/* Optional: Add a close button to the chatbox */
-.chat-header {
-  display: flex;
-  justify-content: flex-end; /* Align close button to the right */
-  padding: 5px;
-  border-bottom: 1px solid #ccc;
-}
-
-.close-btn {
-  cursor: pointer;
-  padding: 5px 10px;
-  border: none;
-  background: none;
-  font-size: 16px;
 }
