@@ -6,6 +6,7 @@ from django.conf import settings
 from datetime import datetime, timedelta
 from django.utils import timezone
 from datetime import date
+from django.utils.timezone import now
 
 
 class Account(models.Model):
@@ -35,7 +36,8 @@ class ParishStaff(models.Model):
 
 class Customer(models.Model):
     class Meta:
-        db_table = "customer" 
+        db_table = "customer"
+
     customer_id = models.AutoField(primary_key=True)
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -113,23 +115,19 @@ class Beneficiary(models.Model):
 
 
 class Payment(models.Model):
+    class Meta:
+        db_table = "payment"
+    
     PAYMENT_MODES = [
         ("Full Payment", "Full Payment"),
         ("6-Month Installment", "6-Month Installment"),
     ]
-
-    class Meta:
-        db_table = "payment"
     
     payment_id = models.AutoField(primary_key=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="payments")  # Added customer FK
     mode_of_payment = models.CharField(max_length=20, choices=PAYMENT_MODES, blank=True, null=True)
-
-    class Meta:
-        db_table = "payment"
-
-    class Meta:
-        db_table = "payment"
+    
+    created_at = models.DateTimeField(default=now)
 
     # Seven receipt fields
     Full_payment_receipt_1 = models.IntegerField(blank=True, null=True)
@@ -172,15 +170,14 @@ class Payment(models.Model):
 
 
 class ColumbaryRecord(models.Model):
+    class Meta:
+        db_table = "columbaryrecord"  # 🔥 Force Django to use the correct table name
+    
     vault_id = models.CharField(primary_key=True, max_length=8, blank=False)
     section = models.CharField(null= False, max_length=7)
     level = models.CharField(null= False, max_length=1)
     inurnment_date = models.DateField(blank=True, null=True)
     urns_per_columbary = models.CharField(max_length=1, null=True, choices=[('1', '1'), ('2', '2'), ('3', '3'), ('4', '4')])
-
-    class Meta:
-        db_table = "columbaryrecord"  # 🔥 Ensures Django uses the correct table
-
 
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
     parish_staff = models.ForeignKey(ParishStaff, on_delete=models.SET_NULL, null=True, blank=True)
@@ -192,8 +189,6 @@ class ColumbaryRecord(models.Model):
     STATUS_CHOICES = [('Vacant', 'Vacant'), ('Occupied', 'Occupied')]
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Vacant')
 
-    class Meta:
-        db_table = "columbaryrecord"
 
     def __str__(self):
         return f"Vault {self.vault_id} - {self.status}"

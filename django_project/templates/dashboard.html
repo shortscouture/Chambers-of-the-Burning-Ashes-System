@@ -13,39 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
     <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: #fff;
-            z-index: 1000;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .container {
-            width: 80%;
-            margin: auto;
-        }
-
-        .chart-container {
-            margin: 20px 0;
-        }
-
-        .info-box {
-            font-size: 20px;
-            font-weight: bold;
-            margin: 20px 0;
-            padding: 10px;
-            background-color: #f4f4f4;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
+ 
     </style>
 </head>
 
@@ -59,10 +27,10 @@
         <form id="dateFilterForm" method="GET" action="/dashboard/">
             <label for="start_date">Start Date:</label>
             <input type="date" id="start_date" name="start_date">
-        
+
             <label for="end_date">End Date:</label>
             <input type="date" id="end_date" name="end_date">
-        
+
             <button type="submit">Filter</button>
         </form>
     </div>
@@ -71,19 +39,22 @@
     <div class="overlay"></div> <!-- Overlay element -->
     <div class="dashboard-container">
         <div class="dashboard-grid">
-            <div class="info-box" onclick="toggleAvailableTable()">
+            <div class="info-box" onclick="toggleTableVisibility('availableTableContainer')">
                 <h2>AVAILABLE COLUMBARIES</h2>
                 <p>{{ vacant_columbaries_count }}</p>
             </div>
-            <div class="info-box" onclick="toggleOccupiedTable()">
+
+            <div class="info-box" onclick="toggleTableVisibility('occupiedTableContainer')">
                 <h2>OCCUPIED COLUMBARIES</h2>
                 <p>{{ occupied_columbaries_count }}</p>
             </div>
-            <div class="info-box" onclick="toggleUnissuedTable()">
+
+            <div class="info-box" onclick="toggleTableVisibility('unissuedTableContainer')">
                 <h2>UNISSUED COLUMBARIES</h2>
                 <p>{{ unissued_columbaries }}</p>
             </div>
-            <div class="info-box" onclick="toggleTable()">
+
+            <div class="info-box" onclick="toggleTableVisibility('pendingTableContainer')">
                 <h2>PENDING LETTERS OF INTENT</h2>
                 <p>{{ pending_counts }}</p>
             </div>
@@ -98,7 +69,6 @@
                         <th>Full Name</th>
                         <th>Email</th>
                         <th>Mobile</th>
-                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -107,12 +77,6 @@
                         <td>{{ customer.full_name }}</td>
                         <td>{{ customer.email_address }}</td>
                         <td>{{ customer.mobile_number }}</td>
-                        <td>
-                            <button class="btn-accept"
-                                onclick="updateCustomerStatus({{ customer.customer_id }}, 'approved')">Accept</button>
-                            <button class="btn-decline"
-                                onclick="updateCustomerStatus({{ customer.customer_id }}, 'declined')">Decline</button>
-                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -174,11 +138,11 @@
         <!-- Unissued Columbaries Table (Initially Hidden) -->
         <div id="unissuedTableContainer" class="table-container hidden">
             <h3>UNISSUED COLUMBARIES</h3>
-            <table>
+            <table id="availableTable">
                 <thead>
                     <tr>
                         <th>Vault ID</th>
-                        <th>Issuance Date</th>
+                        <th>Location</th>
                         <th>Customer</th>
                     </tr>
                 </thead>
@@ -186,12 +150,12 @@
                     {% for column in colmbaryrecord %}
                     <tr>
                         <td>{{ columbary.vault_id }}</td>
-                        <td>{{ columbary.issuance_date }}</td>
+                        <td>{{ column.section }}</td>
                         <td>{{ columbary.customer.full_name }}</td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="3">No unissued columbaries found.</td>
+                        <td colspan="4">No unissued columbaries found.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -323,29 +287,6 @@
 
 
 
-            function updateCustomerStatus(loiId, action) {
-                let confirmation = confirm(`Are you sure you want to ${action} this LOI?`);
-                if (!confirmation) return; // Stop if user cancels
-
-                fetch(`/update-loi-status/${loiId}/`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": getCSRFToken() // 🔥 Ensure CSRF protection
-                    },
-                    body: JSON.stringify({ status: action === "accept" ? "Accepted" : "Declined" })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert(`LOI ${action} successfully!`);
-                            location.reload(); // ✅ Refresh the page to reflect changes
-                        } else {
-                            alert("Error: " + data.error);
-                        }
-                    })
-                    .catch(error => console.error("Error:", error));
-            }
 
             // 🔹 Function to get CSRF Token from cookies
             function getCSRFToken() {
@@ -460,27 +401,43 @@
                     .catch(error => console.error("Error:", error));
             });
 
+            document.addEventListener("DOMContentLoaded", function () {
+                function toggleTableVisibility(tableId) {
+                    var tableContainer = document.getElementById(tableId);
+
+                    // Check if the selected table is already visible
+                    var isVisible = !tableContainer.classList.contains("hidden");
+
+                    // Hide all tables first
+                    document.querySelectorAll('.table-container').forEach(container => {
+                        container.classList.add('hidden');
+                    });
+
+                    // Toggle the selected table
+                    if (!isVisible) {
+                        tableContainer.classList.remove("hidden");
+                    }
+                }
 
 
-            function toggleTable() {
-                var tableContainer = document.getElementById("pendingTableContainer");
-                tableContainer.classList.toggle("hidden");
-            }
 
-            function toggleAvailableTable() {
-                var availableTable = document.getElementById("availableTableContainer");
-                availableTable.classList.toggle("hidden");
-            }
+                // Add event listeners AFTER the page loads
+                document.querySelector(".info-box:nth-child(1)").addEventListener("click", function () {
+                    toggleTableVisibility("availableTableContainer");
+                });
 
-            function toggleOccupiedTable() {
-                var occupiedTable = document.getElementById("occupiedTableContainer");
-                occupiedTable.classList.toggle("hidden");
-            }
+                document.querySelector(".info-box:nth-child(2)").addEventListener("click", function () {
+                    toggleTableVisibility("occupiedTableContainer");
+                });
 
-            function toggleUnissuedTable() {
-                var unissuedTable = document.getElementById("unissuedTableContainer");
-                unissuedTable.classList.toggle("hidden");
-            }
+                document.querySelector(".info-box:nth-child(3)").addEventListener("click", function () {
+                    toggleTableVisibility("unissuedTableContainer");
+                });
+
+                document.querySelector(".info-box:nth-child(4)").addEventListener("click", function () {
+                    toggleTableVisibility("pendingTableContainer");
+                });
+            });
         </script>
 </body>
 

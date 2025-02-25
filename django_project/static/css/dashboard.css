@@ -1,21 +1,25 @@
 /* General Styles */
 body {
-    font-family: Arial, sans-serif;
+    overflow-y: auto !important;  /* Ensure scrolling works */
+    height: auto;
+    min-height: 100vh;
+    background: url("/static/images/church.jpg") no-repeat center center fixed; /* Replace with your image */
+    background-size: cover;
+    height: 100vh; /* Ensure full height */
     margin: 0;
     padding: 0;
-    text-align: center;
-    background: url("/static/images/church.jpg") no-repeat center center fixed;
-    background-size: cover;
-    color: #333;
 }
-  
+
 
 h1 {
-    background-size: 100% 75%;
-    margin-top: -40px;
-    margin-bottom: -230px;
-    padding-top: -20px;
+    text-align: center; /* Centers the text */
+    width: 100%; /* Ensures it spans the full width */
+    margin: 0 auto; /* Centers it horizontally */
+    display: flex; /* Allows flexible alignment */
+    justify-content: center; /* Centers content inside */
+    align-items: center; /* Aligns vertically */
 }
+
 
 .container {
     width: 85%;
@@ -31,15 +35,15 @@ h1 {
     font-size: 17px;
     font-weight: normal;
     font-family: sans-serif;
-    color: #505050;
+    color: #ffffff;
     margin-bottom: 5px;
 }
 
 .info-box p {
     font-size: 50px;
-    font-weight: bold;
+    font-weight: normal;
     font-family: 'Impact', sans-serif;
-    color: #505050;
+    color: #ffffff;
     margin: 0;
 }
 
@@ -53,10 +57,11 @@ h1 {
     background: rgba(90, 90, 90, 0.8); /* Slight transparency */
     padding: 15px;
     border-radius: 10px;
+    margin-bottom: 5%;
 }
 
 .info-box:hover {
-    background: rgba(209, 236, 255, 0.9);
+    background: rgba(1, 108, 207, 0.9);
     transform: scale(1.02);
 }
 
@@ -94,28 +99,31 @@ h1 {
 }
 
 .table-container {
-    width: 70%; /* Adjust width to create spacing on both sides */
-    margin: 0 auto; /* Centers it */
-    margin-top: 20px;
-    padding: 20px;
-    background: rgba(90, 90, 90, 0.8);
+    position: absolute; /* Ensures proper overlay */
+    left: 50%;
+    transform: translateX(-50%); /* Centers it horizontally */
+    top: 20%; /* Adjust positioning */
+    width: 80%; /* Prevents it from being too wide */
+    max-height: 400px; /* Prevents excessive height */
+    overflow-y: auto;
+    background: rgba(90, 90, 90, 0.95); /* Slight transparency */
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease-in-out;
+    text-align: center;
+    padding: 20px;
+    z-index: 100; /* Ensures it stays on top */
 }
 
 .hidden {
-    display: none;
+    display: none; /* Ensures the table is fully hidden */
 }
 
 table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-    font-size: 17px;
-    font-family: sans-serif;
+    width: 100%; /* Ensures the table itself is centered */
+    margin: 0 auto; /* Centers the table inside the container */
     color: #ffffff;
 }
+
 
 th,
 td {
@@ -211,70 +219,34 @@ canvas {
 }
 
 .dashboard-title-image {
-    width: 500px; /* Adjust image width */
-    height: auto; /* Maintain aspect ratio */
+    display: block; /* Ensures no inline spacing issues */
+    margin: 0 auto; /* Centers the image */
+    width: 500px; /* Adjust as needed */
+    height: auto; /* Maintains aspect ratio */
+    margin-top: -8%; /* Adjust spacing */
+    margin-bottom: -10%; /* Adjust spacing */
 }
+
 
 /* Ensures the overlay covers the entire dashboard */
 .overlay {
-    position: fixed; /* Keeps it covering the entire page */
+    position: absolute; /* Keeps it covering the entire page */
     top: 0;
     left: 0;
     width: 100%;
     height: 100%; /* Ensures it covers full content */
-    background: rgba(255, 255, 255, 0.651);
+    background: rgba(255, 255, 255, 0.103);
     z-index: -1;
 }
 
-/* Make sure the dashboard container determines the height */
+
 .dashboard-container {
-    position: relative; /* Ensures it sits above the overlay */
-    z-index: 1; /* Places content above overlay */
+    position: relative;
+    z-index: 1;
     padding: 20px;
-}
-
-/* Accept Button Styles */
-.btn-accept {
-    background-color: #28a745; /* Green */
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: all 0.3s ease-in-out;
-}
-
-.btn-accept:hover {
-    background-color: #218838; /* Darker Green */
-    transform: scale(1.1); /* Slight zoom on hover */
-}
-
-.btn-accept:active {
-    transform: scale(0.9); /* Shrink effect when clicked */
-}
-
-/* Decline Button Styles */
-.btn-decline {
-    background-color: #dc3545; /* Red */
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: all 0.3s ease-in-out;
-}
-
-.btn-decline:hover {
-    background-color: #7c010d; /* Darker Red */
-    transform: scale(1.1); /* Slight zoom on hover */
-}
-
-.btn-decline:active {
-    transform: scale(0.9); /* Shrink effect when clicked */
+    overflow-y: auto !important;  /* Ensure scrolling is allowed */
+    max-height: 90vh;  /* Prevent overflow issues */
+    background: transparent;
 }
 
 #dateFilterForm {

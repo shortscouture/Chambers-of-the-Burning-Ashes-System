@@ -31,7 +31,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 import logging
 from django.views.generic import TemplateView
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, Sum
 from .models import ColumbaryRecord
 from django.utils.safestring import mark_safe
 from django.db.models import Count, Sum
@@ -197,23 +197,27 @@ class DashboardView(TemplateView):
         earnings_by_date = (
             ColumbaryRecord.objects.filter(payment__isnull=False, holder_of_privilege__issuance_date__isnull=False)
             .values("holder_of_privilege__issuance_date")
-            .annotate(total_earnings=Sum("payment__total_amount"))
+            .annotate(total_earnings=Sum("payment__Full_payment_amount_1") + 
+                    Sum("payment__six_month_amount_1") +
+                    Sum("payment__six_month_amount_2") +
+                    Sum("payment__six_month_amount_3") +
+                    Sum("payment__six_month_amount_4") +
+                    Sum("payment__six_month_amount_5") +
+                    Sum("payment__six_month_amount_6"))
             .order_by("holder_of_privilege__issuance_date")
         )
 
         # Get earnings per month
         earnings_by_month = (
-            ColumbaryRecord.objects.filter(payment__isnull=False, holder_of_privilege__issuance_date__isnull=False)
-            .annotate(month=TruncMonth("holder_of_privilege__issuance_date"))
+            Payment.objects
+            .annotate(month=TruncMonth("created_at"))  # Use `created_at` instead
             .values("month")
             .annotate(total_earnings=Sum("total_amount"))
             .order_by("month")
         )
 
         # Convert data for Chart.js
-        earnings_labels = [
-            entry["month"].strftime("%b %Y") for entry in earnings_by_month if entry["month"] is not None
-        ]
+        earnings_labels = [entry["month"].strftime("%b %Y") if entry["month"] else "Unknown" for entry in earnings_by_month]
         earnings_data = [float(entry["total_earnings"]) if entry["total_earnings"] else 0 for entry in earnings_by_month]
 
         # Convert payment method data
@@ -236,37 +240,6 @@ class DashboardView(TemplateView):
         })
 
         return context
-
-@csrf_exempt
-def update_letter_of_intent_status(request, loi_id):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            new_status = data.get("status", "").strip().title()  # ✅ Format correctly
-
-            print(f"Updating LOI status to: '{new_status}'")  # Debugging
-
-            loi = get_object_or_404(Customer, customer_id=loi_id)
-
-            # ✅ Ensure the status is valid
-            VALID_STATUSES = {"Pending", "Accepted", "Declined"}
-            if new_status not in VALID_STATUSES:
-                return JsonResponse({"success": False, "error": f"Invalid status: {new_status}"}, status=400)
-
-            # ✅ Debug column length
-            print(f"New Status: '{new_status}', Length: {len(new_status)}")
-
-            loi.status = new_status
-            loi.save()
-
-            return JsonResponse({"success": True, "message": f"LOI {new_status}"})
-
-        except Exception as e:
-            print(f"Error updating LOI: {e}")  # Debugging
-            return JsonResponse({"success": False, "error": str(e)}, status=400)
-
-    return JsonResponse({"success": False, "error": "Invalid request"}, status=400)
-
 
             
 def send_letter_of_intent(request):

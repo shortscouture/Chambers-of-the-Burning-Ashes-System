@@ -6,7 +6,7 @@ from .views import (
     CustomerHomeView, MemorialView, send_letter_of_intent, verify_otp,
     memorials_verification, accept_letter_of_intent, decline_letter_of_intent,
     RecordsDetailsView, CustomerEditView, SuccesView, ChatbotAPIView, DashboardView, get_crypt_status, MapView, CustomerDeleteView,
-    process_ocr,get_vault_data, update_letter_of_intent_status
+    process_ocr,get_vault_data
 )
 
 
@@ -36,6 +36,5 @@ urlpatterns = [
     path('get_vault_data/<str:section_id>/', get_vault_data, name='get_vault_data'),
   
     path('addnewcustomer/', views.addnewcustomer, name='addnewcustomer'),
-    path("update-loi-status/<int:loi_id>/", update_letter_of_intent_status, name="update_loi_status"),
 
 ]

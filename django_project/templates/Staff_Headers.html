@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
-    <link rel="stylesheet" href="{% static 'css/staff_headers.css' %}">
+    <link rel="stylesheet" href="{% static 'css/Headers.css' %}">
 </head>
 
 <body>
@@ -18,7 +18,6 @@
           <ul class="headname">
             <li><a href="{% url 'dashboard' %}">HOME</a></li>
             <li><a href="{% url 'columbaryrecords' %}">RECORDS</a></li>
-            <li><a href='pages/columbaryrecords.html'>COLUMBARY</a></li>
             <li><a id="logoutBtn" href="{% url 'account_logout' %}" class="custom-signup-btn mb-2">LOG OUT</a></li>
           </ul>
           
