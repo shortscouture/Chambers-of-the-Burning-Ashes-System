@@ -7,7 +7,7 @@
     background-color: #fff; /* Ensure a background color */
     border: 1px solid #ccc;
     border-radius: 5px;
-    display: flex;
+    display: none;
     flex-direction: column;
 }
 
@@ -16,6 +16,7 @@
     justify-content: flex-end; /* Align close button to the right */
     padding: 5px;
     border-bottom: 1px solid #ccc;
+    z-index:21
   }
   
   .close-btn {
@@ -34,6 +35,14 @@
     flex-direction: column;
     gap: 10px;
 }
+
+body {
+    /* Extend the background (example - customize as needed) */
+    background-color: #f0f0f0; /* Light gray background */
+    margin: 0; /* Remove default body margins */
+    height: 100vh; /* Make body full viewport height */
+}
+
 
 /* User message bubble (align right) */
 .chatbox .user-message {
