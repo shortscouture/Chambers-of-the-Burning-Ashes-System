@@ -373,11 +373,12 @@ function populateFields(data) {
         'currentaddress': 'id_address_line_2',
         'emailaddress': 'id_email_address',
         'landlinenumbers': 'id_landline_number',
+        'landlinenumber': 'id_landline_number',
         'landlinemobilenumbers': 'id_mobile_number',
+        'mobilenumber': 'id_mobile_number',
         'mobileno': 'id_mobile_number',
         'telno': 'id_landline_number',
         'beneficiaries': 'id_first_beneficiary_name',
-        'citizenship': 'id_citizenship'
     };
 
     // Process the full name
