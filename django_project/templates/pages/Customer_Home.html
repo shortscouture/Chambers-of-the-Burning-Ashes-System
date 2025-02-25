@@ -29,7 +29,7 @@ https://templatemo.com/tm-526-vanilla
 
     <div class="chat-wrapper" id="chatContainer">
         <div class="chat-header">
-          <button class="close-btn">&times;</button>
+            <span class="chat-title">Chat with us</span> <button class="close-btn">&times;</button>
         </div>
         <div class="chatbox" id="chatbox">
             </div>
@@ -380,7 +380,7 @@ https://templatemo.com/tm-526-vanilla
                 setTimeout(() => { // Small delay to ensure the element is rendered
                     chatbox.scrollTop = chatbox.scrollHeight;
                 }, 0); 
-                
+
                 // Check if there's input and display user's message
                 if (userInput.trim() !== '') {
                     chatbox.innerHTML += `<div class="user-message">${userInput}</div>`;

@@ -2,7 +2,7 @@
 .chat-wrapper {
     position: fixed; /* Keep it fixed in the viewport */
     bottom: 20px;
-    right: 20px;
+    right: 40px;
     width: 300px;
     background-color: #fff;
     border: 1px solid #ccc;
