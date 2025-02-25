@@ -680,6 +680,10 @@ class ChatbotAPIView(APIView):
         db_answer = self.get_answer_from_parish_knowledge(user_query)
 
         ai_response = self.query_openai(user_query, db_answer)
+        
+        # Save the chat history into pages_chatquery
+        self.save_chat_history(user_query, ai_response)
+
 
         return JsonResponse({
             "query": user_query,
@@ -709,7 +713,7 @@ class ChatbotAPIView(APIView):
 
 
 
-    def query_openai(self, user_query, db_answer=None):
+    def query_openai(self, user_query, db_answer=None, past_conversations=None):
         """Uses OpenAI while incorporating database knowledge."""
         try:
             # Construct the AI prompt to guide behavior
@@ -718,29 +722,35 @@ class ChatbotAPIView(APIView):
                 "If there is relevant information from the church database, use it, "
                 "Only answer questions about the columbarium, and if they answer things such as baptism or wedding, or funeral services, direct them to the contact information, it's found in the parish_questions database"
                 "but if the user gives you specific instructions on how to respond, follow them."
+                "direct them to the church's contact information."
             )
 
             # Prepare messages with context  
             messages = [{"role": "system", "content": system_prompt}]
 
+            if past_conversations:
+                for convo in past_conversations:
+                    messages.append({"role": "user", "content": convo["query"]})
+                    messages.append({"role": "assistant", "content": convo["response"]})
+
             if db_answer:
                 messages.append({"role": "assistant", "content": f"Database says: {db_answer}"})
 
-            messages.append({"role": "user", "content": user_query})
+                messages.append({"role": "user", "content": user_query})
 
-            response = openai.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=messages,
-                temperature=0.7
-            )
+                response = openai.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=messages,
+                    temperature=0.7
+                )
 
-            if response and response.choices:
-                return response.choices[0].message.content.strip()
-        
+                if response and response.choices:
+                    return response.choices[0].message.content.strip()
+            
         except Exception as e:
             print(f"OpenAI API error: {e}")
 
-        return "I'm not sure how to answer that. Please contact St. Alphonsus Parish for further assistance."
+        return "I'm not sure how to answer that. Please contact the St. Alphonsus Mary de Liguori Parish for further assistance."
 
 
     def save_unanswered_query(self, query):
@@ -755,6 +765,25 @@ class ChatbotAPIView(APIView):
         with connection.cursor() as cursor:
             cursor.execute("SELECT question, answer FROM parish_knowledge WHERE question LIKE %s LIMIT 5;", [search_query])
             return cursor.fetchall()  # Returns a list of (question, answer) tuples
+
+    def get_past_conversations(self, limit=5):
+        """Retrieve the last few conversations from pages_chatquery for context"""
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT user_message, bot_response FROM pages_chatquery ORDER BY created_at DESC LIMIT %s;",
+                [limit]
+            )
+            past_chats = cursor.fetchall()
+
+        return [{"query": chat[0], "response": chat[1]} for chat in past_chats]
+    
+    def save_chat_history(self, user_query, bot_response):
+        """Logs chat messages to pages_chatquery."""
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "INSERT INTO pages_chatquery (user_message, bot_response, created_at) VALUES (%s, %s, NOW(6));",
+                [user_query, bot_response]
+            )
 
 
 
