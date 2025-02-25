@@ -666,6 +666,7 @@ env = environ.Env(
 )
         
 openai.api_key = env("OPEN_AI_API_KEY")
+logger = logging.getLogger(__name__)
 class ChatbotAPIView(APIView):
     def get(self, request, *args, **kwargs):
         return Response({"message": "Chatbot API is running! Use POST to send messages."}, status=status.HTTP_200_OK)
@@ -676,41 +677,59 @@ class ChatbotAPIView(APIView):
         with connection.cursor() as cursor:
             cursor.execute("SELECT * FROM pages_columbaryrecord;")
             return cursor.fetchall()
-            
-        
-
-        
     def post(self, request, *args, **kwargs):
-        database_data  = self.get_data_from_db()
-        ai_response = self.query_openai(database_data)
-        user_query = request.data.get("message", "")
-        context_data = self.get_data_from_db()
-        logger.info(f"User query: {user_query}")
-        
-        messages = [
-            {"role": "system", "content": "You are a knowledgeable assistant helping parish staff."},
-            {"role": "assistant", "content": f"Relevant Data from Database: {database_data}"},
-            {"role": "user", "content": f"{user_query}"},  # Include user query in OpenAI request
-        ]
-        response = openai.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=messages,
-            temperature=0.7,
-           )
+        """Handles chatbot queries by retrieving database data and querying OpenAI."""
+
+        # Debugging: Print headers & body
+        print("Request Headers:", request.headers)
+        print("Request Body:", request.body)
+        logger.info(f"Request Headers: {request.headers}")
+        logger.info(f"Request Body: {request.body}")
+
+        # Extract user query correctly
+        try:
+            user_query = request.POST.get("message") or request.data.get("message", "")
+            if not user_query:
+                user_query = json.loads(request.body.decode("utf-8")).get("message", "")
+        except Exception as e:
+            logger.error(f"Error parsing request: {e}")
+            return JsonResponse({"error": "Invalid request format"}, status=400)
+
+        if not user_query:
+            return JsonResponse({"error": "No query provided"}, status=400)  # Handle empty query
+
+        database_data = self.get_data_from_db()  # Fetch database records
+        ai_response = self.query_openai(user_query, database_data)  # Get AI response
 
         return JsonResponse({
             "query": user_query,  
-            "context": context_data,  
             "ai_insights": ai_response,
-            "response": response.choices[0].message.content  
         })
-   # def chatbot_view(request):
-       # """Handle AJAX request and return chatbot response."""
-       # db_data = get_data_from_db()
-        #ai_response = query_openai(db_data)
-      #  return JsonResponse({"response": ai_response})
     
-    def query_openai(self, data):
+
+    def get_data_from_db(self):
+        """Fetches relevant data from multiple tables."""
+        data = {}
+        tables = ["parish_knowledge", "parish_staff", "pages_account", "pages_customer", "pages_beneficiary"]  # Exclude sensitive tables
+        
+        try:
+            with connection.cursor() as cursor:
+                for table in tables:
+                    try:
+                        cursor.execute(f"SELECT * FROM {table} LIMIT 10;")
+                        columns = [col[0] for col in cursor.description]
+                        rows = cursor.fetchall()
+                        data[table] = [dict(zip(columns, row)) for row in rows]
+                    except Exception as e:
+                        logger.warning(f"Skipping table {table}: {e}")
+
+        except Exception as e:
+            logger.error(f"Database error: {e}")
+
+        return data
+    
+    def query_openai(self, user_query, data):
+        """Formats database data and sends a query to OpenAI."""
         try:
             formatted_data = json.dumps(data, indent=2)
         except (TypeError, ValueError) as e:
@@ -720,40 +739,23 @@ class ChatbotAPIView(APIView):
             "You are an AI assistant analyzing parish data. "
             "Here is the structured database information:\n\n"
             f"{formatted_data}\n\n"
-            "Please provide insights, trends, and any important observations."
+            "Based on the above, answer the following question:\n"
+            f"'{user_query}'\n\n"
+            "If the information is insufficient, kindly respond appropriately."
         )
-
-        response = openai.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "system", "content": "You are an AI assistant."},
-                    {"role": "user", "content": prompt}]
-        )
-        return response.choices[0].message.content
-    def get_data_from_db(self):
-        """Fetch relevant data from the database, excluding the 'customer' table."""
-        from django.db import connection
-
-        data = {}
 
         try:
-            with connection.cursor() as cursor:
-                # List of tables to query (EXCLUDE 'customer' TABLE)
-                tables = ["parish_knowledge", "parish_staff", "pages_account", "pages_customer", "pages_beneficiary"]  # Add only safe tables
-
-                for table in tables:
-                    try:
-                        cursor.execute(f"SELECT * FROM {table} LIMIT 10;")
-                        columns = [col[0] for col in cursor.description]
-                        rows = cursor.fetchall()
-                        data[table] = [dict(zip(columns, row)) for row in rows]
-                    except Exception as e:
-                        print(f"Skipping {table}: {e}")  # Avoid crashing on missing tables
+            response = openai.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "system", "content": "You are an AI assistant."},
+                          {"role": "user", "content": prompt}],
+                temperature=0.7
+            )
+            return response.choices[0].message.content
 
         except Exception as e:
-            print(f"Database error: {e}")
-
-        return data  # Returns a dictionary of database contents
-
+            logger.error(f"OpenAI API error: {e}")
+            return "I'm unable to process the request at the moment."
 
 def get_crypt_status(request, section):
     # Get all vaults belonging to the given section
