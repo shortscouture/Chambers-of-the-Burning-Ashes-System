@@ -67,11 +67,11 @@ class CustomerHomeView(TemplateView):
 
 
 
-from django.shortcuts import render
-from django.views.generic import TemplateView
+from django.db.models import Value, CharField, Q
+from django.db.models.functions import Concat
 from django.core.paginator import Paginator
-from django.db.models import Q
-from .models import ColumbaryRecord
+from django.views.generic import TemplateView
+from pages.models import ColumbaryRecord
 
 class ColumbaryRecordsView(TemplateView):
     template_name = "pages/columbaryrecords.html"
@@ -83,20 +83,34 @@ class ColumbaryRecordsView(TemplateView):
         search_query = self.request.GET.get("search", "").strip()
         selected_filters = self.request.GET.getlist("filter")
 
-        # Fetch only necessary fields and limit the records per query
-        columbary_records = ColumbaryRecord.objects.select_related("customer").only(
-            "vault_id", "customer__first_name", "customer__last_name", "customer__customer_id"
+        # Annotate customer full name while ensuring null-safe concatenation
+        columbary_records = (
+            ColumbaryRecord.objects.select_related("customer")
+            .annotate(
+                customer_name=Concat(
+                    "customer__first_name",
+                    Value(" "),
+                    "customer__middle_name",
+                    Value(" "),
+                    "customer__last_name",
+                    Value(" "),
+                    "customer__suffix",
+                    output_field=CharField(),
+                )
+            )
+            .order_by("vault_id")  # Ensure ordering to fix pagination warning
         )
 
-        # Apply search filter
+        # Apply search filter if provided
         if search_query:
             columbary_records = columbary_records.filter(
-                Q(vault_id__icontains=search_query) | 
-                Q(customer__first_name__icontains=search_query) | 
+                Q(vault_id__icontains=search_query) |
+                Q(customer__first_name__icontains=search_query) |
+                Q(customer__middle_name__icontains=search_query) |
                 Q(customer__last_name__icontains=search_query)
             )
 
-        # Apply pagination (10 records per page)
+        # Paginate results (10 per page)
         paginator = Paginator(columbary_records, 10)
         page = self.request.GET.get("page", 1)
         paginated_records = paginator.get_page(page)
@@ -107,6 +121,7 @@ class ColumbaryRecordsView(TemplateView):
         context["selected_filters"] = selected_filters
 
         return context
+
 
 
 
@@ -861,25 +876,26 @@ def addnewcustomer(request):
         payment_form = PaymentForm(request.POST)
         holder_form = HolderOfPrivilegeForm(request.POST)
         beneficiary_form = BeneficiaryForm(request.POST)
+        columbary_form = ColumbaryRecordForm(request.POST, instance=vault)  # ✅ Load existing vault record
 
-        if customer_form.is_valid():
+        if customer_form.is_valid() and columbary_form.is_valid():
             customer = customer_form.save()
+
             
-            # Save payment only if valid
             payment = None
             if payment_form.is_valid():
                 payment = payment_form.save(commit=False)
                 payment.customer = customer
                 payment.save()
+
             
-            # Save holder of privilege only if valid
             holder = None
             if holder_form.is_valid():
                 holder = holder_form.save(commit=False)
                 holder.customer = customer
                 holder.save()
+
             
-            # Save beneficiary only if valid
             beneficiary = None
             if beneficiary_form.is_valid():
                 beneficiary = beneficiary_form.save(commit=False)
@@ -887,38 +903,38 @@ def addnewcustomer(request):
                 beneficiary.save()
 
             if vault:
-                # Link the new customer and associated records to the existing vault
+                
                 vault.customer = customer
                 vault.payment = payment if payment else None
                 vault.holder_of_privilege = holder if holder else None
                 vault.beneficiary = beneficiary if beneficiary else None
-                vault.save()
-            else:
-                # Create a new ColumbaryRecord
-                columbary_record = ColumbaryRecord(
-                    vault_id=vault_id,
-                    customer=customer,
-                    payment=payment if payment else None,
-                    holder_of_privilege=holder if holder else None,
-                    beneficiary=beneficiary if beneficiary else None,
-                    status='Occupied'
-                )
-                columbary_record.save()
 
-            return redirect('success')  # Redirect to success page
+                
+                vault.inurnment_date = columbary_form.cleaned_data.get("inurnment_date")
+                vault.urns_per_columbary = columbary_form.cleaned_data.get("urns_per_columbary")
+                vault.status = 'Occupied'
+                
+                vault.save()
+
+            return redirect('columbaryrecords')  
 
     else:
         customer_form = CustomerForm()
         payment_form = PaymentForm()
         holder_form = HolderOfPrivilegeForm()
         beneficiary_form = BeneficiaryForm()
+        columbary_form = ColumbaryRecordForm(instance=vault)  
 
     return render(request, 'pages/addcustomer.html', {
         'customer_form': customer_form,
         'payment_form': payment_form,
         'holder_form': holder_form,
         'beneficiary_form': beneficiary_form,
+        'columbary_form': columbary_form,  
         'vault_id': vault_id
     })
+
+
+
 
 
