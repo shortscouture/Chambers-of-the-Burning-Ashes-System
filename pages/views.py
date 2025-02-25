@@ -42,12 +42,23 @@ from django.db.models.functions import TruncMonth
 import json
 import io
 import base64
-import os
+from django.core.files.uploadedfile import InMemoryUploadedFile
+import boto3
 
 env = environ.Env()
-
-
+textract_client = boto3.client("textract", region_name="us-east-1")
 logger = logging.getLogger(__name__)
+AWS_S3_BUCKET_NAME = env("AWS_S3_BUCKET_NAME")
+AWS_REGION = env("AWS_REGION")
+s3_client = boto3.client("s3")
+
+try:
+    print(f"Testing AWS S3 connection to bucket: {AWS_S3_BUCKET_NAME}")
+    response = s3_client.list_objects_v2(Bucket=AWS_S3_BUCKET_NAME, MaxKeys=1)
+    print(f"S3 connection successful. Found {response.get('KeyCount', 0)} objects")
+except Exception as e:
+    print(f"AWS S3 connection error: {str(e)}")
+    logger.error(f"AWS S3 connection error: {e}")
 
 
 class SuccesView(TemplateView):
@@ -531,6 +542,38 @@ def memorials_verification(request):
 
 
 @csrf_exempt
+def upload_to_s3_and_extract_text(request):
+    if request.method == "POST" and request.FILES.get("file"):
+        uploaded_file = request.FILES["file"]
+        s3_client = boto3.client(
+            "s3",
+            aws_access_key_id=env("AWS_ACCESS_KEY_ID"),
+            aws_secret_access_key=env("AWS_SECRET_ACCESS_KEY"),
+        )
+        bucket_name = env("AWS_S3_BUCKET_NAME")
+        file_name = uploaded_file.name
+        
+        # Upload file to S3
+        s3_client.upload_fileobj(uploaded_file, bucket_name, file_name)
+        
+        # Call AWS Textract
+        textract_client = boto3.client(
+            "textract",
+            aws_access_key_id=env("AWS_ACCESS_KEY_ID"),
+            aws_secret_access_key=env("AWS_SECRET_ACCESS_KEY"),
+        )
+        response = textract_client.detect_document_text(
+            Document={"S3Object": {"Bucket": bucket_name, "Name": file_name}}
+        )
+        
+        # Extract text from Textract response
+        extracted_text = "".join([block["Text"] for block in response.get("Blocks", []) if block["BlockType"] == "LINE"])
+        
+        return JsonResponse({"text": extracted_text})
+    
+    return render(request, "upload.html")
+
+@csrf_exempt
 def verify_otp(request):
     if 'verification_email' not in request.session:
         return redirect('Memorials')
@@ -567,123 +610,59 @@ def verify_otp(request):
 def success(request):
     return render(request, 'pages/success.html')
 
-      
-def preprocess_image(image):
-    """
-    Enhanced image preprocessing specifically for form documents
-    """
-    # Converting PIL Image to cv2 format
-    img = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
-
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    
-    binary = cv2.adaptiveThreshold(
-        gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
-        cv2.THRESH_BINARY, 11, 2
-    )
-    
-    denoised = cv2.fastNlMeansDenoising(binary)
-    
-    contrast = cv2.convertScaleAbs(denoised, alpha=1.5, beta=0)
-    
-    return Image.fromarray(contrast)
-
-def extract_name_components(full_name):
-    """
-    Extract first, middle, and last name from full name string
-    """
-    parts = full_name.strip().split()
-    
-    # Handle special cases like "Jr", "Sr", "III"
-    suffix = ""
-    if parts[-1].lower() in ['jr', 'sr', 'ii', 'iii', 'iv']:
-        suffix = parts.pop()
-    
-    if len(parts) >= 3:
-        first_name = parts[0]
-        last_name = parts[-1]
-        middle_name = ' '.join(parts[1:-1])
-    elif len(parts) == 2:
-        first_name = parts[0]
-        last_name = parts[1]
-        middle_name = ''
-    else:
-        first_name = parts[0] if parts else ''
-        middle_name = ''
-        last_name = ''
-    
-    return {
-        'first_name': first_name,
-        'middle_name': middle_name,
-        'last_name': last_name,
-        'suffix': suffix
-    }
-
-logger = logging.getLogger(__name__)
-
 @csrf_exempt
-def process_ocr(request):
-    if request.method == 'POST' and request.FILES.get('document'):
-        try:
-            image = request.FILES['document']
-            extracted_text = extract_text_openai(image)
-            parsed_data = parse_text_to_dict(extracted_text)
-
-            print("Extracted Text:", extracted_text)  # Debug extracted text
-            print("Parsed Data:", parsed_data)  # Debug parsed data
-            
-            return JsonResponse({'success': True, 'parsed_data': parsed_data})
-        except Exception as e:
-            print("Error in OCR:", str(e))  # Log error in server console
-            return JsonResponse({'success': False, 'error': str(e)})
-
-    return JsonResponse({'success': False, 'error': 'Invalid request'})
-
-
-def extract_text_openai(image):
-    """
-    Extract text using OpenAI's GPT-4 with vision capabilities.
-    """
-    try:
-        # Open and convert image to base64
-        img = Image.open(image)
-        img_byte_array = io.BytesIO()
-        img.save(img_byte_array, format='PNG')
-        img_byte_array.seek(0)
+def upload_and_process(request):
+    if request.method == "POST" and request.FILES.get("document"):
+        uploaded_file = request.FILES["document"]
+        s3_client = boto3.client("s3")
+        bucket_name = env("AWS_S3_BUCKET_NAME")
+        file_key = f"uploads/{uploaded_file.name}"
         
-        # Correctly encode as base64
-        base64_image = base64.b64encode(img_byte_array.getvalue()).decode('utf-8')
+        # Upload file to S3
+        s3_client.upload_fileobj(uploaded_file, bucket_name, file_key)
         
-        # Use the API key from environment variable
-        client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-        
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": "Extract all text from this form. Format as key-value pairs."},
-                        {"type": "image_url", "image_url": f"data:image/png;base64,{base64_image}"}
-                    ]
-                }
-            ],
-            max_tokens=500
+        # Process with Textract
+        textract_client = boto3.client("textract")
+        response = textract_client.analyze_document(
+            Document={"S3Object": {"Bucket": bucket_name, "Name": file_key}},
+            FeatureTypes=["FORMS"]
         )
         
-        # Access content correctly with the new client
-        extracted_text = response.choices[0].message.content.strip()
+        extracted_data = {}
+        for block in response.get("Blocks", []):
+            if block["BlockType"] == "KEY_VALUE_SET" and "KEY" in block.get("EntityTypes", []):
+                key_text = ""
+                value_text = ""
+                for rel in block.get("Relationships", []):
+                    if rel["Type"] == "CHILD":
+                        key_text = " ".join([w["Text"] for w in response["Blocks"] if w["Id"] in rel["Ids"]])
+                    if rel["Type"] == "VALUE":
+                        for value_block in response["Blocks"]:
+                            if value_block["Id"] in rel["Ids"]:
+                                for value_rel in value_block.get("Relationships", []):
+                                    if value_rel["Type"] == "CHILD":
+                                        value_text = " ".join([w["Text"] for w in response["Blocks"] if w["Id"] in value_rel["Ids"]])
+                if key_text and value_text:
+                    extracted_data[key_text] = value_text
         
-        if not extracted_text:
-            raise ValueError("No text extracted from OpenAI response")
-            
-        return extracted_text
-        
-    except Exception as e:
-        # Raise the exception rather than returning it as a string
-        raise Exception(f"OpenAI extraction error: {str(e)}")
+        # Store extracted data in session
+        request.session["extracted_data"] = extracted_data
+        return redirect("fill_form")  # Redirect to form page
+    
+    return render(request, "upload.html")
 
-openai.api_key = env("OPEN_AI_API_KEY")
+def fill_form(request):
+    extracted_data = request.session.get("extracted_data", {})
+    if request.method == "POST":
+        form = YourForm(request.POST)
+        if form.is_valid():
+            form.save()
+            del request.session["extracted_data"]  # Clear session after submission
+            return redirect("success")  # Redirect after submission
+    else:
+        form = YourForm(initial=extracted_data)  # Pre-fill form
+    
+    return render(request, "form.html", {"form": form})
 
 def parse_text_to_dict(text):
     """
@@ -692,7 +671,7 @@ def parse_text_to_dict(text):
     if not text:
         logger.error("OCR extracted text is empty.")
         return {"error": "No text extracted"}
-
+    
     data = {
         "first_name": None,
         "middle_name": None,
@@ -714,68 +693,72 @@ def parse_text_to_dict(text):
         "inurnment_date": None,
         "urns_per_columbary": None
     }
-
+    
     # Extract full name
     full_name_match = re.search(r"Full\s*name:\s*([^\n]*)", text, re.IGNORECASE)
     if full_name_match:
         full_name = full_name_match.group(1).strip()
-        # Parse name - assuming format is "MIGUEL ROSENDO SR CRUZ MONTEMAYOR"
         name_parts = full_name.split()
         if len(name_parts) >= 2:
             data["first_name"] = name_parts[0]
             data["last_name"] = name_parts[-1]
             if len(name_parts) > 2:
-                # Check for common suffixes
-                if name_parts[-2].upper() in ["SR", "JR", "II", "III", "IV"]:
-                    data["suffix"] = name_parts[-2]
-                    data["last_name"] = name_parts[-1]
+                if name_parts[-1].upper() in ["SR", "JR", "II", "III", "IV"]:
+                    data["suffix"] = name_parts[-1]
+                    data["last_name"] = name_parts[-2]
                     if len(name_parts) > 3:
                         data["middle_name"] = " ".join(name_parts[1:-2])
                 else:
                     data["middle_name"] = " ".join(name_parts[1:-1])
-
+    
     # Extract address
-    address_match = re.search(r"Permanent\s*Address:\s*([^\n]*)", text, re.IGNORECASE)
+    address_match = re.search(r"Address:\s*([^\n]*)", text, re.IGNORECASE)
     if address_match:
         address = address_match.group(1).strip()
-        data["address_line_1"] = address
         
-        # Try to parse out city/state
-        address_parts = address.split()
-        if "CITY" in [p.upper() for p in address_parts]:
-            city_index = [p.upper() for p in address_parts].index("CITY")
-            if city_index > 0:
-                data["city"] = address_parts[city_index-1]
-
+        # Try to extract city, province, and postal code from address
+        postal_code_match = re.search(r"(\d{4,})", address)
+        if postal_code_match:
+            data["postal_code"] = postal_code_match.group(1)
+        
+        # Simplified address parsing
+        address_parts = address.split(',')
+        if len(address_parts) >= 1:
+            data["address_line_1"] = address_parts[0].strip()
+        if len(address_parts) >= 2:
+            data["city"] = address_parts[-2].strip()
+        if len(address_parts) >= 3:
+            data["province_or_state"] = address_parts[-1].strip()
+    
     # Extract phone numbers
     landline_match = re.search(r"Landline\s*Number:?\s*([0-9()\s\-+]*)", text, re.IGNORECASE)
     if landline_match:
         data["landline_number"] = landline_match.group(1).strip()
-
+    
     mobile_match = re.search(r"Mobile\s*Number:?\s*([0-9()\s\-+]*)", text, re.IGNORECASE)
     if mobile_match:
         data["mobile_number"] = mobile_match.group(1).strip()
-
+    
     # Extract email
     email_match = re.search(r"Email\s*Address:?\s*([^\s\n]*@[^\s\n]*)", text, re.IGNORECASE)
     if email_match:
         data["email_address"] = email_match.group(1).strip()
-        
+    
     # Extract beneficiary information
-    beneficiary_section = False
-    for line in text.split('\n'):
-        if "BENEFICIARIES" in line.upper():
-            beneficiary_section = True
-            continue
-            
-        if beneficiary_section and "FIRST PRIORITY" in line.upper():
-            # Try to get first beneficiary from the next line
-            continue
-            
-        if beneficiary_section and re.search(r"Full\s*name:", line, re.IGNORECASE):
-            data["first_beneficiary_name"] = re.search(r"Full\s*name:\s*([^\n]*)", line, re.IGNORECASE).group(1).strip()
-            break
-
+    beneficiary_match = re.search(r"Beneficiary\s*Name:?\s*([^\n]*)", text, re.IGNORECASE)
+    if beneficiary_match:
+        data["first_beneficiary_name"] = beneficiary_match.group(1).strip()
+    
+    # Extract vault ID if present
+    vault_match = re.search(r"Vault\s*ID:?\s*([^\n\s]*)", text, re.IGNORECASE)
+    if vault_match:
+        data["vault_id"] = vault_match.group(1).strip()
+    
+    # Extract inurnment date if present
+    date_match = re.search(r"Inurnment\s*Date:?\s*(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})", text, re.IGNORECASE)
+    if date_match:
+        data["inurnment_date"] = date_match.group(1).strip()
+    
     return data
 
 
