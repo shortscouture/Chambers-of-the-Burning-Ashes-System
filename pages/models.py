@@ -118,17 +118,17 @@ class Payment(models.Model):
     ]
 
     class Meta:
-        db_table = "payment"  # 🔥 Ensures Django uses the correct table
+        db_table = "payment"
     
     payment_id = models.AutoField(primary_key=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="payments")  # Added customer FK
     mode_of_payment = models.CharField(max_length=20, choices=PAYMENT_MODES, blank=True, null=True)
 
     class Meta:
-        db_table = "payment"  # 🔥 Ensures Django uses the correct table
+        db_table = "payment"
 
     class Meta:
-        db_table = "payment"  # 🔥 Ensures Django uses the correct table
+        db_table = "payment"
 
     # Seven receipt fields
     Full_payment_receipt_1 = models.IntegerField(blank=True, null=True)
