@@ -27,15 +27,16 @@
     font-size: 16px;
   }
 
-.chatbox {
-    flex-grow: 1;
+  .chatbox {
+    flex-grow: 1; /* Keep this if you want it to take up available space */
     padding: 10px;
-    overflow-y: auto;
+    overflow-y: auto; /* Add scrollbar when content overflows */
+    max-height: 300px; /* Set your desired maximum height */
     display: flex;
     flex-direction: column;
     gap: 10px;
+    height: 300px;
 }
-
 body {
     /* Extend the background (example - customize as needed) */
     background-color: #f0f0f0; /* Light gray background */

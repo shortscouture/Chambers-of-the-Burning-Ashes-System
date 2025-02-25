@@ -25,6 +25,8 @@ Vanilla Template
 https://templatemo.com/tm-526-vanilla
 -->
 <body>
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
     <div class="chat-wrapper" id="chatContainer">
         <div class="chat-header">
           <button class="close-btn">&times;</button>
@@ -341,7 +343,8 @@ https://templatemo.com/tm-526-vanilla
     </script>
 
     <script>
-        const csrfToken = "{{ csrf_token }}";
+        const csrfToken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
+
         $(document).ready(function(){
           // Add smooth scrolling to all links
           $(".fixed-side-navbar a, .primary-button a").on('click', function(event) {
@@ -366,15 +369,18 @@ https://templatemo.com/tm-526-vanilla
             } // End if
           });
         });
-        function toggleChat() {
-            const chatContainer = document.getElementById('chatContainer');
-            // Toggle visibility of the chat container
-            chatContainer.style.display = (chatContainer.style.display === 'none' || chatContainer.style.display === '') ? 'block' : 'none';
-        }
+            function toggleChat() {
+                const chatContainer = document.getElementById('chatContainer');
+                chatContainer.style.display = (chatContainer.style.display === 'none') ? 'block' : 'none';
+            }
             function sendMessage() {
                 const userInput = document.getElementById('userInput').value;
                 const chatbox = document.getElementById('chatbox');
-        
+                
+                setTimeout(() => { // Small delay to ensure the element is rendered
+                    chatbox.scrollTop = chatbox.scrollHeight;
+                }, 0); 
+                
                 // Check if there's input and display user's message
                 if (userInput.trim() !== '') {
                     chatbox.innerHTML += `<div class="user-message">${userInput}</div>`;
@@ -412,12 +418,14 @@ https://templatemo.com/tm-526-vanilla
                     });
                 }
             }
-            const closeButton = document.querySelector('.close-btn');
-            if (closeButton) { // Check if the button exists before adding the listener
-            closeButton.addEventListener('click', () => {
-                document.getElementById('chatContainer').style.display = 'none'; 
+            document.addEventListener('DOMContentLoaded', function() {
+                const closeButton = document.querySelector('.close-btn');
+                if (closeButton) {
+                    closeButton.addEventListener('click', () => {
+                        document.getElementById('chatContainer').style.display = 'none';
+                    });
+                }
             });
-            }
     </script>
 
 </body>
