@@ -617,17 +617,17 @@ def upload_and_process(request):
         s3_client = boto3.client("s3")
         bucket_name = env("AWS_S3_BUCKET_NAME")
         file_key = f"uploads/{uploaded_file.name}"
-        
+
         # Upload file to S3
         s3_client.upload_fileobj(uploaded_file, bucket_name, file_key)
-        
+
         # Process with Textract
         textract_client = boto3.client("textract")
         response = textract_client.analyze_document(
             Document={"S3Object": {"Bucket": bucket_name, "Name": file_key}},
             FeatureTypes=["FORMS"]
         )
-        
+
         extracted_data = {}
         for block in response.get("Blocks", []):
             if block["BlockType"] == "KEY_VALUE_SET" and "KEY" in block.get("EntityTypes", []):
@@ -644,25 +644,11 @@ def upload_and_process(request):
                                         value_text = " ".join([w["Text"] for w in response["Blocks"] if w["Id"] in value_rel["Ids"]])
                 if key_text and value_text:
                     extracted_data[key_text] = value_text
-        
-        # Store extracted data in session
-        request.session["extracted_data"] = extracted_data
-        return redirect("fill_form")  # Redirect to form page
-    
-    return render(request, "upload.html")
 
-def fill_form(request):
-    extracted_data = request.session.get("extracted_data", {})
-    if request.method == "POST":
-        form = YourForm(request.POST)
-        if form.is_valid():
-            form.save()
-            del request.session["extracted_data"]  # Clear session after submission
-            return redirect("success")  # Redirect after submission
-    else:
-        form = YourForm(initial=extracted_data)  # Pre-fill form
-    
-    return render(request, "form.html", {"form": form})
+        # Return extracted data as JSON
+        return JsonResponse({"success": True, "data": extracted_data})
+
+    return JsonResponse({"success": False, "error": "Invalid request"})
 
 def parse_text_to_dict(text):
     """
