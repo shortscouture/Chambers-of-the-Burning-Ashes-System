@@ -669,50 +669,22 @@ openai.api_key = env("OPEN_AI_API_KEY")
 class ChatbotAPIView(APIView):
     def get(self, request, *args, **kwargs):
         return Response({"message": "Chatbot API is running! Use POST to send messages."}, status=status.HTTP_200_OK)
-    
-    def get_relevant_info(self, query):
-        """
-        Retrieves relevant data from the database using full-text search.
-        """
+
+     
+    def get_columbaryrecord(query):
+        """Retrieves relevant customer-related data."""
         with connection.cursor() as cursor:
-            cursor.execute(
-                "SHOW TABLES;"
-                #"WHERE MATCH(question, answer) AGAINST (%s IN NATURAL LANGUAGE MODE) "
-                #"LIMIT 3;", [query]
-            )
-            tables = [row[0] for row in cursor.fetchall()]
-        all_results = []
-        for table in tables:
-            with connection.cursor() as cursor:
-                # Get the first column's name
-                cursor.execute(f"SHOW COLUMNS FROM {table};")
-                first_column = cursor.fetchone()[0]  # Get the first column name
-
-                # Fetch data from this table (first column only)
-                cursor.execute(f"SELECT {first_column} FROM {table} LIMIT 3;")
-                results = cursor.fetchall()
-
-                all_results.extend([str(row[0]) for row in results]) 
-            if all_results:
-                answer = " ".join(all_results)
-
-                # Store the answer in parish_knowledge
-                with connection.cursor() as cursor:
-                    cursor.execute(
-                        "INSERT INTO parish_knowledge (question, answer) VALUES (%s, %s);",
-                        [query, answer]
-                    )
-
-                return answer
-        return "I'm not sure about that. Please check with the parish office or refer to the official guidelines."
-
+            cursor.execute("SELECT * FROM pages_columbaryrecord;")
+            return cursor.fetchall()
+            
         
+
         
     def post(self, request, *args, **kwargs):
-        database_data  = get_data_from_db()
+        database_data  = self.get_data_from_db()
         ai_response = self.query_openai(database_data)
         user_query = request.data.get("message", "")
-        context_data = self.get_relevant_info(self.query_openai)
+        context_data = self.get_data_from_db()
         logger.info(f"User query: {user_query}")
         
         messages = [
@@ -757,6 +729,30 @@ class ChatbotAPIView(APIView):
                     {"role": "user", "content": prompt}]
         )
         return response.choices[0].message.content
+    def get_data_from_db(self):
+        """Fetch relevant data from the database, excluding the 'customer' table."""
+        from django.db import connection
+
+        data = {}
+
+        try:
+            with connection.cursor() as cursor:
+                # List of tables to query (EXCLUDE 'customer' TABLE)
+                tables = ["parish_knowledge", "parish_staff", "pages_account", "pages_customer", "pages_beneficiary"]  # Add only safe tables
+
+                for table in tables:
+                    try:
+                        cursor.execute(f"SELECT * FROM {table} LIMIT 10;")
+                        columns = [col[0] for col in cursor.description]
+                        rows = cursor.fetchall()
+                        data[table] = [dict(zip(columns, row)) for row in rows]
+                    except Exception as e:
+                        print(f"Skipping {table}: {e}")  # Avoid crashing on missing tables
+
+        except Exception as e:
+            print(f"Database error: {e}")
+
+        return data  # Returns a dictionary of database contents
 
 
 def get_crypt_status(request, section):
@@ -784,30 +780,7 @@ def get_section_details(request, section_id):
 #def get_data_from_db():
 #    data = Customer.objects.all().values()  # Fetch all fields
 #    return list(data)
-def get_data_from_db():
-    """Fetch relevant data from the database, excluding the 'customer' table."""
-    from django.db import connection
 
-    data = {}
-
-    try:
-        with connection.cursor() as cursor:
-            # List of tables to query (EXCLUDE 'customer' TABLE)
-            tables = ["parish_knowledge", "parish_staff", "pages_account", "pages_customer", "pages_beneficiary"]  # Add only safe tables
-
-            for table in tables:
-                try:
-                    cursor.execute(f"SELECT * FROM {table} LIMIT 10;")
-                    columns = [col[0] for col in cursor.description]
-                    rows = cursor.fetchall()
-                    data[table] = [dict(zip(columns, row)) for row in rows]
-                except Exception as e:
-                    print(f"Skipping {table}: {e}")  # Avoid crashing on missing tables
-
-    except Exception as e:
-        print(f"Database error: {e}")
-
-    return data  # Returns a dictionary of database contents
 
 def addnewrecord(request):
     
