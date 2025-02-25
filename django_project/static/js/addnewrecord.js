@@ -1,7 +1,3 @@
-// Debugging: Check if the JavaScript file is loaded
-console.log('addnewrecord.js loaded!');
-
-// Function to toggle payment fields based on selected payment mode
 function togglePaymentFields() {
     console.log('Toggling payment fields...');
     const paymentMode = document.getElementById('id_mode_of_payment').value;
@@ -20,11 +16,11 @@ function togglePaymentFields() {
     }
 }
 
-// Initialize payment fields on page load
+
 document.addEventListener('DOMContentLoaded', function () {
     console.log('DOM fully loaded and parsed');
 
-    // Initialize payment fields
+
     togglePaymentFields();
     const paymentModeSelect = document.getElementById('id_mode_of_payment');
     if (paymentModeSelect) {
@@ -33,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
         console.error('Payment mode select element not found!');
     }
 
-    // Initialize OCR UI elements
+
     setupOcrUI();
 });
 
@@ -68,9 +64,9 @@ function setupOcrUI() {
         processOCRButton.addEventListener('click', processUploadedFile);
     }
 }
-    // Set up file upload processing
+
 const processOCRButton = document.getElementById('processOCR');
-console.log('Process OCR button found:', processOCRButton); // Debug log
+console.log('Process OCR button found:', processOCRButton); 
 
 if (processOCRButton) {
     processOCRButton.addEventListener('click', processUploadedFile);
@@ -79,11 +75,9 @@ if (processOCRButton) {
 }
 
 
-// Webcam and OCR variables
 let stream = null;
 let capturedImage = null;
 
-// Initialize webcam
 async function initializeWebcam() {
     console.log('Initializing webcam...');
     try {
@@ -107,7 +101,6 @@ async function initializeWebcam() {
     }
 }
 
-// Stop webcam
 function stopWebcam() {
     console.log('Stopping webcam...');
     if (stream) {
@@ -116,7 +109,6 @@ function stopWebcam() {
     }
 }
 
-// Capture image from webcam
 function captureWebcamImage() {
     console.log('Capturing image from webcam...');
     const video = document.getElementById('webcam-view');
@@ -145,7 +137,6 @@ function captureWebcamImage() {
     capturedImage = canvas.toDataURL('image/jpeg');
 }
 
-// Retake photo
 function retakeWebcamImage() {
     console.log('Retaking webcam image...');
     const video = document.getElementById('webcam-view');
@@ -168,7 +159,6 @@ function retakeWebcamImage() {
     capturedImage = null;
 }
 
-// Process webcam image
 function processWebcamImage() {
     console.log('Processing webcam image...');
     if (!capturedImage) {
@@ -176,13 +166,12 @@ function processWebcamImage() {
         return;
     }
 
-    // Show loading indicator
     showLoading('Processing image...');
 
     fetch(capturedImage)
         .then(res => res.blob())
         .then(blob => {
-            // Create a file from the blob
+            
             const imageFile = new File([blob], "webcam-capture.jpg", { type: "image/jpeg" });
             uploadImageToS3(imageFile);
         })
@@ -209,15 +198,14 @@ function processUploadedFile() {
         return;
     }
 
-    // Show loading indicator
     showLoading('Uploading document...');
 
     uploadImageToS3(fileInput.files[0]);
 }
 
-// Show loading indicator
+
 function showLoading(message = 'Loading...') {
-    // Create loading element if it doesn't exist
+
     let loadingEl = document.getElementById('ocr-loading');
 
     if (!loadingEl) {
@@ -267,7 +255,7 @@ function showLoading(message = 'Loading...') {
     }
 }
 
-// Hide loading indicator
+
 function hideLoading() {
     const loadingEl = document.getElementById('ocr-loading');
     if (loadingEl) {
@@ -289,7 +277,7 @@ async function uploadImageToS3(imageFile) {
             method: 'POST',
             body: formData,
             headers: {
-                'X-CSRFToken': getCookie('csrftoken'), // Ensure CSRF token is included
+                'X-CSRFToken': getCookie('csrftoken'), 
             },
         });
 
@@ -302,7 +290,7 @@ async function uploadImageToS3(imageFile) {
 
         if (result.success) {
             console.log('Upload and processing successful! Data:', result.data);
-            populateFields(result.data); // Populate form fields with extracted data
+            populateFields(result.data); 
         } else {
             console.error('Upload failed with error:', result.error);
             alert('Failed to upload image: ' + result.error);
@@ -316,19 +304,19 @@ async function uploadImageToS3(imageFile) {
 }
 
 function normalizeKey(key) {
-    // First remove the trailing colons, then other special characters
+  
     return key
-        .replace(/:+$/, '')        // Remove trailing colons (one or more)
-        .replace(/[^\w\d]/g, '')   // Remove all non-alphanumeric characters
-        .toLowerCase();            // Convert to lowercase for consistent matching
+        .replace(/:+$/, '')        
+        .replace(/[^\w\d]/g, '')   
+        .toLowerCase();            
 }
 
-// Normalize OCR data with cleaned keys
+
 function normalizeOcrData(data) {
     const normalizedData = {};
     for (const key in data) {
         if (data.hasOwnProperty(key)) {
-            // Make sure to trim the key before normalizing
+           
             const normalizedKey = normalizeKey(key.trim());
             normalizedData[normalizedKey] = data[key];
         }
@@ -339,11 +327,9 @@ function normalizeOcrData(data) {
 function populateFields(data) {
     console.log('Populating fields with data:', data);
 
-    // Normalize OCR data keys
     const normalizedData = normalizeOcrData(data);
     console.log('Normalized OCR data:', normalizedData);
 
-    // Helper function to set value if field exists
     function setValue(fieldId, value) {
         if (!value) return;
 
@@ -354,7 +340,6 @@ function populateFields(data) {
             console.log(`Setting ${fieldId} to "${value}"`);
             element.value = value;
 
-            // Trigger change event for any listeners
             const event = new Event('change', { bubbles: true });
             element.dispatchEvent(event);
         } else {
@@ -381,12 +366,10 @@ function populateFields(data) {
         'beneficiaries': 'id_first_beneficiary_name',
     };
 
-    // Process the full name
     let firstName = '';
     let middleName = '';
     let lastName = '';
 
-    // Try to extract name from various possible fields
     const fullName = normalizedData.fullname || normalizedData.name || '';
     
     if (fullName) {
@@ -397,33 +380,27 @@ function populateFields(data) {
         }
         
         if (nameParts.length >= 3) {
-            // If we have at least 3 parts, assume last name is the last part
-            // and middle name is everything in between
             lastName = nameParts[nameParts.length - 1] || '';
             middleName = nameParts.slice(1, -1).join(' ') || '';
         } else if (nameParts.length === 2) {
-            // If we have only 2 parts, assume it's first and last name
             lastName = nameParts[1] || '';
         }
     }
 
-    // Set name fields
+ 
     setValue('id_first_name', firstName);
     setValue('id_middle_name', middleName);
     setValue('id_last_name', lastName);
-    setValue('id_suffix', ''); // Suffix not available in OCR data
-    
-    // Set default values
-    setValue('id_country', 'Philippines'); // Default value
-    
-    // Map fields from normalized data to form fields
+    setValue('id_suffix', ''); 
+
+    setValue('id_country', 'Philippines'); 
+
     for (const key in normalizedData) {
         if (fieldMap[key]) {
             setValue(fieldMap[key], normalizedData[key]);
         }
     }
 
-    // Process beneficiaries
     if (normalizedData.beneficiaries) {
         const beneficiaries = normalizedData.beneficiaries.split('/');
         
@@ -450,8 +427,8 @@ function populateFields(data) {
         }
     }
 
-    // Other fields
-    setValue('id_urns_per_columbary', '1'); // Default value
+
+    setValue('id_urns_per_columbary', '1'); 
     
     console.log('Field population complete');
 }
@@ -471,5 +448,5 @@ function getCookie(name) {
     return cookieValue;
 }
 
-// Clean up webcam when leaving the page
+
 window.addEventListener('beforeunload', stopWebcam);
