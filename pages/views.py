@@ -677,7 +677,7 @@ class ChatbotAPIView(APIView):
         with connection.cursor() as cursor:
             cursor.execute(
                 "SELECT content FROM parish_knowledge "
-                "WHERE MATCH(content) AGAINST (%s IN NATURAL LANGUAGE MODE) "
+                "WHERE MATCH(question, answer) AGAINST (%s IN NATURAL LANGUAGE MODE) "
                 "LIMIT 3;", [query]
             )
             results = cursor.fetchall()
