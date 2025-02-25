@@ -83,13 +83,11 @@
   </svg>
 </div>
 <div class="form-container">
-    <!-- Dropdown for Level Selection -->
     <label for="level-select">Select Level:</label>
     <select id="level-select">
         <option value="" disabled selected>Select a Level</option>
     </select>
 
-    <!-- Letter of Intent Form (Inside Popup) -->
     <form method="post" action="{% url 'send_letter_of_intent' %}">
         {% csrf_token %}
 
@@ -102,7 +100,7 @@
         <input type="hidden" id="section-input" name="section">
         <input type="hidden" id="level-input" name="level">
 
-        <button class = "submit-btn" type="submit">Send Letter of Intent</button>
+        <button class = "submit-btn" type="submit"> SUBMIT</button>
     </form>
     <button class = "close-btn" onclick="closePopup()">close</button>
   </div>
