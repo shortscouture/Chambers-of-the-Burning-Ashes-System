@@ -77,51 +77,135 @@
                 <p class="no-records">No Columbary Records found for this customer.</p>
             {% endif %}
 
-            <!-- Payment Details -->
-            <h3 class="sub-header">Payment Details</h3>
-            {% if payments %}
-                {% for payment in payments %}
+                    <!-- Payment Details -->
+<h3 class="sub-header">Payment Details</h3>
+{% if payments %}
+    {% for payment in payments %}
+        <div class="details-section">
+            <div class="row">
+                <span class="label">Mode of Payment:</span>
+                <span class="value">{{ payment.mode_of_payment }}</span>
+            </div>
+            
+            <!-- Full Payment -->
+            {% if payment.mode_of_payment == "Full Payment" and payment.Full_payment_receipt_1 %}
+                <div class="row">
+                    <span class="label">Receipt #:</span>
+                    <span class="value">{{ payment.Full_payment_receipt_1 }}</span>
+                </div>
+                <div class="row">
+                    <span class="label">Amount:</span>
+                    <span class="value">{{ payment.Full_payment_amount_1 }}</span>
+                </div>
+            {% endif %}
+            
+            <!-- 6-Month Installment -->
+            {% if payment.mode_of_payment == "6-Month Installment" %}
+                {% if payment.six_month_receipt_1 %}
+                    <div class="row"><span class="label">Installment 1 Receipt #:</span> <span class="value">{{ payment.six_month_receipt_1 }}</span></div>
+                    <div class="row"><span class="label">Installment 1 Amount:</span> <span class="value">{{ payment.six_month_amount_1 }}</span></div>
+                {% endif %}
+                {% if payment.six_month_receipt_2 %}
+                    <div class="row"><span class="label">Installment 2 Receipt #:</span> <span class="value">{{ payment.six_month_receipt_2 }}</span></div>
+                    <div class="row"><span class="label">Installment 2 Amount:</span> <span class="value">{{ payment.six_month_amount_2 }}</span></div>
+                {% endif %}
+                {% if payment.six_month_receipt_3 %}
+                    <div class="row"><span class="label">Installment 3 Receipt #:</span> <span class="value">{{ payment.six_month_receipt_3 }}</span></div>
+                    <div class="row"><span class="label">Installment 3 Amount:</span> <span class="value">{{ payment.six_month_amount_3 }}</span></div>
+                {% endif %}
+                {% if payment.six_month_receipt_4 %}
+                    <div class="row"><span class="label">Installment 4 Receipt #:</span> <span class="value">{{ payment.six_month_receipt_4 }}</span></div>
+                    <div class="row"><span class="label">Installment 4 Amount:</span> <span class="value">{{ payment.six_month_amount_4 }}</span></div>
+                {% endif %}
+                {% if payment.six_month_receipt_5 %}
+                    <div class="row"><span class="label">Installment 5 Receipt #:</span> <span class="value">{{ payment.six_month_receipt_5 }}</span></div>
+                    <div class="row"><span class="label">Installment 5 Amount:</span> <span class="value">{{ payment.six_month_amount_5 }}</span></div>
+                {% endif %}
+                {% if payment.six_month_receipt_6 %}
+                    <div class="row"><span class="label">Installment 6 Receipt #:</span> <span class="value">{{ payment.six_month_receipt_6 }}</span></div>
+                    <div class="row"><span class="label">Installment 6 Amount:</span> <span class="value">{{ payment.six_month_amount_6 }}</span></div>
+                {% endif %}
+            {% endif %}
+            
+            <hr class="separator">
+        </div>
+    {% endfor %}
+{% else %}
+    <p class="no-records">No Payment Records found for this customer.</p>
+{% endif %}
+
+
+
+            <!-- Holder of Privilege Details -->
+            <h3 class="sub-header">Holder of Privilege Details</h3>
+            {% if holderofprivilege %}
+                {% for holder in holderofprivilege %}
                     <div class="details-section">
                         <div class="row">
-                            <span class="label">Mode of Payment:</span>
-                            <span class="value">{{ payment.mode_of_payment }}</span>
+                            <span class="label">Issuing Parish Priest:</span>
+                            <span class="value">{{ holder.issuing_parish_priest }}</span>
                         </div>
-                        {% if payment.mode_of_payment == "Full Payment" and payment.Full_payment_receipt_1 %}
-                            <div class="row">
-                                <span class="label">Receipt #:</span>
-                                <span class="value">{{ payment.Full_payment_receipt_1 }}</span>
-                            </div>
-                            <div class="row">
-                                <span class="label">Amount:</span>
-                                <span class="value">{{ payment.Full_payment_amount_1 }}</span>
-                            </div>
-                        {% endif %}
+                        <div class="row">
+                            <span class="label">Issuance Date:</span>
+                            <span class="value">{{ holder.issuance_date }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">Expiration Date:</span>
+                            <span class="value">{{ holder.expiration_date }}</span>
+                        </div>
                         <hr class="separator">
                     </div>
                 {% endfor %}
             {% else %}
-                <p class="no-records">No Payment Records found for this customer.</p>
+                <p class="no-records">No Holder of Privilege Records found for this customer.</p>
             {% endif %}
 
-            <!-- File Upload Section -->
-            <h3 class="sub-header">Upload Files</h3>
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                {{ file_form.as_p }}
-                <button type="submit">Upload</button>
-            </form>
-
-            <!-- Display Uploaded Files -->
-            <h3 class="sub-header">Uploaded Files</h3>
-            <ul>
-                {% for file in files %}
-                    <li>
-                        <a href="{{ file.file.url }}" target="_blank">{{ file.file.name }}</a> (Uploaded: {{ file.uploaded_at }})
-                    </li>
-                {% empty %}
-                    <p>No files uploaded.</p>
+            <!-- Beneficiary Details -->
+            <h3 class="sub-header">Beneficiary Details</h3>
+            {% if beneficiaries %}
+                {% for beneficiary in beneficiaries %}
+                    <div class="details-section">
+                        <div class="row">
+                            <span class="label">First Beneficiary Name:</span>
+                            <span class="value">{{ beneficiary.first_beneficiary_name }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">Second Beneficiary Name:</span>
+                            <span class="value">{{ beneficiary.second_beneficiary_name }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="label">Third Beneficiary Name:</span>
+                            <span class="value">{{ beneficiary.third_beneficiary_name }}</span>
+                        </div>
+                        <hr class="separator">
+                    </div>
                 {% endfor %}
-            </ul>
+            {% else %}
+                <p class="no-records">No Beneficiary Details found for this customer.</p>
+            {% endif %}
+
+
+        
+        <!-- File Upload Section -->
+        <h3 class="sub-header">Upload Files</h3>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ file_form.as_p }}
+            <button type="submit">Upload</button>
+        </form>
+
+        <!-- Display Uploaded Files -->
+        <h3 class="sub-header">Uploaded Files</h3>
+        <ul>
+            {% for file in files %}
+                <li>
+                    <a href="{{ file.file.url }}" target="_blank">{{ file.file.name }}</a> (Uploaded: {{ file.uploaded_at }})
+                </li>
+            {% empty %}
+                <p>No files uploaded.</p>
+            {% endfor %}
+        </ul>
+
 
             <!-- Buttons Section -->
             <div class="back-button" style="display: flex; justify-content: center; margin-top: 20px;">
@@ -132,6 +216,7 @@
                     <button>Edit Customer</button> 
                 </a> 
             </div>
+
         </div>
     </div>
 </body>

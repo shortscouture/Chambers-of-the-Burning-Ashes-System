@@ -67,59 +67,93 @@ class CustomerHomeView(TemplateView):
 
 
 
-from django.db.models import Value, CharField, Q
-from django.db.models.functions import Concat
-from django.core.paginator import Paginator
-from django.views.generic import TemplateView
-from pages.models import ColumbaryRecord
-
 class ColumbaryRecordsView(TemplateView):
     template_name = "pages/columbaryrecords.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Get search query & filters
+        # Get search query & selected filters
         search_query = self.request.GET.get("search", "").strip()
-        selected_filters = self.request.GET.getlist("filter")
+        selected_filters = self.request.GET.getlist("filter")  # Multiple selections
 
-        # Annotate customer full name while ensuring null-safe concatenation
-        columbary_records = (
-            ColumbaryRecord.objects.select_related("customer")
-            .annotate(
-                customer_name=Concat(
-                    "customer__first_name",
-                    Value(" "),
-                    "customer__middle_name",
-                    Value(" "),
-                    "customer__last_name",
-                    Value(" "),
-                    "customer__suffix",
-                    output_field=CharField(),
-                )
-            )
-            .order_by("vault_id")  # Ensure ordering to fix pagination warning
-        )
+        # Fetch all records
+        columbary_records = ColumbaryRecord.objects.select_related("customer").all()
 
-        # Apply search filter if provided
+        # Apply search filter
         if search_query:
             columbary_records = columbary_records.filter(
-                Q(vault_id__icontains=search_query) |
-                Q(customer__first_name__icontains=search_query) |
-                Q(customer__middle_name__icontains=search_query) |
+                Q(vault_id__icontains=search_query) | 
+                Q(customer__first_name__icontains=search_query) | 
                 Q(customer__last_name__icontains=search_query)
             )
 
-        # Paginate results (10 per page)
-        paginator = Paginator(columbary_records, 10)
+        records_data = []
+        for record in columbary_records:
+            customer = getattr(record, "customer", None)  # Avoid NoneType errors
+
+            has_beneficiary = (
+                customer and customer.beneficiaries.filter(first_beneficiary_name__isnull=False).exists()
+            )
+
+            has_payment = (
+                customer and customer.payments.filter(
+                    mode_of_payment__isnull=False
+                ).filter(
+                    Q(mode_of_payment="Full Payment", Full_payment_receipt_1__isnull=False, Full_payment_amount_1__isnull=False) |
+                    Q(mode_of_payment="6-Month Installment", 
+                      six_month_receipt_1__isnull=False, six_month_amount_1__isnull=False, 
+                      six_month_receipt_2__isnull=False, six_month_amount_2__isnull=False, 
+                      six_month_receipt_3__isnull=False, six_month_amount_3__isnull=False, 
+                      six_month_receipt_4__isnull=False, six_month_amount_4__isnull=False, 
+                      six_month_receipt_5__isnull=False, six_month_amount_5__isnull=False, 
+                      six_month_receipt_6__isnull=False, six_month_amount_6__isnull=False)
+                ).exists()
+            )
+
+            has_holder_of_privilege = (
+                customer and customer.privileges.filter(issuance_date__isnull=False).exists()
+            )
+
+            record_entry = {
+                "vault_id": record.vault_id,
+                "customer_name": customer.full_name() if customer else "No Customer",
+                "has_beneficiary": has_beneficiary,
+                "has_payment": has_payment,
+                "has_holder_of_privilege": has_holder_of_privilege,
+                "customer_id": customer.customer_id if customer else None,
+            }
+
+            records_data.append(record_entry)
+
+        # Apply filter logic
+        if selected_filters:
+            if len(selected_filters) == 3:
+                # Show only fully completed records if all three filters are selected
+                records_data = [
+                    record for record in records_data
+                    if record["has_beneficiary"] and record["has_payment"] and record["has_holder_of_privilege"]
+                ]
+            else:
+                # Show records that match at least one selected filter
+                records_data = [
+                    record for record in records_data
+                    if (
+                        ("beneficiary" in selected_filters and record["has_beneficiary"]) or
+                        ("payment" in selected_filters and record["has_payment"]) or
+                        ("holder" in selected_filters and record["has_holder_of_privilege"])
+                    )
+                ]
+
+        # Apply pagination (10 records per page)
         page = self.request.GET.get("page", 1)
+        paginator = Paginator(records_data, 10)  # Show 10 per page
         paginated_records = paginator.get_page(page)
 
         # Add to context
         context["records_data"] = paginated_records
-        context["search_query"] = search_query
-        context["selected_filters"] = selected_filters
-
+        context["search_query"] = search_query  # Keep search input filled
+        context["selected_filters"] = selected_filters  # Keep selected filters
         return context
 
 
