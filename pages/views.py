@@ -671,91 +671,47 @@ class ChatbotAPIView(APIView):
     def get(self, request, *args, **kwargs):
         return Response({"message": "Chatbot API is running! Use POST to send messages."}, status=status.HTTP_200_OK)
 
-     
-    def get_columbaryrecord(query):
-        """Retrieves relevant customer-related data."""
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT * FROM pages_columbaryrecord;")
-            return cursor.fetchall()
     def post(self, request, *args, **kwargs):
-        """Handles chatbot queries by retrieving database data and querying OpenAI."""
+        """Handles chatbot queries by retrieving answers from parish_knowledge and logging unanswered queries."""
 
-        # Debugging: Print headers & body
-        print("Request Headers:", request.headers)
-        print("Request Body:", request.body)
-        logger.info(f"Request Headers: {request.headers}")
-        logger.info(f"Request Body: {request.body}")
-
-        # Extract user query correctly
-        try:
-            user_query = request.POST.get("message") or request.data.get("message", "")
-            if not user_query:
-                user_query = json.loads(request.body.decode("utf-8")).get("message", "")
-        except Exception as e:
-            logger.error(f"Error parsing request: {e}")
-            return JsonResponse({"error": "Invalid request format"}, status=400)
-
+        # Extract user query
+        user_query = request.data.get("message", "").strip()
         if not user_query:
-            return JsonResponse({"error": "No query provided"}, status=400)  # Handle empty query
+            return JsonResponse({"error": "No query provided"}, status=400)
 
-        database_data = self.get_data_from_db()  # Fetch database records
-        ai_response = self.query_openai(user_query, database_data)  # Get AI response
+        # Check if an answer exists in parish_knowledge
+        answer = self.get_answer_from_parish_knowledge(user_query)
+
+        if answer:
+            response_text = answer  # Return the relevant answer
+        else:
+            response_text = (
+                "I'm sorry, I couldn't find an answer to your question. "
+                "For further assistance, please contact St. Alphonsus Parish: "
+                "[Facebook 📘](https://www.facebook.com/stalphonsusparishmagallanes) | "
+                "[Instagram 📸](https://www.instagram.com/stalphonsusparishmagallanes)"
+            )
+
+            # Save the unanswered question to pages_chatquery
+            self.save_unanswered_query(user_query)
 
         return JsonResponse({
-            "query": user_query,  
-            "ai_insights": ai_response,
+            "query": user_query,
+            "response": response_text,
         })
-    
 
-    def get_data_from_db(self):
-        """Fetches relevant data from multiple tables."""
-        data = {}
-        tables = ["parish_knowledge", "parish_staff", "pages_account", "pages_customer", "pages_beneficiary"]  # Exclude sensitive tables
-        
-        try:
-            with connection.cursor() as cursor:
-                for table in tables:
-                    try:
-                        cursor.execute(f"SELECT * FROM {table} LIMIT 10;")
-                        columns = [col[0] for col in cursor.description]
-                        rows = cursor.fetchall()
-                        data[table] = [dict(zip(columns, row)) for row in rows]
-                    except Exception as e:
-                        logger.warning(f"Skipping table {table}: {e}")
+    def get_answer_from_parish_knowledge(self, query):
+        """Searches the parish_knowledge table for a matching question and returns the answer."""
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT answer FROM parish_knowledge WHERE question = %s LIMIT 1;", [query])
+            result = cursor.fetchone()
+            return result[0] if result else None  # Return answer if found, otherwise None
 
-        except Exception as e:
-            logger.error(f"Database error: {e}")
+    def save_unanswered_query(self, query):
+        """Saves unanswered queries to pages_chatquery for future review."""
+        with connection.cursor() as cursor:
+            cursor.execute("INSERT INTO pages_chatquery (user_message, bot_response) VALUES (%s, NOW());", [query])
 
-        return data
-    
-    def query_openai(self, user_query, data):
-        """Formats database data and sends a query to OpenAI."""
-        try:
-            formatted_data = json.dumps(data, indent=2)
-        except (TypeError, ValueError) as e:
-            return f"Error formatting data: {str(e)}"
-
-        prompt = (
-            "You are an AI assistant analyzing parish data. "
-            "Here is the structured database information:\n\n"
-            f"{formatted_data}\n\n"
-            "Based on the above, answer the following question:\n"
-            f"'{user_query}'\n\n"
-            "If the information is insufficient, kindly respond appropriately."
-        )
-
-        try:
-            response = openai.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[{"role": "system", "content": "You are an AI assistant."},
-                          {"role": "user", "content": prompt}],
-                temperature=0.7
-            )
-            return response.choices[0].message.content
-
-        except Exception as e:
-            logger.error(f"OpenAI API error: {e}")
-            return "I'm unable to process the request at the moment."
 
 def get_crypt_status(request, section):
     # Get all vaults belonging to the given section
