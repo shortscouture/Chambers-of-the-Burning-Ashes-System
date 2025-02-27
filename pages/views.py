@@ -19,10 +19,11 @@ from django.db import transaction, connection
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-import pytesseract
 from PIL import Image
 import re
+import numpy as np
 import openai
+from openai import OpenAI
 from django.db import transaction
 import json
 import environ
@@ -31,15 +32,32 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 import logging
 from django.views.generic import TemplateView
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, Sum
 from .models import ColumbaryRecord
 from django.utils.safestring import mark_safe
 from django.db.models import Count, Sum
 from django.db.models.functions import TruncMonth
 import json
+import io
+import base64
+from django.core.files.uploadedfile import InMemoryUploadedFile
+import boto3
 
+env = environ.Env()
+textract_client = boto3.client("textract", region_name="us-east-1")
 
 logger = logging.getLogger(__name__)
+AWS_S3_BUCKET_NAME = env("AWS_S3_BUCKET_NAME")
+AWS_REGION = env("AWS_REGION")
+s3_client = boto3.client("s3")
+
+try:
+    print(f"Testing AWS S3 connection to bucket: {AWS_S3_BUCKET_NAME}")
+    response = s3_client.list_objects_v2(Bucket=AWS_S3_BUCKET_NAME, MaxKeys=1)
+    print(f"S3 connection successful. Found {response.get('KeyCount', 0)} objects")
+except Exception as e:
+    print(f"AWS S3 connection error: {str(e)}")
+    logger.error(f"AWS S3 connection error: {e}")
 
 
 class SuccesView(TemplateView):
@@ -66,6 +84,8 @@ class CustomerHomeView(TemplateView):
     template_name = "pages/Customer_Home.html"
 
 
+
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 class ColumbaryRecordsView(TemplateView):
     template_name = "pages/columbaryrecords.html"
@@ -148,13 +168,23 @@ class ColumbaryRecordsView(TemplateView):
         # Apply pagination (10 records per page)
         page = self.request.GET.get("page", 1)
         paginator = Paginator(records_data, 10)  # Show 10 per page
-        paginated_records = paginator.get_page(page)
+
+        try:
+            paginated_records = paginator.page(page)
+        except PageNotAnInteger:
+            paginated_records = paginator.page(1)  # Show first page if invalid
+        except EmptyPage:
+            paginated_records = paginator.page(paginator.num_pages)  # Show last page if out of range
 
         # Add to context
         context["records_data"] = paginated_records
         context["search_query"] = search_query  # Keep search input filled
         context["selected_filters"] = selected_filters  # Keep selected filters
+        context["is_paginated"] = paginator.num_pages > 1  # Flag for pagination
         return context
+
+
+
 
 
 
@@ -194,45 +224,104 @@ class DashboardView(TemplateView):
         earnings_by_date = (
             ColumbaryRecord.objects.filter(payment__isnull=False, holder_of_privilege__issuance_date__isnull=False)
             .values("holder_of_privilege__issuance_date")
-            .annotate(total_earnings=Sum("payment__total_amount"))
+            .annotate(total_earnings=Sum("payment__Full_payment_amount_1") + 
+                    Sum("payment__six_month_amount_1") +
+                    Sum("payment__six_month_amount_2") +
+                    Sum("payment__six_month_amount_3") +
+                    Sum("payment__six_month_amount_4") +
+                    Sum("payment__six_month_amount_5") +
+                    Sum("payment__six_month_amount_6"))
             .order_by("holder_of_privilege__issuance_date")
         )
 
-        # Get earnings per month
+        class DashboardView(TemplateView):
+            template_name = "dashboard.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Get filter parameters from the request
+        request = self.request
+        start_date = request.GET.get("start_date")
+        end_date = request.GET.get("end_date")
+
+        if start_date and end_date:
+            start_date = datetime.strptime(start_date, "%Y-%m-%d")
+            end_date = datetime.strptime(end_date, "%Y-%m-%d")
+        else:
+            start_date = None
+            end_date = None
+
+        # Always include **unissued** columbaries (no filtering on them)
+        unissued_columbaries = ColumbaryRecord.objects.filter(
+            holder_of_privilege__issuance_date__isnull=True, 
+            customer__isnull=False
+        )
+
+        # Always include **pending** customers
+        pending_customers = Customer.objects.filter(status="pending")
+
+        # Fetch all columbaries without filtering first
+        all_columbaries = ColumbaryRecord.objects.all()
+
+        # Apply filtering **only to columbaries with issuance dates**  
+        if start_date and end_date:
+            filtered_columbaries = all_columbaries.filter(holder_of_privilege__issuance_date__range=[start_date, end_date])
+        else:
+            filtered_columbaries = all_columbaries  # No filter if no date selected
+
+        # Separate vacant and occupied columbaries
+        vacant_columbaries = filtered_columbaries.filter(status="Vacant")
+        occupied_columbaries = filtered_columbaries.filter(status="Occupied")
+
+        # Count filtered columbaries
+        vacant_columbaries_count = vacant_columbaries.count()
+        occupied_columbaries_count = occupied_columbaries.count()
+
+        # Get Payments & Apply Date Filter
+        payments = Payment.objects.all()
+        if start_date and end_date:
+            payments = payments.filter(created_at__date__range=[start_date, end_date])
+
+        # Count Payments
+        full_payment_count = payments.filter(mode_of_payment="Full Payment").count()
+        installment_count = payments.filter(mode_of_payment="6-Month Installment").count()
+
+        # Earnings per month based on filtered payments
         earnings_by_month = (
-            ColumbaryRecord.objects.filter(payment__isnull=False, holder_of_privilege__issuance_date__isnull=False)
-            .annotate(month=TruncMonth("holder_of_privilege__issuance_date"))
+            payments.annotate(month=TruncMonth("created_at"))
             .values("month")
-            .annotate(total_earnings=Sum("payment__total_amount"))
+            .annotate(total_earnings=Sum("total_amount"))
             .order_by("month")
         )
 
         # Convert data for Chart.js
-        earnings_labels = [
-            entry["month"].strftime("%b %Y") for entry in earnings_by_month if entry["month"] is not None
-        ]
+        earnings_labels = [entry["month"].strftime("%b %Y") if entry["month"] else "Unknown" for entry in earnings_by_month]
         earnings_data = [float(entry["total_earnings"]) if entry["total_earnings"] else 0 for entry in earnings_by_month]
 
-        # Convert payment method data
         payment_labels = ["Full Payment", "Installment"]
         payment_data = [full_payment_count, installment_count]
 
-        # Add data to context
+        # Update context with ALL columbaries (ensures they are always passed)
         context.update({
-            'customer_status_counts': customer_status_counts,
-            'pending_counts': pending_counts,
-            'pending_customers': Customer.objects.filter(status="pending"),
-            'unissued_columbaries': unissued_columbaries,
-            'vacant_columbaries_count': vacant_columbaries_count,
-            'occupied_columbaries_count': occupied_columbaries_count,
-            'unissued_columbary_records': unissued_columbary_records,  
+            "vacant_columbaries": vacant_columbaries,  # ✅ Fix: Always pass available columbaries
+            "occupied_columbaries": occupied_columbaries,  # ✅ Fix: Always pass occupied columbaries
+            "vacant_columbaries_count": vacant_columbaries_count,
+            "occupied_columbaries_count": occupied_columbaries_count,
+            "unissued_columbaries": unissued_columbaries.count(),
+            "pending_counts": pending_customers.count(),
+            "unissued_columbary_records": unissued_columbaries,
+            "pending_customers": pending_customers,
             "payment_labels": mark_safe(json.dumps(payment_labels)),
             "payment_data": mark_safe(json.dumps(payment_data)),
-            "earnings_labels": mark_safe(json.dumps(earnings_labels)),  
-            "earnings_data": mark_safe(json.dumps(earnings_data)),  
+            "earnings_labels": mark_safe(json.dumps(earnings_labels)),
+            "earnings_data": mark_safe(json.dumps(earnings_data)),
+            "start_date": start_date.strftime("%Y-%m-%d") if start_date else "",
+            "end_date": end_date.strftime("%Y-%m-%d") if end_date else "",
         })
 
         return context
+
 
             
 def send_letter_of_intent(request):
@@ -351,22 +440,43 @@ def decline_letter_of_intent(request, intent_id):
     return redirect('some_rejection_page')
 
 
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views.generic import TemplateView
+from .models import Customer, ColumbaryRecord, HolderOfPrivilege, Beneficiary, Payment, CustomerFile
+from .forms import CustomerFileForm
+
 class RecordsDetailsView(TemplateView):
     template_name = "pages/recordsdetails.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        customer_id = self.kwargs.get('customer_id')
-        
+        customer_id = self.kwargs.get("customer_id")
+
         customer = get_object_or_404(Customer, customer_id=customer_id)
         
-        context['customer'] = customer
-        context['columbary_records'] = ColumbaryRecord.objects.filter(customer=customer)
-        context['holderofprivilege'] = HolderOfPrivilege.objects.filter(customer=customer)
-        context['beneficiaries'] = Beneficiary.objects.filter(customer=customer)
-        context['payments'] = Payment.objects.filter(customer=customer)
-        
+        context["customer"] = customer
+        context["columbary_records"] = ColumbaryRecord.objects.filter(customer=customer)
+        context["holderofprivilege"] = HolderOfPrivilege.objects.filter(customer=customer)
+        context["beneficiaries"] = Beneficiary.objects.filter(customer=customer)
+        context["payments"] = Payment.objects.filter(customer=customer)
+        context["files"] = CustomerFile.objects.filter(customer=customer)
+        context["file_form"] = CustomerFileForm()
+
         return context
+
+    def post(self, request, *args, **kwargs):
+        customer_id = self.kwargs.get("customer_id")
+        customer = get_object_or_404(Customer, customer_id=customer_id)
+
+        file_form = CustomerFileForm(request.POST, request.FILES)
+        if file_form.is_valid():
+            file_instance = file_form.save(commit=False)
+            file_instance.customer = customer
+            file_instance.save()
+            return redirect("recordsdetails", customer_id=customer.customer_id)
+
+        return self.get(request, *args, **kwargs)
+
 
 
 class CustomerEditView(TemplateView):
@@ -523,6 +633,38 @@ def memorials_verification(request):
 
 
 @csrf_exempt
+def upload_to_s3_and_extract_text(request):
+    if request.method == "POST" and request.FILES.get("file"):
+        uploaded_file = request.FILES["file"]
+        s3_client = boto3.client(
+            "s3",
+            aws_access_key_id=env("AWS_ACCESS_KEY_ID"),
+            aws_secret_access_key=env("AWS_SECRET_ACCESS_KEY"),
+        )
+        bucket_name = env("AWS_S3_BUCKET_NAME")
+        file_name = uploaded_file.name
+        
+        
+        s3_client.upload_fileobj(uploaded_file, bucket_name, file_name)
+        
+        
+        textract_client = boto3.client(
+            "textract",
+            aws_access_key_id=env("AWS_ACCESS_KEY_ID"),
+            aws_secret_access_key=env("AWS_SECRET_ACCESS_KEY"),
+        )
+        response = textract_client.detect_document_text(
+            Document={"S3Object": {"Bucket": bucket_name, "Name": file_name}}
+        )
+        
+        
+        extracted_text = "".join([block["Text"] for block in response.get("Blocks", []) if block["BlockType"] == "LINE"])
+        
+        return JsonResponse({"text": extracted_text})
+    
+    return render(request, "upload.html")
+
+@csrf_exempt
 def verify_otp(request):
     if 'verification_email' not in request.session:
         return redirect('Memorials')
@@ -559,106 +701,142 @@ def verify_otp(request):
 def success(request):
     return render(request, 'pages/success.html')
 
-      
-def preprocess_image(image):
-    """
-    Preprocess the image to improve OCR accuracy
-    """
-    img = Image.open(image).convert('L')
-    img = img.point(lambda x: 0 if x < 128 else 255)
-    return img
+@csrf_exempt
+def upload_and_process(request):
+    if request.method == "POST" and request.FILES.get("document"):
+        uploaded_file = request.FILES["document"]
+        s3_client = boto3.client("s3")
+        bucket_name = env("AWS_S3_BUCKET_NAME")
+        file_key = f"uploads/{uploaded_file.name}"
 
-@csrf_exempt 
-def process_ocr(request):
-    if request.method == 'POST' and request.FILES.get('document'):
-        try:
-            # Extract text from the uploaded image
-            image = request.FILES['document']
-            extracted_text = extract_text(image)
-            
-            # Parse the extracted text into a dictionary
-            data = parse_text_to_dict(extracted_text)
-            
-            return JsonResponse({'success': True, 'data': data})
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
-    return JsonResponse({'success': False, 'error': 'Invalid request'})
+        
+        s3_client.upload_fileobj(uploaded_file, bucket_name, file_key)
 
-def extract_text(image):
-    """
-    Extract text from image using pytesseract
-    """
-    img = Image.open(image).convert('L')  # Convert to grayscale
-    text = pytesseract.image_to_string(img)
-    return text
+        
+        textract_client = boto3.client("textract")
+        response = textract_client.analyze_document(
+            Document={"S3Object": {"Bucket": bucket_name, "Name": file_key}},
+            FeatureTypes=["FORMS"]
+        )
+
+        extracted_data = {}
+        for block in response.get("Blocks", []):
+            if block["BlockType"] == "KEY_VALUE_SET" and "KEY" in block.get("EntityTypes", []):
+                key_text = ""
+                value_text = ""
+                for rel in block.get("Relationships", []):
+                    if rel["Type"] == "CHILD":
+                        key_text = " ".join([w["Text"] for w in response["Blocks"] if w["Id"] in rel["Ids"]])
+                    if rel["Type"] == "VALUE":
+                        for value_block in response["Blocks"]:
+                            if value_block["Id"] in rel["Ids"]:
+                                for value_rel in value_block.get("Relationships", []):
+                                    if value_rel["Type"] == "CHILD":
+                                        value_text = " ".join([w["Text"] for w in response["Blocks"] if w["Id"] in value_rel["Ids"]])
+                if key_text and value_text:
+                    extracted_data[key_text] = value_text
+
+        
+        return JsonResponse({"success": True, "data": extracted_data})
+
+    return JsonResponse({"success": False, "error": "Invalid request"})
 
 def parse_text_to_dict(text):
     """
-    Parse extracted text into a dictionary matching model fields.
+    Parse extracted text into a structured dictionary.
     """
+    if not text:
+        logger.error("OCR extracted text is empty.")
+        return {"error": "No text extracted"}
+    
     data = {
-        # Customer fields
-        'first_name': None,
-        'middle_name': None,
-        'last_name': None,
-        'suffix': None,
-        'country': 'Philippines',  # Default value
-        'address_line_1': None,
-        'address_line_2': None,
-        'city': None,
-        'province_or_state': None,
-        'postal_code': None,
-        'landline_number': None,
-        'mobile_number': None,
-        'email_address': None,
-        
-        # Beneficiary fields
-        'first_beneficiary_name': None,
-        'second_beneficiary_name': None,
-        'third_beneficiary_name': None,
-        
-        # ColumbaryRecord fields
-        'vault_id': None,
-        'inurnment_date': None,
-        'urns_per_columbary': None,
+        "first_name": None,
+        "middle_name": None,
+        "last_name": None,
+        "suffix": None,
+        "country": "Philippines",
+        "address_line_1": None,
+        "address_line_2": None,
+        "city": None,
+        "province_or_state": None,
+        "postal_code": None,
+        "landline_number": None,
+        "mobile_number": None,
+        "email_address": None,
+        "first_beneficiary_name": None,
+        "second_beneficiary_name": None,
+        "third_beneficiary_name": None,
+        "vault_id": None,
+        "inurnment_date": None,
+        "urns_per_columbary": None
     }
-
-    # Example patterns (adjust based on your document structure)
-    patterns = {
-        # Customer patterns
-        'full_name': r'Full name:[\s]*([^\n]*)',
-        'permanent_address': r'Permanent Address:[\s]*([^\n]*)',
-        'mobile_number': r'Mobile Number:[\s]*([^\n]*)',
-        'email_address': r'Email Address:[\s]*([^\n]*)',
-        
-        # Beneficiary patterns
-        'first_beneficiary_name': r'FIRST PRIORITY[\s]*Full name:[\s]*([^\n]*)',
-        'second_beneficiary_name': r'SECOND PRIORITY[\s]*Full name:[\s]*([^\n]*)',
-        'third_beneficiary_name': r'THIRD PRIORITY[\s]*Full name:[\s]*([^\n]*)',
-        
-        # ColumbaryRecord patterns
-        'vault_id': r'Vault ID:[\s]*([^\n]*)',
-        'inurnment_date': r'Inurnment Date:[\s]*([^\n]*)',
-        'urns_per_columbary': r'Urns Per Columbary:[\s]*([^\n]*)',
-    }
-
-    # Extract all fields using patterns
-    for field, pattern in patterns.items():
-        match = re.search(pattern, text)
-        if match:
-            data[field] = match.group(1).strip()
-
-    # Split full name into first, middle, and last names
-    if data.get('full_name'):
-        name_parts = data['full_name'].split()
-        if len(name_parts) >= 1:
-            data['first_name'] = name_parts[0]
+    
+    
+    full_name_match = re.search(r"Full\s*name:\s*([^\n]*)", text, re.IGNORECASE)
+    if full_name_match:
+        full_name = full_name_match.group(1).strip()
+        name_parts = full_name.split()
         if len(name_parts) >= 2:
-            data['last_name'] = name_parts[-1]
-        if len(name_parts) > 2:
-            data['middle_name'] = ' '.join(name_parts[1:-1])
-
+            data["first_name"] = name_parts[0]
+            data["last_name"] = name_parts[-1]
+            if len(name_parts) > 2:
+                if name_parts[-1].upper() in ["SR", "JR", "II", "III", "IV"]:
+                    data["suffix"] = name_parts[-1]
+                    data["last_name"] = name_parts[-2]
+                    if len(name_parts) > 3:
+                        data["middle_name"] = " ".join(name_parts[1:-2])
+                else:
+                    data["middle_name"] = " ".join(name_parts[1:-1])
+    
+    
+    address_match = re.search(r"Address:\s*([^\n]*)", text, re.IGNORECASE)
+    if address_match:
+        address = address_match.group(1).strip()
+        
+        
+        postal_code_match = re.search(r"(\d{4,})", address)
+        if postal_code_match:
+            data["postal_code"] = postal_code_match.group(1)
+        
+        address_parts = address.split(',')
+        if len(address_parts) >= 1:
+            data["address_line_1"] = address_parts[0].strip()
+        if len(address_parts) >= 2:
+            data["city"] = address_parts[-2].strip()
+        if len(address_parts) >= 3:
+            data["province_or_state"] = address_parts[-1].strip()
+    
+    
+    landline_match = re.search(r"Landline\s*Number:?\s*([0-9()\s\-+]*)", text, re.IGNORECASE)
+    if landline_match:
+        data["landline_number"] = landline_match.group(1).strip()
+    
+    mobile_match = re.search(r"Mobile\s*Number:?\s*([0-9()\s\-+]*)", text, re.IGNORECASE)
+    if mobile_match:
+        data["mobile_number"] = mobile_match.group(1).strip()
+    
+    
+    email_match = re.search(r"Email\s*Address:?\s*([^\s\n]*@[^\s\n]*)", text, re.IGNORECASE)
+    if email_match:
+        data["email_address"] = email_match.group(1).strip()
+    
+    
+    beneficiary_match = re.search(r"Beneficiary\s*Name:?\s*([^\n]*)", text, re.IGNORECASE)
+    if beneficiary_match:
+        data["first_beneficiary_name"] = beneficiary_match.group(1).strip()
+    
+    
+    vault_match = re.search(r"Vault\s*ID:?\s*([^\n\s]*)", text, re.IGNORECASE)
+    if vault_match:
+        data["vault_id"] = vault_match.group(1).strip()
+    
+    # Extract inurnment date if present
+    date_match = re.search(r"Inurnment\s*Date:?\s*(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})", text, re.IGNORECASE)
+    if date_match:
+        data["inurnment_date"] = date_match.group(1).strip()
+    
     return data
+
 
 #chatbot env
 env = environ.Env(
@@ -887,25 +1065,26 @@ def addnewcustomer(request):
         payment_form = PaymentForm(request.POST)
         holder_form = HolderOfPrivilegeForm(request.POST)
         beneficiary_form = BeneficiaryForm(request.POST)
+        columbary_form = ColumbaryRecordForm(request.POST, instance=vault)  # ✅ Load existing vault record
 
-        if customer_form.is_valid():
+        if customer_form.is_valid() and columbary_form.is_valid():
             customer = customer_form.save()
+
             
-            # Save payment only if valid
             payment = None
             if payment_form.is_valid():
                 payment = payment_form.save(commit=False)
                 payment.customer = customer
                 payment.save()
+
             
-            # Save holder of privilege only if valid
             holder = None
             if holder_form.is_valid():
                 holder = holder_form.save(commit=False)
                 holder.customer = customer
                 holder.save()
+
             
-            # Save beneficiary only if valid
             beneficiary = None
             if beneficiary_form.is_valid():
                 beneficiary = beneficiary_form.save(commit=False)
@@ -913,37 +1092,34 @@ def addnewcustomer(request):
                 beneficiary.save()
 
             if vault:
-                # Link the new customer and associated records to the existing vault
+                
                 vault.customer = customer
                 vault.payment = payment if payment else None
                 vault.holder_of_privilege = holder if holder else None
                 vault.beneficiary = beneficiary if beneficiary else None
-                vault.save()
-            else:
-                # Create a new ColumbaryRecord
-                columbary_record = ColumbaryRecord(
-                    vault_id=vault_id,
-                    customer=customer,
-                    payment=payment if payment else None,
-                    holder_of_privilege=holder if holder else None,
-                    beneficiary=beneficiary if beneficiary else None,
-                    status='Occupied'
-                )
-                columbary_record.save()
 
-            return redirect('success')  # Redirect to success page
+                
+                vault.inurnment_date = columbary_form.cleaned_data.get("inurnment_date")
+                vault.urns_per_columbary = columbary_form.cleaned_data.get("urns_per_columbary")
+                vault.status = 'Occupied'
+                
+                vault.save()
+
+            return redirect('columbaryrecords')  
 
     else:
         customer_form = CustomerForm()
         payment_form = PaymentForm()
         holder_form = HolderOfPrivilegeForm()
         beneficiary_form = BeneficiaryForm()
+        columbary_form = ColumbaryRecordForm(instance=vault)  
 
     return render(request, 'pages/addcustomer.html', {
         'customer_form': customer_form,
         'payment_form': payment_form,
         'holder_form': holder_form,
         'beneficiary_form': beneficiary_form,
+        'columbary_form': columbary_form,  
         'vault_id': vault_id
     })
 
@@ -963,3 +1139,6 @@ def contact(request):
         return JsonResponse({'success': True, 'message': 'Email sent successfully'})
 
     return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
+
+
+

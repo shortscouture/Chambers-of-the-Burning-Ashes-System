@@ -1,23 +1,62 @@
 /* Main Content */
 .content {
   padding: 20px;
-  margin-left: 250px; /* Adjust to match your existing sidebar width */
+  margin: 0 auto;
+  max-width: 95%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* Top Navigation */
 .top-nav {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
   background: rgba(255, 255, 255, 0.9);
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 1200px;
+}
+
+/* Filters & Search Bar Container */
+.filter-search-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1000px;
+  gap: 10px;
+}
+
+/* Checklist Filters */
+.checklist-filters {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.checklist-filters label {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  gap: 5px;
+  white-space: nowrap;
 }
 
 /* Search Bar */
 .search-bar {
   display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-form {
+  display: flex;
+  align-items: center;
   gap: 10px;
 }
 
@@ -25,10 +64,11 @@
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  width: 250px;
 }
 
-.search-bar button {
-  padding: 10px 20px;
+.bluebutt button {
+  padding: 10px 15px;
   background: #007bff;
   color: white;
   border: none;
@@ -37,7 +77,7 @@
   transition: background 0.3s ease;
 }
 
-.search-bar button:hover {
+.bluehov button:hover {
   background: #0056b3;
 }
 
@@ -48,16 +88,19 @@
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 1200px;
 }
 
+/* Table */
 table {
   width: 100%;
   border-collapse: collapse;
+  text-align: center;
 }
 
 table th, table td {
-  padding: 10px;
-  text-align: left;
+  padding: 12px;
   border-bottom: 1px solid #ddd;
 }
 
@@ -65,6 +108,17 @@ table th {
   background: #f4f4f4;
 }
 
+/* Sortable Headers */
+th.sortable {
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+th.sortable:hover {
+  background-color: #ddd;
+}
+
+/* Buttons */
 .details-button {
   background: #28a745;
   color: white;
@@ -78,6 +132,7 @@ table th {
   background: #218838;
 }
 
+/* No Records Message */
 .no-records {
   text-align: center;
   color: red;
@@ -96,7 +151,7 @@ table th {
   font-weight: bold;
 }
 
-
+/* Pagination */
 .pagination {
   text-align: center;
   margin-top: 20px;
@@ -120,4 +175,23 @@ table th {
 .pagination span {
   font-weight: bold;
   padding: 8px 16px;
+}
+
+/* Background */
+body {
+  background: url("{% static 'images/garden3.jpg' %}") no-repeat center center fixed;
+  background-size: cover;
+}
+
+.add-button {
+  background: #e70a0a;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.add-button:hover {
+  background: #a40808;
 }

@@ -9,6 +9,14 @@
     <link rel="stylesheet" href="{% static 'css/addcustomer.css' %}">
     <script src="{% static 'js/addnewrecord.js' %}" defer></script>
 </head>
+<style>
+    body {
+        background: url("{% static 'images/inside.jpg' %}") no-repeat center center fixed;
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+</style>
 <body>
 
 <div class="container">
@@ -21,6 +29,33 @@
             <p>Assigning to Vault ID: <strong>{{ vault_id }}</strong></p>
             <input type="hidden" name="vault_id" value="{{ vault_id }}">
         {% endif %}
+        <h4>OCR Options</h4>
+        <div>
+            <!-- Webcam option -->
+            <label>
+                <input type="radio" id="webcamOption" name="ocrOption" value="webcam" checked> Capture from Webcam
+            </label>
+            <br>
+            <!-- File upload option -->
+            <label>
+                <input type="radio" id="uploadOption" name="ocrOption" value="upload"> Upload Document
+            </label>
+        </div>
+
+        <div id="webcam-container" style="display: none;">
+            <h5>Capture Image from Webcam</h5>
+            <video id="webcam-view" width="640" height="480" autoplay></video>
+            <canvas id="captured-image" style="display: none;"></canvas>
+            <button type="button" id="captureButton" onclick="captureWebcamImage()">Capture Image</button>
+            <button type="button" id="retakeButton" style="display: none;" onclick="retakeWebcamImage()">Retake Image</button>
+            <button type="button" id="processWebcamButton" style="display: none;" onclick="processWebcamImage()">Process Image</button>
+        </div>
+
+        <div id="fileUploadContainer" style="display: none;">
+            <h5>Upload Document</h5>
+            <input type="file" id="ocrInput" accept="image/*">
+            <button type="button" id="processOCR">Process OCR</button>
+        </div>
         
         <div class="row">
             <div class="col-md-4">{{ customer_form.first_name.label_tag }} {{ customer_form.first_name }}</div>

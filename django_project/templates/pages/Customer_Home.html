@@ -14,6 +14,7 @@
         <link rel="stylesheet" href="../../static/css/hero-slider.css">
         <link rel="stylesheet" href="../../static/css/templatemo-main.css">
         <link rel="stylesheet" href="../../static/css/owl-carousel.css">
+        <link rel="stylesheet" href="../../static/css/chatbot.css">
 
         <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800" rel="stylesheet">
 
@@ -24,6 +25,28 @@ Vanilla Template
 https://templatemo.com/tm-526-vanilla
 -->
 <body>
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+    <div class="chat-wrapper" id="chatContainer">
+        <div class="chat-header">
+            <span class="chat-title">Chat with us</span> <button class="close-btn">&times;</button>
+        </div>
+        <div class="chatbox" id="chatbox">
+            </div>
+        <div class="input-container">
+            <input type="text" id="userInput" placeholder="Type your message...">
+            <button class="send-btn" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+    
+    <div class="Bot" onclick="toggleChat()">
+        <svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.808a.75.75 0 00-1.214-.882l-3.483 4.79a.75.75 0 00-.256.695l3.483 4.79a.75.75 0 001.214-.882l-3.483-4.79a.75.75 0 00.256-.695l3.483-4.79z" clip-rule="evenodd" />
+    </svg>
+        </svg>
+    </div>
+</div>
 
     <div class="fixed-side-navbar">
         <ul class="nav flex-column">
@@ -52,17 +75,7 @@ https://templatemo.com/tm-526-vanilla
                     <svg width="800px" height="800px" viewBox="0 0 15 15" fill: "white" xmlns="http://www.w3.org/2000/svg" onclick = "toggleChat()" class = "Bot">
                     <path d="M5.5 11.4928L5.91594 11.2154C5.8232 11.0763 5.66712 10.9928 5.5 10.9928V11.4928ZM7.5 14.4909L7.08406 14.7683C7.1768 14.9074 7.33288 14.9909 7.5 14.9909C7.66712 14.9909 7.8232 14.9074 7.91594 14.7683L7.5 14.4909ZM9.5 11.4928V10.9928C9.33288 10.9928 9.1768 11.0763 9.08406 11.2154L9.5 11.4928ZM5.08406 11.7703L7.08406 14.7683L7.91594 14.2134L5.91594 11.2154L5.08406 11.7703ZM7.91594 14.7683L9.91594 11.7703L9.08406 11.2154L7.08406 14.2134L7.91594 14.7683ZM9.5 11.9928H13.5V10.9928H9.5V11.9928ZM13.5 11.9928C14.3288 11.9928 15 11.3226 15 10.4935H14C14 10.7697 13.7772 10.9928 13.5 10.9928V11.9928ZM15 10.4935V1.49935H14V10.4935H15ZM15 1.49935C15 0.670259 14.3288 0 13.5 0V1C13.7772 1 14 1.22316 14 1.49935H15ZM13.5 0H1.5V1H13.5V0ZM1.5 0C0.671165 0 0 0.670259 0 1.49935H1C1 1.22316 1.22283 1 1.5 1V0ZM0 1.49935V10.4935H1V1.49935H0ZM0 10.4935C0 11.3226 0.671165 11.9928 1.5 11.9928V10.9928C1.22284 10.9928 1 10.7697 1 10.4935H0ZM1.5 11.9928H5.5V10.9928H1.5V11.9928ZM7 7H8V6H7V7ZM4 7H5V6H4V7ZM10 7H11V6H10V7Z" fill="white"/>                   
                     </svg>
-
-                    <div id="chatContainer" class="chat-container">
-                        <div id="chatbox" class="chatbox"></div>
-                        <div class="input-container">
-                            <input type="text" id="userInput" class="input-box" placeholder="Type your message..." onkeydown="if(event.key==='Enter') sendMessage()">
-                            <button onclick="sendMessage()" class="send-btn">Send</button>
-                        </div>
-                    </div>
-                    
-                
-                </div>
+                   
                     
     </svg>
                 </svg>
@@ -314,8 +327,6 @@ https://templatemo.com/tm-526-vanilla
         </div>
     </footer>
 
-
-
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script>window.jQuery || document.write('<script src="../../static/js/vendor/jquery-1.11.2.min.js"><\/script>')</script>
     <script src="../../static/js/vendor/bootstrap.min.js"></script>
@@ -333,6 +344,8 @@ https://templatemo.com/tm-526-vanilla
     </script>
 
     <script>
+        const csrfToken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
+
         $(document).ready(function(){
           // Add smooth scrolling to all links
           $(".fixed-side-navbar a, .primary-button a").on('click', function(event) {
@@ -357,6 +370,65 @@ https://templatemo.com/tm-526-vanilla
             } // End if
           });
         });
+            function toggleChat() {
+                const chatContainer = document.getElementById('chatContainer');
+                chatContainer.style.display = (chatContainer.style.display === 'none') ? 'block' : 'none';
+            }
+            function sendMessage() {
+                const userInput = document.getElementById('userInput').value;
+                const chatbox = document.getElementById('chatbox');
+                
+                setTimeout(() => { // Small delay to ensure the element is rendered
+                    chatbox.scrollTop = chatbox.scrollHeight;
+                }, 0); 
+
+                // Check if there's input and display user's message
+                if (userInput.trim() !== '') {
+                    chatbox.innerHTML += `<div class="user-message">${userInput}</div>`;
+        
+                    // Clear the input field
+                    document.getElementById('userInput').value = '';
+        
+                    // Make a POST request to the chatbot API
+                    fetch('/chatbot/', {  // Ensure this is your correct API endpoint
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken,
+                        },
+                        body: JSON.stringify({ message: userInput })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            // If there was an error (e.g., no query), display the error message
+                            chatbox.innerHTML += `<div class="bot-message error">${data.error}</div>`;
+                        } else {
+                            // Display the chatbot's response
+                            const botMessage = data.response;
+                            chatbox.innerHTML += `<div class="bot-message">${botMessage}</div>`;
+                        }
+        
+                        // Scroll to the bottom of the chatbox
+                        chatbox.scrollTop = chatbox.scrollHeight;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        chatbox.innerHTML += `<div class="bot-message error">There was an error connecting to the bot.</div>`;
+                        chatbox.scrollTop = chatbox.scrollHeight;
+                    });
+                }
+            }
+            document.addEventListener('DOMContentLoaded', function() {
+                const closeButton = document.querySelector('.close-btn');
+                if (closeButton) {
+                    closeButton.addEventListener('click', () => {
+                        document.getElementById('chatContainer').style.display = 'none';
+                    });
+                }
+            });
+            const chatTitle = document.querySelector('.chat-title'); // Or the element you are using for the title
+
     </script>
 
 </body>

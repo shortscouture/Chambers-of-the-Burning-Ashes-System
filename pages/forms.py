@@ -1,5 +1,5 @@
 from django import forms
-from .models import Customer, ColumbaryRecord, Beneficiary, Payment, HolderOfPrivilege
+from .models import Customer, ColumbaryRecord, Beneficiary, Payment, HolderOfPrivilege, CustomerFile
 
 class CustomerForm(forms.ModelForm):
     # Name Fields
@@ -242,4 +242,12 @@ class PaymentForm(forms.ModelForm):
                 cleaned_data[amount_field] = None
 
         return cleaned_data
+
+
+
+
+class CustomerFileForm(forms.ModelForm):
+    class Meta:
+        model = CustomerFile
+        fields = ["file"]
 
