@@ -103,3 +103,27 @@ function sendMessage() {
           console.error("Error:", error);
       });
 }
+
+document.getElementById("contact").addEventListener("submit", function(event) {
+  event.preventDefault();  // Stop the page from reloading
+
+  let formData = new FormData(this);
+
+  fetch("{% url 'contact' %}", {
+      method: "POST",
+      body: formData,
+      headers: {
+          "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+      }
+  })
+  .then(response => response.json())
+  .then(data => {
+      if (data.success) {
+          alert("Your message has been sent successfully!");
+          document.getElementById("contact").reset();
+      } else {
+          alert("There was an error sending your message.");
+      }
+  })
+  .catch(error => console.error("Error:", error));
+});

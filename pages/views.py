@@ -948,7 +948,7 @@ def addnewcustomer(request):
     })
 
 @csrf_exempt  # Only use if CSRF token isn't included in the form
-def send_email(request):
+def contact(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         email = request.POST.get('email')
@@ -957,7 +957,7 @@ def send_email(request):
         subject = f"New Contact Form Submission from {name}"
         body = f"Name: {name}\nEmail: {email}\nMessage:\n{message}"
 
-        email_message = EmailMessage(subject, body, 'jamesnaldo376@gmail.com', ['recipient_email@gmail.com'])
+        email_message = EmailMessage(subject, body, 'stalphonsusmakati@gmail.com', ['jamesnaldo376@gmail.com'])
         email_message.send()
 
         return JsonResponse({'success': True, 'message': 'Email sent successfully'})
