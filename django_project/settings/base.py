@@ -17,10 +17,10 @@ env = environ.Env(
     DEBUG=(bool, False) #default value for DEBUG = False
 )
 
-
 # Read env file
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
+DATABASE_URL = f"mysql+pymysql://{env('DB_USER')}:{env('DB_PASSWORD')}@{env('DB_HOST')}:{env('DB_PORT')}/{env('DB_NAME')}"
 # use env for sensitive settings
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/dev/howto/deployment/checklist/

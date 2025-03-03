@@ -24,7 +24,7 @@ import re
 import numpy as np
 import openai
 from openai import OpenAI
-from django.db import transaction
+from django.db import transaction, connection
 import json
 import environ
 from django.db.models.functions import TruncMonth
@@ -41,7 +41,15 @@ import json
 import io
 import base64
 from django.core.files.uploadedfile import InMemoryUploadedFile
-import boto3
+from langchain.chat_models import ChatOpenAI
+from langchain_experimental.sql import SQLDatabaseChain
+from langchain.sql_database import SQLDatabase
+from langchain.vectorstores import FAISS
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.document_loaders import SQLLoader
+import pymysql
+import langgraph
+from langgraph.graph import StateGraph
 
 env = environ.Env()
 textract_client = boto3.client("textract", region_name="us-east-1")
@@ -697,7 +705,6 @@ def verify_otp(request):
 
     return render(request, 'pages/verify_otp.html')
 
-
 def success(request):
     return render(request, 'pages/success.html')
 
@@ -845,138 +852,107 @@ env = environ.Env(
         
 openai.api_key = env("OPEN_AI_API_KEY")
 logger = logging.getLogger(__name__)
+db = SQLDatabase.from_uri(settings.DATABASE_URL)
+
 class ChatbotAPIView(APIView):
     def get(self, request, *args, **kwargs):
-        return Response({"message": "Chatbot API is running! Use POST to send messages."}, status=200)
+        return JsonResponse({"message": "Chatbot API is running! Use POST to send messages."}, status=200)
 
-    
     def post(self, request, *args, **kwargs):
         user_query = request.data.get("message", "").strip()
         if not user_query:
             return JsonResponse({"error": "No query provided"}, status=400)
 
+        # Load chat history from session
         past_conversations = request.session.get("chat_history", [])
-        
-        db_answer = self.get_answer_from_parish_knowledge(user_query)
 
-        ai_response = self.query_openai(user_query, db_answer, past_conversations)
-        
-        
-        past_conversations.append({"query": user_query, "response": ai_response})
+        # Initialize the chatbot workflow
+        chatbot = self.create_chatbot_workflow()
+        result = chatbot.invoke({"user_query": user_query, "past_conversations": past_conversations})
+
+        # Update session chat history
+        past_conversations.append({"query": user_query, "response": result["final_response"]})
         request.session["chat_history"] = past_conversations[-5:]
-        
-        self.save_chat_history(user_query, ai_response)
 
+        # Save chat history
+        self.save_chat_history(user_query, result["final_response"])
 
         return JsonResponse({
             "query": user_query,
-            "response": ai_response,
+            "response": result["final_response"],
         })
 
+    def sql_agent(self, query):
+        """Executes a SQL query using LangChain SQLDatabaseChain."""
+        llm = ChatOpenAI(model="gpt-4", temperature=0)
+        sql_chain = SQLDatabaseChain.from_llm(llm, db, verbose=True)
+        return sql_chain.run(query)
 
-    def get_answer_from_parish_knowledge(self, query):
-        """Uses FULLTEXT search to find the best matching answer in parish_knowledge."""
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                SELECT answer, MATCH(question) AGAINST (%s IN NATURAL LANGUAGE MODE) AS relevance 
-                FROM parish_knowledge 
-                WHERE MATCH(question) AGAINST (%s IN NATURAL LANGUAGE MODE) 
-                ORDER BY relevance DESC LIMIT 1;
-                """, [query, query])
-            result = cursor.fetchone()
-            return result[0] if result else None
+    def rag_retriever(self, user_query):
+        """Retrieves relevant documents from the parish knowledge base using vector search."""
+        loader = SQLLoader(db=db, table_name="parish_knowledge", text_column="answer")
+        docs = loader.load()
+        vectorstore = FAISS.from_documents(docs, OpenAIEmbeddings())
+        retriever = vectorstore.as_retriever()
+        results = retriever.get_relevant_documents(user_query)
+        return results[0].page_content if results else "No relevant data found."
 
+    def generate_response(self, user_query, sql_result, rag_result, past_conversations):
+        """Generates a chatbot response using OpenAI and conversation history."""
+        system_prompt = (
+            "You are a helpful chatbot for church visitors, specializing in columbarium policies.\n"
+            "Rules:\n"
+            "- Use database answers when available.\n"
+            "- Do NOT answer baptism, funeral, or wedding-related queries. Refer users to the database contacts.\n"
+            "- Be professional and concise.\n"
+            "- Ask for clarification if unsure.\n"
+        )
 
-    def get_all_knowledge(self):
-        """Retrieves all questions and answers from parish_knowledge for AI context."""
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT question, answer FROM parish_knowledge;")
-            rows = cursor.fetchall()
-        return [{"question": q, "answer": a} for q, a in rows]
+        messages = [{"role": "system", "content": system_prompt}]
 
+        if past_conversations:
+            for convo in past_conversations:
+                messages.append({"role": "user", "content": convo["query"]})
+                messages.append({"role": "assistant", "content": convo["response"]})
 
+        if sql_result:
+            messages.append({"role": "assistant", "content": f"Database answer: {sql_result}"})
 
-    def query_openai(self, user_query, db_answer=None, past_conversations=None):
-        """Uses OpenAI while incorporating database knowledge."""
-        try:
-            # Construct the AI prompt to guide behavior
-            system_prompt = (
-                    """
-                        You are a helpful and polite chatbot for church visitors.
-                        Your primary job is to assist customers with questions about the columbarium.
-                    
-                        Rules:
-                        - Use the database answer if it is available before guessing.
-                        - If the question is about **baptism, funeral services, or weddings** do NOT answer.
-                        Instead, refer them to the contact information found in the DATABASE.
-                        - Responses should be **brief and professional**.
-                        - If unsure, **ask for clarification**.
+        if rag_result:
+            messages.append({"role": "assistant", "content": f"Knowledge Base: {rag_result}"})
 
-                        Database Context:
-                        The parish_knowledge database stores information. When available, use this to improve accuracy.
-                    """
-            )
+        messages.append({"role": "user", "content": user_query})
 
-            # Prepare messages with context  
-            messages = [{"role": "system", "content": system_prompt}]
+        response = ChatOpenAI(model="gpt-4").predict_messages(messages)
+        return response.content
 
-            if past_conversations:
-                for convo in past_conversations:
-                    messages.append({"role": "user", "content": convo["query"]})
-                    messages.append({"role": "assistant", "content": convo["response"]})
+    def create_chatbot_workflow(self):
+        """Creates a structured LangGraph workflow for SQL + RAG-based chatbot responses."""
+        class ChatState:
+            user_query: str
+            sql_result: str = ""
+            rag_result: str = ""
+            past_conversations: list = []
+            final_response: str = ""
 
-            if db_answer:
-                messages.append({"role": "assistant", "content": f"Database says: {db_answer}"})
+        workflow = StateGraph(ChatState)
+        workflow.add_node("SQL Query", self.sql_agent)
+        workflow.add_node("RAG Retrieval", self.rag_retriever)
+        workflow.add_node("AI Response", self.generate_response)
 
-                messages.append({"role": "user", "content": user_query})
+        workflow.set_entry_point("SQL Query")
+        workflow.add_edge("SQL Query", "RAG Retrieval")
+        workflow.add_edge("RAG Retrieval", "AI Response")
 
-                response = openai.chat.completions.create(
-                    model="gpt-3.5-turbo",
-                    messages=messages,
-                    temperature=0.7
-                )
+        return workflow.compile()
 
-                if response and response.choices:
-                    return response.choices[0].message.content.strip()
-            
-        except Exception as e:
-            print(f"OpenAI API error: {e}")
-
-        return "I'm not sure how to answer that. Please contact the St. Alphonsus Mary de Liguori Parish for further assistance."
-
-
-    def save_unanswered_query(self, query):
-        """Logs unanswered queries to pages_chatquery."""
-        with connection.cursor() as cursor:
-            cursor.execute("INSERT INTO pages_chatquery (query, created_at) VALUES (%s, NOW());", [query])
-
-    
-    def get_related_parish_knowledge(self, query):
-        """Finds questions in parish_knowledge that contain keywords from the user's query."""
-        search_query = f"%{query}%"
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT question, answer FROM parish_knowledge WHERE question LIKE %s LIMIT 5;", [search_query])
-            return cursor.fetchall()  # Returns a list of (question, answer) tuples
-
-    def get_past_conversations(self, limit=5):
-        """Retrieve the last few conversations from pages_chatquery for context"""
-        with connection.cursor() as cursor:
-            cursor.execute(
-                "SELECT user_message, bot_response FROM pages_chatquery ORDER BY created_at DESC LIMIT %s;",
-                [limit]
-            )
-            past_chats = cursor.fetchall()
-
-        return [{"query": chat[0], "response": chat[1]} for chat in past_chats]
-    
     def save_chat_history(self, user_query, bot_response):
-        """Logs chat messages to pages_chatquery."""
+        """Logs chat history into pages_chatquery."""
         with connection.cursor() as cursor:
             cursor.execute(
                 "INSERT INTO pages_chatquery (user_message, bot_response, created_at) VALUES (%s, %s, NOW(6));",
                 [user_query, bot_response]
             )
-
 
 
 def get_crypt_status(request, section):
@@ -1137,7 +1113,105 @@ def addnewcustomer(request):
         'vault_id': vault_id
     })
 
+class ChatbotAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        return JsonResponse({"message": "Chatbot API is running! Use POST to send messages."}, status=200)
 
+    def post(self, request, *args, **kwargs):
+        user_query = request.data.get("message", "").strip()
+        if not user_query:
+            return JsonResponse({"error": "No query provided"}, status=400)
+
+        # Load chat history from session
+        past_conversations = request.session.get("chat_history", [])
+
+        # Initialize the chatbot workflow
+        chatbot = self.create_chatbot_workflow()
+        result = chatbot.invoke({"user_query": user_query, "past_conversations": past_conversations})
+
+        # Update session chat history
+        past_conversations.append({"query": user_query, "response": result["final_response"]})
+        request.session["chat_history"] = past_conversations[-5:]
+
+        # Save chat history
+        self.save_chat_history(user_query, result["final_response"])
+
+        return JsonResponse({
+            "query": user_query,
+            "response": result["final_response"],
+        })
+
+    def sql_agent(self, query):
+        """Executes a SQL query using LangChain SQLDatabaseChain."""
+        llm = ChatOpenAI(model="gpt-4", temperature=0)
+        sql_chain = SQLDatabaseChain.from_llm(llm, db, verbose=True)
+        return sql_chain.run(query)
+
+    def rag_retriever(self, user_query):
+        """Retrieves relevant documents from the parish knowledge base using vector search."""
+        loader = SQLLoader(db=db, table_name="parish_knowledge", text_column="answer")
+        docs = loader.load()
+        vectorstore = FAISS.from_documents(docs, OpenAIEmbeddings())
+        retriever = vectorstore.as_retriever()
+        results = retriever.get_relevant_documents(user_query)
+        return results[0].page_content if results else "No relevant data found."
+
+    def generate_response(self, user_query, sql_result, rag_result, past_conversations):
+        """Generates a chatbot response using OpenAI and conversation history."""
+        system_prompt = (
+            "You are a helpful chatbot for church visitors, specializing in columbarium policies.\n"
+            "Rules:\n"
+            "- Use database answers when available.\n"
+            "- Do NOT answer baptism, funeral, or wedding-related queries. Refer users to the database contacts.\n"
+            "- Be professional and concise.\n"
+            "- Ask for clarification if unsure.\n"
+        )
+
+        messages = [{"role": "system", "content": system_prompt}]
+
+        if past_conversations:
+            for convo in past_conversations:
+                messages.append({"role": "user", "content": convo["query"]})
+                messages.append({"role": "assistant", "content": convo["response"]})
+
+        if sql_result:
+            messages.append({"role": "assistant", "content": f"Database answer: {sql_result}"})
+
+        if rag_result:
+            messages.append({"role": "assistant", "content": f"Knowledge Base: {rag_result}"})
+
+        messages.append({"role": "user", "content": user_query})
+
+        response = ChatOpenAI(model="gpt-4").predict_messages(messages)
+        return response.content
+
+    def create_chatbot_workflow(self):
+        """Creates a structured LangGraph workflow for SQL + RAG-based chatbot responses."""
+        class ChatState:
+            user_query: str
+            sql_result: str = ""
+            rag_result: str = ""
+            past_conversations: list = []
+            final_response: str = ""
+
+        workflow = StateGraph(ChatState)
+        workflow.add_node("SQL Query", self.sql_agent)
+        workflow.add_node("RAG Retrieval", self.rag_retriever)
+        workflow.add_node("AI Response", self.generate_response)
+
+        workflow.set_entry_point("SQL Query")
+        workflow.add_edge("SQL Query", "RAG Retrieval")
+        workflow.add_edge("RAG Retrieval", "AI Response")
+
+        return workflow.compile()
+
+    def save_chat_history(self, user_query, bot_response):
+        """Logs chat history into pages_chatquery."""
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "INSERT INTO pages_chatquery (user_message, bot_response, created_at) VALUES (%s, %s, NOW(6));",
+                [user_query, bot_response]
+            )
 
 
 
