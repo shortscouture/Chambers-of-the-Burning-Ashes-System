@@ -855,11 +855,16 @@ class ChatbotAPIView(APIView):
         if not user_query:
             return JsonResponse({"error": "No query provided"}, status=400)
 
+        past_conversations = request.session.get("chat_history", [])
+        
         db_answer = self.get_answer_from_parish_knowledge(user_query)
 
-        ai_response = self.query_openai(user_query, db_answer)
+        ai_response = self.query_openai(user_query, db_answer, past_conversations)
         
-        # Save the chat history into pages_chatquery
+        
+        past_conversations.append({"query": user_query, "response": ai_response})
+        request.session["chat_history"] = past_conversations[-5:]
+        
         self.save_chat_history(user_query, ai_response)
 
 
