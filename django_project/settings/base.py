@@ -58,7 +58,8 @@ INSTALLED_APPS = [
     "cv2",
     # Local
     "accounts",
-    "pages"
+    "pages",
+    "parish_ai"
 ]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware

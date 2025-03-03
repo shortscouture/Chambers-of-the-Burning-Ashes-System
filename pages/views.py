@@ -46,10 +46,10 @@ from langchain_experimental.sql import SQLDatabaseChain
 from langchain.sql_database import SQLDatabase
 from langchain.vectorstores import FAISS
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.document_loaders import SQLLoader
 import pymysql
 import langgraph
 from langgraph.graph import StateGraph
+from sqlalchemy import create_engine
 
 env = environ.Env()
 textract_client = boto3.client("textract", region_name="us-east-1")
@@ -1112,6 +1112,18 @@ def addnewcustomer(request):
         'columbary_form': columbary_form,  
         'vault_id': vault_id
     })
+    
+import os
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_project.settings")
+
+# Use DATABASE_URL from settings.py
+DATABASE_URL = settings.DATABASE_URL  # Since it's already formatted correctly for SQLAlchemy
+
+# Create SQLAlchemy engine
+engine = create_engine(DATABASE_URL)
+
+# Use LangChain's SQLDatabase
+db = SQLDatabase(engine)
 
 class ChatbotAPIView(APIView):
     def get(self, request, *args, **kwargs):
