@@ -122,8 +122,8 @@ p {
 	margin-top: 22px;
 	background-image: url(../images/St.Alphonsus.png);
 	display: inline-block;
-	width: 125px;
-	height: 32px;
+	width: 300px;
+	height: 150px;
 	background-repeat: no-repeat;
 }
 .header.active .navbar-brand .logo{
