@@ -25,351 +25,506 @@ Vanilla Template
 https://templatemo.com/tm-526-vanilla
 -->
 <body>
-    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-
-    <div class="chat-wrapper" id="chatContainer">
-        <div class="chat-header">
-            <span class="chat-title">Chat with us</span> <button class="close-btn">&times;</button>
-        </div>
-        <div class="chatbox" id="chatbox">
-            </div>
-        <div class="input-container">
-            <input type="text" id="userInput" placeholder="Type your message...">
-            <button class="send-btn" onclick="sendMessage()">Send</button>
-        </div>
-    </div>
-    
-    <div class="Bot" onclick="toggleChat()">
-        <svg>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
-      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.808a.75.75 0 00-1.214-.882l-3.483 4.79a.75.75 0 00-.256.695l3.483 4.79a.75.75 0 001.214-.882l-3.483-4.79a.75.75 0 00.256-.695l3.483-4.79z" clip-rule="evenodd" />
-    </svg>
-        </svg>
-    </div>
-</div>
-
-    <div class="fixed-side-navbar">
-        <ul class="nav flex-column">
-            <li class="nav-item"><a class="nav-link" href="#home"><span>Intro</span></a></li>
-            <li class="nav-item"><a class="nav-link" href="#services"><span>Services</span></a></li>
-            <li class="nav-item"><a class="nav-link" href="#portfolio"><span>Gallery</span></a></li>
-            <li class="nav-item"><a class="nav-link" href="#our-story"><span>Memorials</span></a></li>
-            <li class="nav-item"><a class="nav-link" href="#contact-us"><span>Contact Us</span></a></li>
-        </ul>
-    </div>
-
-    <div class="parallax-content baner-content" id="home">
+    <div class="header">
         <div class="container">
-            <div class="first-content">
-                <h1>St. Alph<em>onsus</em></h1>
-                <span><em>Mary de Ligu</em>ori Parish</span>
-                <div class="primary-button">
-                    <a href="#services">Come Inside</a>
+            <nav class="navbar navbar-inverse" role="navigation">
+                <div class="navbar-header">
+                    <button type="button" id="nav-toggle" class="navbar-toggle" data-toggle="collapse" data-target="#main-nav">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a href="#" class="navbar-brand scroll-top">
+                        <div class="logo"></div>
+                    </a>
                 </div>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="#fff" id = "door" onclick="showInfoBox(event)" class="bi bi-door-open-fill" viewBox="0 0 16 16">
-                    <path d="M1.5 15a.5.5 0 0 0 0 1h13a.5.5 0 0 0 0-1H13V2.5A1.5 1.5 0 0 0 11.5 1H11V.5a.5.5 0 0 0-.57-.495l-7 1A.5.5 0 0 0 3 1.5V15zM11 2h.5a.5.5 0 0 1 .5.5V15h-1zm-2.5 8c-.276 0-.5-.448-.5-1s.224-1 .5-1 .5.448.5 1-.224 1-.5 1"/>
-                    <div id="infobox" style="display: none;">
-                        <iframe width="90%" height="500px" allowFullScreen="true" allow="accelerometer; magnetometer; gyroscope" style="display:block; margin:20px auto; border:0 none; max-width:950px;border-radius:8px; box-shadow: 0 1px 1px rgba(0,0,0,0.11),0 2px 2px rgba(0,0,0,0.11),0 4px 4px rgba(0,0,0,0.11),0 6px 8px rgba(0,0,0,0.11),0 8px 16px rgba(0,0,0,0.11);" src="https://panoraven.com/fr/embed/ODfH5luaho"></iframe>
-                    </div>    
-                    <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
-                    <svg width="800px" height="800px" viewBox="0 0 15 15" fill: "white" xmlns="http://www.w3.org/2000/svg" onclick = "toggleChat()" class = "Bot">
-                    <path d="M5.5 11.4928L5.91594 11.2154C5.8232 11.0763 5.66712 10.9928 5.5 10.9928V11.4928ZM7.5 14.4909L7.08406 14.7683C7.1768 14.9074 7.33288 14.9909 7.5 14.9909C7.66712 14.9909 7.8232 14.9074 7.91594 14.7683L7.5 14.4909ZM9.5 11.4928V10.9928C9.33288 10.9928 9.1768 11.0763 9.08406 11.2154L9.5 11.4928ZM5.08406 11.7703L7.08406 14.7683L7.91594 14.2134L5.91594 11.2154L5.08406 11.7703ZM7.91594 14.7683L9.91594 11.7703L9.08406 11.2154L7.08406 14.2134L7.91594 14.7683ZM9.5 11.9928H13.5V10.9928H9.5V11.9928ZM13.5 11.9928C14.3288 11.9928 15 11.3226 15 10.4935H14C14 10.7697 13.7772 10.9928 13.5 10.9928V11.9928ZM15 10.4935V1.49935H14V10.4935H15ZM15 1.49935C15 0.670259 14.3288 0 13.5 0V1C13.7772 1 14 1.22316 14 1.49935H15ZM13.5 0H1.5V1H13.5V0ZM1.5 0C0.671165 0 0 0.670259 0 1.49935H1C1 1.22316 1.22283 1 1.5 1V0ZM0 1.49935V10.4935H1V1.49935H0ZM0 10.4935C0 11.3226 0.671165 11.9928 1.5 11.9928V10.9928C1.22284 10.9928 1 10.7697 1 10.4935H0ZM1.5 11.9928H5.5V10.9928H1.5V11.9928ZM7 7H8V6H7V7ZM4 7H5V6H4V7ZM10 7H11V6H10V7Z" fill="white"/>                   
-                    </svg>
-                   
-                    
-    </svg>
-                </svg>
-            </div>
+                <!--/.navbar-header-->
+                <div id="main-nav" class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav">
+                        <li><a href="#" class="scroll-top">Home</a></li>
+                        <li><a href="#" class="scroll-link" data-id="about">About Us</a></li>
+                        <li><a href="#" class="scroll-link" data-id="portfolio">Portfolio</a></li>
+                        <li><a href="#" class="scroll-link" data-id="blog">Blog</a></li>
+                        <li><a href="#" class="scroll-link" data-id="contact">Contact Us</a></li>
+                    </ul>
+                </div>
+                <!--/.navbar-collapse-->
+            </nav>
+            <!--/.navbar-->
         </div>
+        <!--/.container-->
     </div>
+    <!--/.header-->
 
 
-    <div class="service-content" id="services">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="left-text">
-                        <h4>More About Us</h4>
-                        <div class="line-dec"></div>
-                        <p>St. Alphonsus Mary de Liguori Parish, commonly known as Magallanes Church, is a prominent 
-                            Catholic church located in Magallanes Village, Makati City, Philippines. 
-                            Established in 1967, the original structure was designed by National Artist Architect Leandro Locsin</p>
-                        <ul>
-                            <li>-  Praesent porta urna id eros</li>
-                            <li>-  Curabitur consectetur malesuada</li>
-                            <li>-  Nam pretium imperdiet enim</li>
-                            <li>-  Sed viverra arcu non nisi efficitur</li>
-                        </ul>
+    <section class="cd-hero">
+        <ul class="cd-hero-slider autoplay">  
+        <!-- 
+            <ul class="cd-hero-slider autoplay"> for slider auto play 
+            <ul class="cd-hero-slider"> for disabled auto play
+        -->
+            <li class="selected first-slide">
+                <div class="cd-full-width">
+                    <div class="tm-slide-content-div slide-caption">
+                        <span>Introduction to</span>
+                        <h2>Creative Meteor</h2>
+                        <p>Phasellus interdum tortor sem. Quisque sit amet condimentum sem. Phasellus luctus, felis sit amet pulvinar luctus.</p>
                         <div class="primary-button">
-                            <a href="#portfolio">Learn More About Us</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-8">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="service-item">
-                                <h4>Weddings Service</h4>
-                                <div class="line-dec"></div>
-                                <p>Create lasting memories as you celebrate your sacred union in our beautiful sanctuary, where our experienced clergy will guide you through a personalized ceremony that reflects your faith and love story.</p>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="service-item">
-                                <h4>Holy Mass</h4>
-                                <div class="line-dec"></div>
-                                <p>Join our welcoming community for reverent worship services that combine traditional liturgy with uplifting music and meaningful homilies to nourish your spiritual journey.<br> </br></p>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="service-item">
-                                <h4>Baptism</h4>
-                                <div class="line-dec"></div>
-                                <p>Begin your child's faith journey with this sacred sacrament in a joyful ceremony supported by thorough preparation for parents and godparents.<br> </br></p>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="service-item">
-                                <h4>Columbary Services</h4>
-                                <div class="line-dec"></div>
-                                <p>Honor your loved ones in our peaceful columbarium, offering a dignified final resting place within our thoughtfully maintained sacred grounds for permanent remembrance and reflection.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>                
-            </div>
-        </div>
-    </div>
+                            <a href="#" class="scroll-link" data-id="about">Discover More</a>
+                        </div>                           
+                    </div>                   
+                </div> <!-- .cd-full-width -->
+            </li>
 
-    
-    <div class="parallax-content projects-content" id="portfolio">
+            <li class="second-slide">
+                <div class="cd-full-width">
+                    <div class="tm-slide-content-div slide-caption">
+                        <span>We Are Perfect Staffs</span>
+                        <h2>Our Team Members</h2>
+                        <p>Donec dolor ipsum, laoreet nec metus non, tempus elementum massa. Donec non elit rhoncus, vestibulum enim sed, rutrum arcu.</p>
+                        <div class="primary-button">
+                            <a href="#">Read More</a>
+                        </div>                        
+                    </div>                     
+                </div> <!-- .cd-full-width -->
+            </li>
+
+            <li class="third-slide">
+                <div class="cd-full-width">
+                    <div class="tm-slide-content-div slide-caption">
+                        <span>Design is a hobby</span>
+                        <h2>Responsive Layout</h2>
+                        <p>Integer ut dolor eget magna congue gravida ut at arcu. Vivamus maximus neque quis luctus tempus. Vestibulum consequat.</p>
+                        <div class="primary-button">
+                            <a href="#">View Details</a>
+                        </div>                           
+                    </div>                         
+                </div> <!-- .cd-full-width -->
+            </li>
+        </ul> <!-- .cd-hero-slider -->
+
+        <div class="cd-slider-nav">
+            <nav>
+                <span class="cd-marker item-1"></span>
+                
+                <ul>
+                    <li class="selected"><a href="#0"></a></li>
+                    <li><a href="#0"></a></li>
+                    <li><a href="#0"></a></li>                        
+                </ul>
+            </nav> 
+        </div> <!-- .cd-slider-nav -->
+    </section> <!-- .cd-hero -->
+
+    <div id="about" class="page-section">
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
-                    <div id="owl-testimonials" class="owl-carousel owl-theme">
-                        <div class="item">
-                            <div class="testimonials-item">
-                                <a href="../../static/images/1st-item.jpg" data-lightbox="image-1"><img src="../../static/images/1st-item.jpg" alt=""></a>
-                                <div class="text-content">
-                                    <h4>Christmas Eve Mass </h4>
-                                    <span>Dec. 24, 2024</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="item">
-                            <div class="testimonials-item">
-                                <a href="../../static/images/2nd-item.jpg" data-lightbox="image-1"><img src="../../static/images/2nd-item.jpg" alt=""></a>
-                                <div class="text-content">
-                                    <h4>Christmas Eve Mass </h4>
-                                    <span>Dec. 24, 2024</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="item">
-                            <div class="testimonials-item">
-                                <a href="../../static/images/3rd-item.jpg" data-lightbox="image-1"><img src="../../static/images/3rd-item.jpg" alt=""></a>
-                                <div class="text-content">
-                                    <h4>Christmas Eve Mass </h4>
-                                    <span>Dec. 24, 2024</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="item">
-                            <div class="testimonials-item">
-                                <a href="../../static/images/4th-item.jpg" data-lightbox="image-1"><img src="../../static/images/4th-item.jpg" alt=""></a>
-                                <div class="text-content">
-                                    <h4>Solemn Easter Vigil Serviceh</h4>
-                                    <span>March 30, 2024</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="item">
-                            <div class="testimonials-item">
-                                <a href="../../static/images/5th-item.jpg" data-lightbox="image-1"><img src="../../static/images/5th-item.jpg" alt=""></a>
-                                <div class="text-content">
-                                    <h4>Solemn Easter Vigil Service</h4>
-                                    <span>March 30, 2024</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="item">
-                            <div class="testimonials-item">
-                                <a href="../../static/images/6th-item.jpg" data-lightbox="image-1"><img src="../../static/images/6th-item.jpg" alt=""></a>
-                                <div class="text-content">
-                                    <h4>Way of the Cross &amp; Procession</h4>
-                                    <span>Good Friday 2024</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="item">
-                            <div class="testimonials-item">
-                                <a href="../../static/images/7th-item.jpg" data-lightbox="image-1"><img src="../../static/images/7th-item.jpg" alt=""></a>
-                                <div class="text-content">
-                                    <h4>Way of the Cross &amp; Procession</h4>
-                                    <span>Good Friday 2024</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="item">
-                            <div class="testimonials-item">
-                                <a href="../../static/images/8th-item.jpg" data-lightbox="image-1"><img src="../../static/images/8th-item.jpg" alt=""></a>
-                                <div class="text-content">
-                                    <h4>Exhibit: St Alphonsus</h4>
-                                    <span>His Life and Works 2023</span>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="section-heading">
+                        <h4>What We Do</h4>
+                        <div class="line-dec"></div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-
-    <div class="tabs-content" id="our-story">
-        <div class="container">
             <div class="row">
-                <div class="col-md-8 mx-auto">
-                    <div class="wrapper">
-                    <section id="first-tab-group" class="tabgroup">
-                      <div id="tab1">        
-                        <div style="position: relative; width: 100%; height: 0; padding-top: 56.2500%;
-                        padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden;
-                        border-radius: 8px; will-change: transform;">
-                         <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
-                           src="https://www.canva.com/design/DAGSxDPvYjU/5nn9ldVh9MHa10a-0CInxg/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
-                         </iframe>
-                       </div>
-                       <a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAGSxDPvYjU&#x2F;5nn9ldVh9MHa10a-0CInxg&#x2F;view?utm_content=DAGSxDPvYjU&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">
-                       </div>
-                       <a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAGf7HED--8&#x2F;aj-H7yHGiWN-pVasylWIqQ&#x2F;view?utm_content=DAGf7HED--8&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener"></a> 
-                      </div>
-                    <ul class="tabs clearfix" data-tabgroup="first-tab-group">
-                      <li class = "button"><a href ="{% url 'Columbary_Map' %}"> AVAIL NOW</a></li>
-                      <li class = "button"><a href ="{% url 'Memorials' %}">Retrieve vault</a></li>
-                    </ul>
+                <div class="col-md-3 col-sm-6 col-xs-12">
+                    <div class="service-item first-service">
+                        <div class="icon"></div>
+                        <h4>Easy Customizations</h4>
+                        <p>Meteor is free HTML website template by Tooplate. Feel free to use this layout for your project.</p>
+                    </div>
+                </div>
+                 <div class="col-md-3 col-sm-6 col-xs-12">
+                    <div class="service-item second-service">
+                        <div class="icon"></div>
+                        <h4>Creative Ideas</h4>
+                        <p>Biodiesel schltz suculents phone cliche ramps snackwave coloring book tumeric poke, typewriter.</p>
+                    </div>
+                </div>
+                 <div class="col-md-3 col-sm-6 col-xs-12">
+                    <div class="service-item third-service">
+                        <div class="icon"></div>
+                        <h4>Good Profit</h4>
+                        <p>Biodiesel schltz suculents phone cliche ramps snackwave coloring book tumeric poke, typewriter.</p>
+                    </div>
+                </div>
+                 <div class="col-md-3 col-sm-6 col-xs-12">
+                    <div class="service-item fourth-service">
+                        <div class="icon"></div>
+                        <h4>Open To Public</h4>
+                        <p>Biodiesel schltz suculents phone cliche ramps snackwave coloring book tumeric poke, typewriter.</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-
-    <div class="parallax-content contact-content" id="contact-us">
+    <div id="what-we-do">
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
-                    <div class="contact-form">
-                        <div class="row">
-                            <form id="contact" action="{% url 'contact' %}" method="post">
-                                {% csrf_token %}
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <fieldset>
-                                            <input name="name" type="text" class="form-control" id="name" placeholder="Your name..." required="">
-                                        </fieldset>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <fieldset>
-                                            <input name="email" type="email" class="form-control" id="email" placeholder="Your email..." required="">
-                                        </fieldset>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <fieldset>
-                                            <textarea name="message" rows="6" class="form-control" id="message" placeholder="Your message..." required=""></textarea>
-                                        </fieldset>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <fieldset>
-                                            <button type="submit" id="form-submit" class="btn">Send Message</button>
-                                        </fieldset>
-                                    </div>
+                    <div class="left-text">
+                        <h4>New offers just arrived,<br>Get it now and take profit.</h4>
+                        <p>Gochujang pitchfork post-ironic hammock kombucha fanny pack cronut. Raw denim chicharrones semiotics af truffaut pinterest. Distillery letterpress authentic adaptogen. Meditation schlitz humblebrag photo booth celiac cliche chartreuse.<br><br>Pinterest 90's wolf celiac dreamcatcher listicle deep v semiotics. Intelligentsia literally meggings trust fund put a bird on it. Shoreditch crucifix artisan pug shaman twee. Health goth bicycle rights retro iPhone.</p>
+                        <ul>
+                            <li>
+                                <div class="white-button">
+                                    <a href="#" class="scroll-link" data-id="portfolio">Discover More</a>
                                 </div>
-                            </form>
+                            </li>
+                            <li>
+                                <div class="primary-button">
+                                    <a href="#">Purchase Now</a>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="right-image">
+                        <img src="img/what-we-do-right-image.png" alt="">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="portfolio" class="page-section">
+        <div class="content-wrapper">
+            <div class="inner-container container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="section-heading">
+                            <h4>Our Portfolio</h4>
+                            <div class="line-dec"></div>
                         </div>
                     </div>
                 </div>
+                <div class="projects-holder-3">
+                    <div class="filter-categories">
+                        <ul class="project-filter">
+                            <li class="filter" data-filter="all"><span>All</span></li>
+                            <li class="filter" data-filter="nature"><span>Nature</span></li>
+                            <li class="filter" data-filter="workspace"><span>Workspace</span></li>
+                            <li class="filter" data-filter="city"><span>City</span></li>
+                            <li class="filter" data-filter="technology"><span>Technology</span></li>
+                        </ul>
+                    </div>
+                    <div class="projects-holder">
+                        <div class="row">
+                            <div class="col-md-3 col-sm-6 project-item mix workspace">
+                              <div class="thumb">
+                                  <div class="image">
+                                    <img src="img/portfolio_01.jpg">
+                                  </div>
+                                  <div class="hover-effect">
+                                    <a href="img/portfolio_big_01.jpg" data-lightbox="image-1"><i class="fa fa-search"></i></a>
+                                  </div>
+                              </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6 project-item mix workspace">
+                              <div class="thumb">
+                                  <div class="image">
+                                    <img src="img/portfolio_02.jpg">
+                                  </div>
+                                  <div class="hover-effect">
+                                    <a href="img/portfolio_big_02.jpg" data-lightbox="image-1"><i class="fa fa-search"></i></a>
+                                  </div>
+                              </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6 project-item mix technology">
+                              <div class="thumb">
+                                  <div class="image">
+                                    <img src="img/portfolio_03.jpg">
+                                  </div>
+                                  <div class="hover-effect">
+                                    <a href="img/portfolio_big_03.jpg" data-lightbox="image-1"><i class="fa fa-search"></i></a>
+                                  </div>
+                              </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6 project-item mix city">
+                              <div class="thumb">
+                                  <div class="image">
+                                    <img src="img/portfolio_04.jpg">
+                                  </div>
+                                  <div class="hover-effect">
+                                    <a href="img/portfolio_big_04.jpg" data-lightbox="image-1"><i class="fa fa-search"></i></a>
+                                  </div>
+                              </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6 project-item mix nature">
+                              <div class="thumb">
+                                  <div class="image">
+                                    <img src="img/portfolio_05.jpg">
+                                  </div>
+                                  <div class="hover-effect">
+                                    <a href="img/portfolio_big_05.jpg" data-lightbox="image-1"><i class="fa fa-search"></i></a>
+                                  </div>
+                              </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6 project-item mix technology">
+                              <div class="thumb">
+                                  <div class="image">
+                                    <img src="img/portfolio_06.jpg">
+                                  </div>
+                                  <div class="hover-effect">
+                                    <a href="img/portfolio_big_06.jpg" data-lightbox="image-1"><i class="fa fa-search"></i></a>
+                                  </div>
+                              </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6 project-item mix workspace">
+                              <div class="thumb">
+                                  <div class="image">
+                                    <img src="img/portfolio_07.jpg">
+                                  </div>
+                                  <div class="hover-effect">
+                                    <a href="img/portfolio_big_07.jpg" data-lightbox="image-1"><i class="fa fa-search"></i></a>
+                                  </div>
+                              </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6 project-item mix city">
+                              <div class="thumb">
+                                  <div class="image">
+                                    <img src="img/portfolio_08.jpg">
+                                  </div>
+                                  <div class="hover-effect">
+                                    <a href="img/portfolio_big_08.jpg" data-lightbox="image-1"><i class="fa fa-search"></i></a>
+                                  </div>
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> 
+    </div>
+
+
+    <div id="blog" class="page-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="section-heading">
+                        <h4>Our Blog Posts</h4>
+                        <div class="line-dec"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="blog-item b1">
+                        <div class="thumb">
+                            <img src="img/blog_01.jpg" alt="">
+                            <div class="text-content">
+                                <h4>Delecioius Food Served</h4>
+                                <span>Posted: <em>George</em>  /  Date: <em>11 Aug 2017</em>  /  Category: <em>Design</em></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="blog-item second-blog b2">
+                        <div class="thumb">
+                            <img src="img/blog_02.jpg" alt="">
+                            <div class="text-content">
+                                <h4>Creative &amp; Clean Workspace</h4>
+                                <span>Posted: <em>Kerley</em>  /  Date: <em>24 Jul 2017</em>  /  Category: <em>Artwork</em></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="blog-item b3">
+                        <div class="thumb">
+                            <img src="img/blog_03.jpg" alt="">
+                            <div class="text-content">
+                                <h4>Crashed Plane Captured</h4>
+                                <span>Posted: <em>Johnny</em>  /  Date: <em>16 Jul 2017</em>  /  Category: <em>Branding</em></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="pop">
+                      <span>✖</span>
+                      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin quis neque lacinia, porta nulla in, pellentesque ante. Vivamus in luctus mauris, non pharetra nibh. Morbi porttitor nisl sit amet velit pellentesque consequat. Etiam blandit libero turpis, id vehicula leo posuere a. In vel massa sollicitudin, tincidunt massa et, tincidunt ex.<br><br>Duis volutpat condimentum mollis. Sed eleifend libero ut viverra mattis. Suspendisse consectetur diam dolor, ut efficitur sem finibus vel. Vivamus tristique lacus sed dapibus varius. Fusce pharetra, quam quis congue pretium, ante dui imperdiet ipsum, eget lobortis leo leo sed diam.</p>
+                    </div>
+                    <div class="pop2">
+                      <span>✖</span>
+                      <p>Praesent purus leo, aliquet et efficitur id, pulvinar scelerisque enim. Maecenas a arcu sagittis, ornare ante ut, suscipit lectus. Donec dolor ipsum, laoreet nec metus non, tempus elementum massa. Donec non elit rhoncus, vestibulum enim sed, rutrum arcu. Vestibulum et purus ac diam condimentum volutpat sed ac est. Phasellus interdum tortor sem. Quisque sit amet condimentum sem. Phasellus luctus, felis sit amet pulvinar luctus, lectus dui mattis tellus, et placerat nunc ante at lacus.<br><br>Vivamus vestibulum, nisi sed placerat accumsan, felis felis venenatis tortor, vel condimentum arcu neque vel mauris. Donec a magna gravida, egestas libero non, molestie massa. Integer ut dolor eget magna congue gravida ut at arcu. Vivamus maximus neque quis luctus tempus. Vestibulum consequat a justo id feugiat. </p>
+                    </div>
+                    <div class="pop3">
+                      <span>✖</span>
+                      <p>Nullam rhoncus, orci et iaculis sodales, quam lectus suscipit augue, ut auctor massa dolor id metus. Nulla porta ut diam sodales dignissim. Ut sit amet augue vel justo laoreet dignissim. Maecenas vitae sollicitudin eros. In commodo placerat cursus. Quisque malesuada, nisl ac lacinia commodo, justo eros maximus ex, quis cursus odio erat at neque. Sed tincidunt eu dolor eget posuere.<br><br>Curabitur sit amet elit sit amet ligula eleifend aliquam quis eget quam. Mauris id mi nec justo venenatis tincidunt at ac massa. Sed et volutpat nunc. Quisque at urna quam. Duis sit amet neque eget quam iaculis iaculis. Quisque maximus porta elementum. Nam ac mattis erat, quis accumsan odio.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="fun-facts">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 col-sm-6 col-xs-12">
+                    <div class="fact-item">
+                        <div class="counter" data-count="926">0</div>
+                        <span>Regular Visitors</span>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 col-xs-12">
+                    <div class="fact-item">
+                        <div class="counter" data-count="214">0</div>
+                        <span>Finished Projects</span>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 col-xs-12">
+                    <div class="fact-item">
+                        <div class="counter" data-count="118">0</div>
+                        <span>Happy Clients</span>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 col-xs-12">
+                    <div class="fact-item">
+                        <div class="counter" data-count="16">0</div>
+                        <span>Total Awards</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="contact" class="page-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="section-heading">
+                        <h4>Contact Us</h4>
+                        <div class="line-dec"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
                 <div class="col-md-6">
                     <div class="map">
-                    <!-- How to change your own map point
-                           1. Go to Google Maps
-                           2. Click on your location point
-                           3. Click "Share" and choose "Embed map" tab
-                           4. Copy only URL and paste it within the src="" field below
-                    -->
-
-                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1976.3642213833928!2d121.01971569678747!3d14.530094957901879!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397c930242cea63%3A0xa01a909508772593!2sSt.%20Alphonsus%20Mary%20de%20Liguori%20Parish%20Church!5e1!3m2!1sen!2sph!4v1740234645849!5m2!1sen!2sph" width="100%" height="390" frameborder="0" style="border:0" allowfullscreen></iframe>
+                        <img src="img/map.jpg" alt="">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="row">
+                      <form id="contact" action="" method="post">
+                        <div class="col-md-6">
+                          <fieldset>
+                            <input name="name" type="text" class="form-control" id="name" placeholder="Your name..." required>
+                          </fieldset>
+                        </div>
+                        <div class="col-md-6">
+                          <fieldset>
+                            <input name="email" type="email" class="form-control" id="email" placeholder="Your email..." required>
+                          </fieldset>
+                        </div>
+                        <div class="col-md-12">
+                          <fieldset>
+                            <textarea name="message" rows="6" class="form-control" id="message" placeholder="Your message..." required></textarea>
+                          </fieldset>
+                        </div>
+                        <div class="col-md-12">
+                          <fieldset>
+                            <button type="submit" id="form-submit" class="btn">Send Message</button>
+                          </fieldset>
+                        </div>
+                      </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
 
     <footer>
         <div class="container">
             <div class="row">
-                <div class="col-md-12">
-                    <div class="primary-button">
-                        <a href="#home">Back To Top</a>
+                <div class="col-md-6">
+                    <div class="copyright-text">
+                        <p>Copyright &copy; 2017 Company Name 
+                        
+                        - Design: Tooplate</p>
                     </div>
-                    <ul>
-                        <li><a href="#"><i class="fa fa-facebook"></i></a></li>
-                        <li><a href="#"><i class="fa fa-twitter"></i></a></li>
-                        <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
-                        <li><a href="#"><i class="fa fa-google"></i></a></li>
-                        <li><a href="#"><i class="fa fa-dribbble"></i></a></li>
-                    </ul>
-                    <p>Copyright &copy; 2025 Team Phishda
-            
-            		- Design: <a rel="nofollow noopener" href="https://templatemo.com"><em>TemplateMo</em></a></p>
+                </div>
+                <div class="col-md-6">
+                    <div class="social-icons">
+                        <ul>
+                            <li>
+                                <a href="#"><i class="fa fa-facebook"></i></a>
+                            </li>
+                            <li>
+                                <a href="#"><i class="fa fa-twitter"></i></a>
+                            </li>
+                            <li>
+                                <a href="#"><i class="fa fa-linkedin"></i></a>
+                            </li>
+                            <li>
+                                <a href="#"><i class="fa fa-rss"></i></a>
+                            </li>
+                            <li>
+                                <a href="#"><i class="fa fa-dribbble"></i></a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
     </footer>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="../../static/js/vendor/jquery-1.11.2.min.js"><\/script>')</script>
-    <script src="../../static/js/vendor/bootstrap.min.js"></script>
-    <script src="../../static/js/plugins.js"></script>
-    <script src="../../static/js/main.js"></script>
-    <script>
-        function openCity(cityName) {
-            var i;
-            var x = document.getElementsByClassName("city");
-            for (i = 0; i < x.length; i++) {
-               x[i].style.display = "none";  
-            }
-            document.getElementById(cityName).style.display = "block";  
-        }
-    </script>
 
-    <script>
-        const csrfToken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.2.min.js"><\/script>')</script>
 
-        $(document).ready(function(){
-          // Add smooth scrolling to all links
-          $(".fixed-side-navbar a, .primary-button a").on('click', function(event) {
+    <script src="js/vendor/bootstrap.min.js"></script>
 
-            // Make sure this.hash has a value before overriding default behavior
-            if (this.hash !== "") {
-              // Prevent default anchor click behavior
-              event.preventDefault();
+    <script src="js/plugins.js"></script>
+    <script src="js/main.js"></script>
 
-              // Store hash
-              var hash = this.hash;
-
-              // Using jQuery's animate() method to add smooth page scroll
-              // The optional number (800) specifies the number of milliseconds it takes to scroll to the specified area
-              $('html, body').animate({
-                scrollTop: $(hash).offset().top
-              }, 800, function(){
-           
-                // Add hash (#) to URL when done scrolling (default click behavior)
-                window.location.hash = hash;
-              });
-            } // End if
-          });
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            // navigation click actions 
+            $('.scroll-link').on('click', function(event){
+                event.preventDefault();
+                var sectionID = $(this).attr("data-id");
+                scrollToID('#' + sectionID, 750);
+            });
+            // scroll to top action
+            $('.scroll-top').on('click', function(event) {
+                event.preventDefault();
+                $('html, body').animate({scrollTop:0}, 'slow');         
+            });
+            // mobile nav toggle
+            $('#nav-toggle').on('click', function (event) {
+                event.preventDefault();
+                $('#main-nav').toggleClass("open");
+            });
         });
+        // scroll function
+        function scrollToID(id, speed){
+            var offSet = 50;
+            var targetOffset = $(id).offset().top - offSet;
+            var mainNav = $('#main-nav');
+            $('html,body').animate({scrollTop:targetOffset}, speed);
+            if (mainNav.hasClass("open")) {
+                mainNav.css("height", "1px").removeClass("in").addClass("collapse");
+                mainNav.removeClass("open");
+            }
+        }
+        if (typeof console === "undefined") {
+            console = {
+                log: function() { }
+            };
+        }
             function toggleChat() {
                 const chatContainer = document.getElementById('chatContainer');
                 chatContainer.style.display = (chatContainer.style.display === 'none') ? 'block' : 'none';
