@@ -25,7 +25,8 @@ llm = ChatOpenAI(model="gpt-4", temperature=0.5, openai_api_key=OPEN_AI_API_KEY)
 embeddings = OpenAIEmbeddings(openai_api_key=OPEN_AI_API_KEY)
 
 # Initialize FAISS vector store for RAG
-vector_db = FAISS.load_local("faiss_index", embeddings)
+vector_db = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
+
 
 # Create LangGraph Workflow
 workflow = Graph()
