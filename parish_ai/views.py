@@ -1,37 +1,16 @@
-from django.http import JsonResponse
-from django.views import View
-from sqlalchemy.orm import sessionmaker
-from .models import ParishKnowledge, ChatQuery  # Import ORM models
-from .database import engine  # Ensure you have an SQLAlchemy engine setup
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .chatbot import chatbot
 
-# Create a database session
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-class ChatbotAPIView(View):
-    def get_answer(self, question_text):
-        """Retrieve an answer from the parish_knowledge table."""
-        session = SessionLocal()
-        result = session.query(ParishKnowledge).filter_by(question=question_text).first()
-        session.close()
-        return result.answer if result else "Sorry, I don't have an answer for that."
-
-    def store_chat_query(self, user_query):
-        """Store user queries in the chat_query table."""
-        session = SessionLocal()
-        new_query = ChatQuery(chat_query=user_query)
-        session.add(new_query)
-        session.commit()
-        session.close()
-
+class ChatbotAPIView(APIView):
     def post(self, request):
-        """Handle chatbot interactions via POST requests."""
-        data = request.POST
-        user_query = data.get("query")
+        user_query = request.data.get("query", "")
 
-        # Store user query
-        self.store_chat_query(user_query)
+        if not user_query:
+            return Response({"error": "Query cannot be empty"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Get AI response
-        answer = self.get_answer(user_query)
+        # Run the chatbot workflow
+        result = chatbot.invoke({"query": user_query})
 
-        return JsonResponse({"question": user_query, "answer": answer})
+        return Response(result["response"], status=status.HTTP_200_OK)
