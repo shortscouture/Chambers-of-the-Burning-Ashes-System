@@ -1,4 +1,3 @@
-import os
 from dotenv import load_dotenv
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import HumanMessage
@@ -10,8 +9,7 @@ from django.conf import settings
 from .database import SessionLocal
 
 # Load environment variables
-load_dotenv()
-OPENAI_API_KEY = settings.OPENAI_API_KEY
+OPEN_AI_API_KEY = settings.OPEN_AI_API_KEY
 
 # Initialize LLM
 llm = ChatOpenAI(model="gpt-4", temperature=0.5, openai_api_key=OPENAI_API_KEY)
