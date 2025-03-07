@@ -1,4 +1,4 @@
-from dotenv import load_dotenv
+from pathlib import Path
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import HumanMessage
 from langgraph.graph import Graph
@@ -7,13 +7,22 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from sqlalchemy.orm import Session
 from django.conf import settings
 from .database import SessionLocal
+import environ
+
+BASE_DIR = Path(__file__).resolve().parent.parent # always need lagyan tatlong parent kasi nasa base.py tayo
+
+
+# Initialize env variablesparent
+env = environ.Env(
+    DEBUG=(bool, False) #default value for DEBUG = False
+)
 
 # Load environment variables
-OPEN_AI_API_KEY = settings.OPEN_AI_API_KEY
+OPEN_AI_API_KEY = env("OPEN_AI_API_KEY")
 
 # Initialize LLM
-llm = ChatOpenAI(model="gpt-4", temperature=0.5, openai_api_key=OPENAI_API_KEY)
-embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
+llm = ChatOpenAI(model="gpt-4", temperature=0.5, openai_api_key=OPEN_AI_API_KEY)
+embeddings = OpenAIEmbeddings(openai_api_key=OPEN_AI_API_KEY)
 
 # Initialize FAISS vector store for RAG
 vector_db = FAISS.load_local("faiss_index", embeddings)
