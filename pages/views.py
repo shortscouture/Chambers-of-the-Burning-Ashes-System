@@ -20,7 +20,6 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from PIL import Image
-import re
 import numpy as np
 import openai
 from openai import OpenAI
