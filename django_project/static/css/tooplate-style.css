@@ -22,7 +22,7 @@ p {
 }
 .primary-button a {
 	display: inline-block;
-	background-color: #a2cf8d;
+	background-color: rgb(69, 148, 238);;
 	padding: 12px 18px;
 	color: #fff;
 	font-size: 11px;
@@ -34,7 +34,7 @@ p {
 	transition: all 0.5s;
 }
 .primary-button a:hover {
-	background-color: #5c9d7d;
+	background-color: #0056b3;
 }
 .white-button a {
 	display: inline-block;
@@ -154,11 +154,11 @@ p {
 }
 .navbar-inverse .navbar-toggle {
 	margin-top: 22px;
-    border-color: #a2cf8d;
-    background-color: #a2cf8d;
+    border-color: rgb(69, 148, 238);;
+    background-color: rgb(69, 148, 238);;
 }
 .navbar-inverse .navbar-toggle:hover, .navbar-inverse .navbar-toggle:focus {
-	background-color: #a2cf8d;
+	background-color: rgb(69, 148, 238);;
 }
 
 bootstrap.min.css:5
@@ -246,7 +246,7 @@ ul.cd-hero-slider {
 }
 
 .service-item:hover {
-	background-color: #a2cf8d;
+	background-color: rgb(69, 148, 238);;
 }
 
 .service-item h4 {
@@ -376,7 +376,7 @@ ul.cd-hero-slider {
 }
 
 .filter-categories ul li.active span {
-  color: #a2cf8d;
+  color: rgb(69, 148, 238);;
 }
 
 .project-item {
@@ -413,13 +413,13 @@ ul.cd-hero-slider {
 	height: 46px;
 	background-color: #fff;
 	line-height: 46px;
-	color: #a2cf8d;
+	color: rgb(69, 148, 238);;
 	border-radius: 50%;
 	font-size: 18px;
 }
 
 .project-item .hover-effect i:hover {
-	background-color: #5c9d7d;
+	background-color: #0056b3;
 	color: #fff;
 	transition: all 0.5s;
 }
@@ -517,11 +517,11 @@ ul.cd-hero-slider {
 	line-height: 44px;
 	color: #fff;
 	text-align: center;
-	background-color: #a2cf8d;
+	background-color: rgb(69, 148, 238);;
 }
 
 .pop span:hover, .pop2 span:hover, .pop3 span:hover {
-	background-color: #5c9d7d;
+	background-color: #0056b3;
 	transition: all 0.5s;
 }
 
@@ -543,7 +543,7 @@ ul.cd-hero-slider {
 .fact-item .counter {
 	font-size: 24px;
 	font-weight: 700;
-	color: #a2cf8d;
+	color: rgb(69, 148, 238);;
 }
 
 .fact-item span {
@@ -615,7 +615,7 @@ ul.cd-hero-slider {
 
 #contact button {
 	display: inline-block;
-	background-color: #a2cf8d;
+	background-color: rgb(69, 148, 238);;
 	padding: 12px 18px;
 	color: #fff;
 	font-size: 11px;
@@ -628,7 +628,7 @@ ul.cd-hero-slider {
 
 #contact button:hover {
 	color: #fff;
-	background-color: #5c9d7d;
+	background-color: #0056b3;
 	transition: all 0.3s;
 }
 
@@ -650,7 +650,7 @@ footer p {
 footer em {
 	font-style: normal;
 	font-weight: 700;
-	color: #a2cf8d;
+	color: rgb(69, 148, 238);;
 }
 
 footer ul {
@@ -670,14 +670,14 @@ footer ul li a {
 	line-height: 36px;
 	text-align: center;
 	display: inline-block;
-	background-color: #a2cf8d;
+	background-color: rgb(69, 148, 238);;
 	color: #202628;
 	border-radius: 50%;
 }
 
 footer ul li a:hover {
 	color: #202628;
-	background-color: #5c9d7d;
+	background-color: #0056b3;
 	transition: all 0.5s;
 }
 
