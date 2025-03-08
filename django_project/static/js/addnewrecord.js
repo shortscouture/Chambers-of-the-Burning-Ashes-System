@@ -323,64 +323,64 @@ function normalizeOcrData(data) {
 
 let addressData = [];
 
+
 async function loadAddressData() {
     try {
         const response = await fetch('/static/csv/PHLZipCodes.csv'); 
         if (!response.ok) throw new Error(`Failed to load CSV: ${response.statusText}`);
 
         const csvText = await response.text();
-        return parseCSV(csvText);
+        addressData = parseCSV(csvText);
+        console.log("CSV Loaded Successfully:", addressData);
     } catch (error) {
         console.error("Error loading CSV:", error);
-        return {};
     }
 }
 
+
 function parseCSV(csvText) {
-    const rows = csvText.split('\n').map(row => row.trim()).filter(row => row);
+    const rows = csvText.split("\n").map(row => row.trim()).filter(row => row);
     const data = {};
 
-    for (let i = 1; i < rows.length; i++) {  
-        const cols = rows[i].split(',');
+    for (let i = 1; i < rows.length; i++) {  // Skip header row
+        const cols = rows[i].split(",");
 
-        if (cols.length < 4) continue; 
+        if (cols.length < 4) continue;  // Ensure all columns exist
 
         const region = cols[0].trim();
         const province = cols[1].trim();
-        const city = cols[2].trim().toLowerCase(); 
-        const zip = cols[3].trim();
+        const city = cols[2].trim().toLowerCase();  // Normalize city name
+        const zipCode = cols[3].trim();
 
-        data[city] = { region, province, city, zip };
+        data[city] = { region, province, city, zipCode };
     }
-    console.log("CSV Loaded Successfully:", data);
     return data;
 }
 
 
-function extractAddressDetails(address) {
-    if (!address || !addressData.length) return {};
 
+function extractAddressDetails(address) {
+    if (!address || Object.keys(addressData).length === 0) return {};
+
+    const addressLower = address.toLowerCase();
     let matchedEntry = null;
 
-    for (const entry of addressData) {
-        const city = entry["City_or_Municipality"]?.toLowerCase();
-        const zipCode = entry["ZipCOde"]?.toLowerCase();
-
-        if (address.toLowerCase().includes(city) || address.toLowerCase().includes(zipCode)) {
-            matchedEntry = entry;
+    for (const city in addressData) {
+        if (addressLower.includes(city) || addressLower.includes(addressData[city].zipCode)) {
+            matchedEntry = addressData[city];
             break;
         }
     }
 
     if (matchedEntry) {
         return {
-            city: matchedEntry["City_or_Municipality"] || "",
-            province: matchedEntry["Province"] || "",
-            region: matchedEntry["Region"] || "",
-            zipCode: matchedEntry["ZipCOde"] || "",
+            city: matchedEntry.city || "",
+            province: matchedEntry.province || "",
+            region: matchedEntry.region || "",
+            zipCode: matchedEntry.zipCode || "",
             remainingAddress: address
-                .replace(matchedEntry["City_or_Municipality"], "")
-                .replace(matchedEntry["ZipCOde"], "")
+                .replace(matchedEntry.city, "")
+                .replace(matchedEntry.zipCode, "")
                 .trim()
         };
     }
@@ -388,27 +388,10 @@ function extractAddressDetails(address) {
     return { remainingAddress: address };
 }
 
-async function loadAddressData() {
-    const response = await fetch('/static/csv/PHLZipCodes.csv'); 
-    const csvText = await response.text();
-    const rows = csvText.split("\n").map(row => row.split(","));
-    
-    const addressData = {};
-    
-    for (let i = 1; i < rows.length; i++) {
-        const [region, province, city, zip] = rows[i].map(value => value.trim());
-        if (city) {
-            addressData[city.toLowerCase()] = { region, province, zip };
-        }
-    }
-    
-    return addressData;
-}
 
 async function populateFields(data) {
     console.log('Populating fields with data:', data);
 
-    const addressData = await loadAddressData(); 
     const normalizedData = normalizeOcrData(data);
     console.log('Normalized OCR data:', normalizedData);
 
