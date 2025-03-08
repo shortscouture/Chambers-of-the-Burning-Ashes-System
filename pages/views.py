@@ -42,6 +42,8 @@ import io
 import base64
 from django.core.files.uploadedfile import InMemoryUploadedFile
 import boto3
+from django.db.models import Sum, F, Value, DecimalField
+from django.db.models.functions import Coalesce
 
 env = environ.Env()
 textract_client = boto3.client("textract", region_name="us-east-1")
@@ -294,6 +296,20 @@ class DashboardView(TemplateView):
             .annotate(total_earnings=Sum("total_amount"))
             .order_by("month")
         )
+        
+        # Fetch Payment Records
+        full_payment_records = Payment.objects.filter(mode_of_payment="Full Payment")
+        installment_payment_records = Payment.objects.filter(mode_of_payment="6-Month Installment").annotate(
+            total_installment_paid=Coalesce(
+                Sum(F("six_month_amount_1"), output_field=DecimalField()) + 
+                Sum(F("six_month_amount_2"), output_field=DecimalField()) + 
+                Sum(F("six_month_amount_3"), output_field=DecimalField()) + 
+                Sum(F("six_month_amount_4"), output_field=DecimalField()) + 
+                Sum(F("six_month_amount_5"), output_field=DecimalField()) + 
+                Sum(F("six_month_amount_6"), output_field=DecimalField()), 
+                Value(0, output_field=DecimalField())
+            )
+        )
 
         # Convert data for Chart.js
         earnings_labels = [entry["month"].strftime("%b %Y") if entry["month"] else "Unknown" for entry in earnings_by_month]
@@ -318,6 +334,8 @@ class DashboardView(TemplateView):
             "earnings_data": mark_safe(json.dumps(earnings_data)),
             "start_date": start_date.strftime("%Y-%m-%d") if start_date else "",
             "end_date": end_date.strftime("%Y-%m-%d") if end_date else "",
+            "full_payment_records": full_payment_records,
+            "installment_payment_records": installment_payment_records,
         })
 
         return context

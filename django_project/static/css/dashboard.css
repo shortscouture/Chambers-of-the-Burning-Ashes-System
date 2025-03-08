@@ -3,7 +3,7 @@ body {
     overflow-y: auto !important;  /* Ensure scrolling works */
     height: auto;
     min-height: 100vh;
-    background: url("/static/images/church.jpg") no-repeat center center fixed; /* Replace with your image */
+    background: linear-gradient(120deg, rgb(148, 148, 148), rgb(255, 255, 255), rgb(211, 211, 211));
     background-size: cover;
     height: 100vh; /* Ensure full height */
     margin: 0;
@@ -31,19 +31,12 @@ h1 {
 }
 
 /* Info Boxes */
-.info-box h2 {
-    font-size: 17px;
-    font-weight: normal;
-    font-family: sans-serif;
-    color: #ffffff;
-    margin-bottom: 5px;
-}
 
 .info-box p {
     font-size: 50px;
     font-weight: normal;
     font-family: 'Impact', sans-serif;
-    color: #ffffff;
+    color: #000000;
     margin: 0;
 }
 
@@ -53,16 +46,70 @@ h1 {
     justify-content: center;
     align-items: center;
     text-align: center;
-    height: 120px;
-    background: rgba(90, 90, 90, 0.8); /* Slight transparency */
+    height: 140px;
+    background: rgba(255, 255, 255, 0.8); /* Slight transparency */
     padding: 15px;
     border-radius: 10px;
     margin-bottom: 5%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease; /* Smooth animation */
 }
 
+/* Hover effect: Slight scale increase, shadow, and background change */
+/* Hover effect: Slightly enlarge */
 .info-box:hover {
-    background: rgba(1, 108, 207, 0.9);
-    transform: scale(1.02);
+    transform: scale(1.05);
+    background: linear-gradient(120deg, rgb(2, 119, 253), rgb(255, 255, 255), rgb(0, 195, 255));
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Click effect: Quick scale down and pulse */
+.info-box.clicked {
+    animation: pulse 0.3s ease-in-out;
+}
+
+/* Hover effect on the icon */
+.info-box:hover .info-icon {
+    transform: rotate(360deg); /* Rotate icon */
+    transition: transform 0.5s ease; /* Smooth rotation */
+    color: #2e2e2e; /* Change icon color */
+}
+
+/* Add a class for the click effect */
+.info-box:active {
+    transform: scale(0.95); /* Slightly shrink the box */
+    transition: transform 0.1s ease-in-out;
+}
+
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+
+.info-box h2 {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    font-size: 17px;
+    font-weight: normal;
+    font-family: sans-serif;
+    color: #000000;
+    margin-bottom: 5px;
+}
+
+/* Style the icons */
+.info-icon {
+    font-size: 40px; /* Adjust icon size */
+    color: #0565cc; /* Adjust icon color */
+    margin-left: 70px; /* Add spacing between text and icon */
+    margin-right: 15px; /* Add spacing between text and icon */
+}
+
+/* Change icon color on hover */
+.info-box:hover .info-icon {
+    color: #ffffff;
 }
 
 .dashboard-grid {
@@ -94,7 +141,7 @@ h1 {
     /* Make title smaller */
     font-weight: normal;
     font-family: sans-serif;
-    color: #ffffff;
+    color: #020202;
     margin-bottom: 5px;
 }
 
@@ -106,7 +153,7 @@ h1 {
     width: 80%; /* Prevents it from being too wide */
     max-height: 400px; /* Prevents excessive height */
     overflow-y: auto;
-    background: rgba(90, 90, 90, 0.95); /* Slight transparency */
+    background: rgba(255, 255, 255, 0.95); /* Slight transparency */
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
@@ -121,7 +168,7 @@ h1 {
 table {
     width: 100%; /* Ensures the table itself is centered */
     margin: 0 auto; /* Centers the table inside the container */
-    color: #ffffff;
+    color: #000000;
 }
 
 
@@ -137,31 +184,6 @@ th {
     color: white;
 }
 
-.btn-accept {
-    background-color: green;
-    color: white;
-    padding: 5px 10px;
-    text-decoration: none;
-    border-radius: 5px;
-}
-
-.btn-decline {
-    background-color: red;
-    color: white;
-    padding: 5px 10px;
-    text-decoration: none;
-    border-radius: 5px;
-}
-
-.info-box {
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-.info-box:hover {
-    background-color: #d1ecff;
-}
-
 /* Chart Containers */
 .chart-container {
     display: flex;
@@ -171,7 +193,7 @@ th {
     width: auto;
     height: 450px; /* Ensure charts have the same height */
     padding: 20px;
-    background: rgba(90, 90, 90, 0.8);
+    background: linear-gradient(120deg, rgba(51, 51, 51, 0.849), rgba(0, 0, 0, 0.87));
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
@@ -235,7 +257,8 @@ canvas {
     left: 0;
     width: 100%;
     height: 100%; /* Ensures it covers full content */
-    background: rgba(255, 255, 255, 0.103);
+    background: rgba(255, 255, 255, 0.582);
+    background-size: cover;
     z-index: -1;
 }
 
@@ -246,7 +269,7 @@ canvas {
     padding: 20px;
     overflow-y: auto !important;  /* Ensure scrolling is allowed */
     max-height: 90vh;  /* Prevent overflow issues */
-    background: transparent;
+    background: linear-gradient(120deg, rgba(0, 238, 255, 0.8), rgba(0, 102, 255, 0.8), rgba(0, 255, 221, 0.8));
 }
 
 #dateFilterForm {
@@ -268,7 +291,7 @@ canvas {
     align-items: center; /* Aligns vertically */
     text-align: center;
     margin: 20px auto; /* Adjust spacing */
-    margin-bottom: -20px;
+    margin-bottom: -5px;
     width: 100%;
 }
 
