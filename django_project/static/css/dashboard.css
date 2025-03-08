@@ -3,7 +3,7 @@ body {
     overflow-y: auto !important;  /* Ensure scrolling works */
     height: auto;
     min-height: 100vh;
-    background: linear-gradient(120deg, rgb(148, 148, 148), rgb(255, 255, 255), rgb(211, 211, 211));
+    background: url("/static/images/cross.jpg") no-repeat center center;
     background-size: cover;
     height: 100vh; /* Ensure full height */
     margin: 0;
@@ -58,7 +58,7 @@ h1 {
 /* Hover effect: Slightly enlarge */
 .info-box:hover {
     transform: scale(1.05);
-    background: linear-gradient(120deg, rgb(2, 119, 253), rgb(255, 255, 255), rgb(0, 195, 255));
+    background: linear-gradient(120deg, rgb(0, 72, 150), rgb(255, 255, 255), rgb(206, 244, 255));
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
 
@@ -90,7 +90,7 @@ h1 {
 
 .info-box h2 {
     display: flex;
-    align-items: center;
+    align-items: justify;
     width: 100%;
     font-size: 17px;
     font-weight: normal;
@@ -101,9 +101,9 @@ h1 {
 
 /* Style the icons */
 .info-icon {
-    font-size: 40px; /* Adjust icon size */
+    font-size: 30px; /* Adjust icon size */
     color: #0565cc; /* Adjust icon color */
-    margin-left: 70px; /* Add spacing between text and icon */
+    margin-left: 20%; /* Add spacing between text and icon */
     margin-right: 15px; /* Add spacing between text and icon */
 }
 
@@ -257,7 +257,7 @@ canvas {
     left: 0;
     width: 100%;
     height: 100%; /* Ensures it covers full content */
-    background: rgba(255, 255, 255, 0.582);
+    background: rgba(255, 255, 255, 0.884);
     background-size: cover;
     z-index: -1;
 }
