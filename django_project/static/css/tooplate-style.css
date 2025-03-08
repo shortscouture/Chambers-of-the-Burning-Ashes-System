@@ -409,7 +409,7 @@ ul.cd-hero-slider {
 
 .project-item .hover-effect {
 	position: absolute;
-	background-color: rgba(162, 207, 141, 0.95);
+	background-color: rgb(69, 148, 238);
 	width: 100%;
 	top: 0;
 	bottom: 0;
@@ -446,7 +446,7 @@ ul.cd-hero-slider {
 /* BLOG */
 
 #blog {
-	background-image: url(../images/blog-bg.png);
+	background-image: url(../images/cloud.png);
 	background-repeat: no-repeat;
 	background-size: cover;
 	width: 100%;
