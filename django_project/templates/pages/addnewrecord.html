@@ -141,6 +141,43 @@
                     <option value="4">4</option>
                 </select>
             </div>
+            <h3>Payment Details</h3>
+            <div class="form-group">
+                <label for="id_mode_of_payment">Mode of Payment:</label>
+                <select name="mode_of_payment" id="id_mode_of_payment" class="form-control">
+                    <option value="">Select Payment Mode</option>
+                    <option value="Full Payment">Full Payment</option>
+                    <option value="6-Month Installment">6-Month Installment</option>
+                </select>
+            </div>
+        
+            <div id="full_payment_fields" style="display: none;">
+                <label for="id_full_payment_amount">Full Payment Amount:</label>
+                <input type="text" name="full_payment_amount" id="id_full_payment_amount" class="form-control">
+            </div>
+        
+            <div id="installment_payment_fields" style="display: none;">
+                <label for="id_installment_amount">Installment Amount:</label>
+                <input type="text" name="installment_amount" id="id_installment_amount" class="form-control">
+
+                <label for="id_installment_amount">Installment Amount:</label>
+                <input type="text" name="installment_amount" id="id_installment_amount" class="form-control">
+
+                <label for="id_installment_amount">Installment Amount:</label>
+                <input type="text" name="installment_amount" id="id_installment_amount" class="form-control">
+
+                <label for="id_installment_amount">Installment Amount:</label>
+                <input type="text" name="installment_amount" id="id_installment_amount" class="form-control">
+
+                <label for="id_installment_amount">Installment Amount:</label>
+                <input type="text" name="installment_amount" id="id_installment_amount" class="form-control">
+
+                <label for="id_installment_amount">Installment Amount:</label>
+                <input type="text" name="installment_amount" id="id_installment_amount" class="form-control">
+                
+                <label for="id_installment_due_date">Installment Due Date:</label>
+                <input type="date" name="installment_due_date" id="id_installment_due_date" class="form-control">
+            </div>
 
             <button type="submit" class="btn btn-primary">Submit Record</button>
 
