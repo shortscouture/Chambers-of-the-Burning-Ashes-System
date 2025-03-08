@@ -16,10 +16,8 @@ function togglePaymentFields() {
     }
 }
 
-
 document.addEventListener('DOMContentLoaded', function () {
     console.log('DOM fully loaded and parsed');
-
 
     togglePaymentFields();
     const paymentModeSelect = document.getElementById('id_mode_of_payment');
@@ -28,7 +26,6 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
         console.error('Payment mode select element not found!');
     }
-
 
     setupOcrUI();
 });
