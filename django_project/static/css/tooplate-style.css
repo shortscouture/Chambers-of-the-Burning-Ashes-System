@@ -302,6 +302,7 @@ ul.cd-hero-slider {
 	background-image: url(../images/fourth-service-main.png);
 	height: 32px;
 	width: 32px;
+	background-repeat: no-repeat;
 	display: inline-block;
 }
 
