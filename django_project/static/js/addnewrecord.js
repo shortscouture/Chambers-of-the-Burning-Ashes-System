@@ -321,9 +321,94 @@ function normalizeOcrData(data) {
     return normalizedData;
 }
 
-function populateFields(data) {
+let addressData = [];
+
+async function loadAddressData() {
+    try {
+        const response = await fetch('/static/csv/PHLZipCodes.csv'); 
+        if (!response.ok) throw new Error(`Failed to load CSV: ${response.statusText}`);
+
+        const csvText = await response.text();
+        return parseCSV(csvText);
+    } catch (error) {
+        console.error("Error loading CSV:", error);
+        return {};
+    }
+}
+
+function parseCSV(csvText) {
+    const rows = csvText.split('\n').map(row => row.trim()).filter(row => row);
+    const data = {};
+
+    for (let i = 1; i < rows.length; i++) {  
+        const cols = rows[i].split(',');
+
+        if (cols.length < 4) continue; 
+
+        const region = cols[0].trim();
+        const province = cols[1].trim();
+        const city = cols[2].trim().toLowerCase(); 
+        const zip = cols[3].trim();
+
+        data[city] = { region, province, city, zip };
+    }
+    console.log("CSV Loaded Successfully:", data);
+    return data;
+}
+
+
+function extractAddressDetails(address) {
+    if (!address || !addressData.length) return {};
+
+    let matchedEntry = null;
+
+    for (const entry of addressData) {
+        const city = entry["City_or_Municipality"]?.toLowerCase();
+        const zipCode = entry["ZipCOde"]?.toLowerCase();
+
+        if (address.toLowerCase().includes(city) || address.toLowerCase().includes(zipCode)) {
+            matchedEntry = entry;
+            break;
+        }
+    }
+
+    if (matchedEntry) {
+        return {
+            city: matchedEntry["City_or_Municipality"] || "",
+            province: matchedEntry["Province"] || "",
+            region: matchedEntry["Region"] || "",
+            zipCode: matchedEntry["ZipCOde"] || "",
+            remainingAddress: address
+                .replace(matchedEntry["City_or_Municipality"], "")
+                .replace(matchedEntry["ZipCOde"], "")
+                .trim()
+        };
+    }
+
+    return { remainingAddress: address };
+}
+
+async function loadAddressData() {
+    const response = await fetch('/static/csv/PHLZipCodes.csv'); 
+    const csvText = await response.text();
+    const rows = csvText.split("\n").map(row => row.split(","));
+    
+    const addressData = {};
+    
+    for (let i = 1; i < rows.length; i++) {
+        const [region, province, city, zip] = rows[i].map(value => value.trim());
+        if (city) {
+            addressData[city.toLowerCase()] = { region, province, zip };
+        }
+    }
+    
+    return addressData;
+}
+
+async function populateFields(data) {
     console.log('Populating fields with data:', data);
 
+    const addressData = await loadAddressData(); 
     const normalizedData = normalizeOcrData(data);
     console.log('Normalized OCR data:', normalizedData);
 
@@ -344,7 +429,6 @@ function populateFields(data) {
         }
     }
 
-    // Map for field names (normalized key -> form field id)
     const fieldMap = {
         'fullname': 'id_first_name',
         'firstname': 'id_first_name',
@@ -384,12 +468,10 @@ function populateFields(data) {
         }
     }
 
- 
     setValue('id_first_name', firstName);
     setValue('id_middle_name', middleName);
     setValue('id_last_name', lastName);
     setValue('id_suffix', ''); 
-
     setValue('id_country', 'Philippines'); 
 
     for (const key in normalizedData) {
@@ -414,7 +496,6 @@ function populateFields(data) {
         }
     }
 
-    // Extract mobile number if available in combined format
     if (normalizedData.landlinemobilenumbers) {
         const mobilePattern = /(\d{4}[-\s]?\d{3}[-\s]?\d{4})/;
         const mobileMatch = normalizedData.landlinemobilenumbers.match(mobilePattern);
@@ -424,9 +505,32 @@ function populateFields(data) {
         }
     }
 
-
     setValue('id_urns_per_columbary', '1'); 
-    
+
+    // Extract Address and Match it to the CSV
+    if (normalizedData.address) {
+        const addressParts = normalizedData.address.toLowerCase().split(',');
+        
+        let foundCity = null;
+        for (let part of addressParts) {
+            const cityName = part.trim();
+            if (addressData[cityName]) {
+                foundCity = addressData[cityName];
+                break;
+            }
+        }
+
+        if (foundCity) {
+            console.log("Matched Address Data:", foundCity);
+            setValue('id_city', foundCity.city || '');
+            setValue('id_province', foundCity.province || '');
+            setValue('id_region', foundCity.region || '');
+            setValue('id_zip_code', foundCity.zip || '');
+        } else {
+            console.warn("No matching city found in CSV.");
+        }
+    }
+
     console.log('Field population complete');
 }
 
