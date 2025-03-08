@@ -326,20 +326,28 @@ let addressData = [];
 
 function loadAddressData() {
     return new Promise(async (resolve, reject) => {
+        if (addressData.length > 0) {
+            console.log("📌 CSV already loaded.");
+            resolve(); // If already loaded, return immediately
+            return;
+        }
+
         try {
+            console.log("🔄 Loading CSV...");
             const response = await fetch('/static/csv/PHLZipCodes.csv'); 
             if (!response.ok) throw new Error(`Failed to load CSV: ${response.statusText}`);
 
             const csvText = await response.text();
             addressData = parseCSV(csvText);
             console.log("✅ CSV Loaded Successfully:", addressData);
-            resolve(); 
+            resolve(); // ✅ Resolves when loading is complete
         } catch (error) {
             console.error("❌ Error loading CSV:", error);
             reject(error);
         }
     });
 }
+
 
 
 
@@ -371,42 +379,53 @@ function parseCSV(csvText) {
 
 
 function extractAddressDetails(address) {
-    if (!address || Object.keys(addressData).length === 0) {
-        console.warn("⚠️ Address data is empty or not loaded.");
-        return {};
-    }
-
     console.log("📌 Checking Address Against CSV Data...");
 
-    const addressLower = address.toLowerCase().trim();
-    let matchedEntry = null;
+    if (!addressData || addressData.length === 0) {
+        console.warn("❌ CSV data is empty or not loaded.");
+        return { remainingAddress: address };
+    }
 
-    for (const key in addressData) {
-        const cityEntry = addressData[key].City_or_Municipality.toLowerCase().trim();
-        const provinceEntry = addressData[key].Province.toLowerCase().trim();
-        const regionEntry = addressData[key].Region.toLowerCase().trim();
-        const zipEntry = addressData[key].ZipCOde.toLowerCase().trim();
+    let city = "";
+    let barangay = "";
+    let zipCode = "";
 
-        // 🔍 Check if city name appears anywhere in the address
-        if (addressLower.includes(cityEntry) || addressLower.includes(zipEntry)) {
-            matchedEntry = {
-                city: addressData[key].City_or_Municipality,
-                province: addressData[key].Province,
-                region: addressData[key].Region,
-                zipCode: addressData[key].ZipCOde,
-                remainingAddress: cleanRemainingAddress(address, addressData[key])
-            };
-            console.log(`✅ Match Found: ${matchedEntry.city} →`, matchedEntry);
+    // Normalize address for better matching
+    const normalizedAddress = address.toLowerCase().replace(/\s+/g, ' ').trim();
+
+    for (const entry of addressData) {
+        const csvCity = (entry.City || "").toLowerCase().trim();
+        const csvBarangay = (entry.Barangay || "").toLowerCase().trim();
+        const csvZipCode = (entry.ZipCode || "").toLowerCase().trim();
+
+        if (normalizedAddress.includes(csvCity)) {
+            city = entry.City;
+            barangay = csvBarangay;
+            zipCode = entry.ZipCode;
             break;
         }
     }
 
-    if (!matchedEntry) {
+    if (!city) {
         console.warn("❌ No matching city found in CSV.");
         return { remainingAddress: address };
     }
 
-    return matchedEntry;
+    console.log(`✅ Matched City: ${city}, Barangay: ${barangay}, Zip: ${zipCode}`);
+
+    // Remove matched parts from the address
+    let remainingAddress = normalizedAddress
+        .replace(new RegExp(city, "i"), "")
+        .replace(new RegExp(barangay, "i"), "")
+        .replace(new RegExp(zipCode, "i"), "")
+        .trim();
+
+    return {
+        city,
+        barangay,
+        zipCode,
+        remainingAddress
+    };
 }
 
 function cleanRemainingAddress(address, matchedEntry) {
@@ -433,14 +452,11 @@ async function handleUploadAndProcess(data) {
 async function populateFields(data) {
     console.log('Populating fields with data:', data);
 
+    await loadAddressData();  // ✅ Ensures CSV is fully loaded before proceeding
+
     const normalizedData = normalizeOcrData(data);
     console.log('Normalized OCR data:', normalizedData);
 
-    if (Object.keys(addressData).length === 0) {
-        console.warn("⚠️ CSV data not yet loaded. Retrying...");
-        setTimeout(() => populateFields(data), 500); // Retry after 500ms
-        return;
-    }
     function setValue(fieldId, value) {
         if (!value) return;
 
@@ -553,6 +569,7 @@ async function populateFields(data) {
 
     console.log('Field population complete');
 }
+
 
 function getCookie(name) {
     let cookieValue = null;
