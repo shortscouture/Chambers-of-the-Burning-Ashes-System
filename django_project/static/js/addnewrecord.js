@@ -355,14 +355,14 @@ function parseCSV(csvText) {
     const rows = csvText.split("\n").map(row => row.trim()).filter(row => row);
     const data = {};
 
-    for (let i = 1; i < rows.length; i++) {  // Skip header row
+    for (let i = 1; i < rows.length; i++) {  
         const cols = rows[i].split(",");
 
-        if (cols.length < 4) continue;  // Ensure all columns exist
+        if (cols.length < 4) continue;  
 
         const region = cols[0].trim();
         const province = cols[1].trim();
-        const cityOrMunicipality = cols[2].trim().toLowerCase();  // Normalize city name
+        const cityOrMunicipality = cols[2].trim().toLowerCase();  
         const zipCode = cols[3].trim();
 
         data[cityOrMunicipality] = { 
@@ -377,61 +377,51 @@ function parseCSV(csvText) {
 
 
 
-
 function extractAddressDetails(address) {
     console.log("📌 Checking Address Against CSV Data...");
 
-    if (!addressData || addressData.length === 0) {
-        console.warn("❌ CSV data is empty or not loaded.");
-        return { remainingAddress: address };
+    if (!Array.isArray(addressData) || addressData.length === 0) {
+        console.warn("⚠️ CSV data not yet loaded. Retrying...");
+        return { remainingAddress: address };  
     }
 
-    let city = "";
-    let barangay = "";
-    let zipCode = "";
-
-    // Normalize address for better matching
-    const normalizedAddress = address.toLowerCase().replace(/\s+/g, ' ').trim();
-
-    for (const entry of addressData) {
-        const csvCity = (entry.City || "").toLowerCase().trim();
-        const csvBarangay = (entry.Barangay || "").toLowerCase().trim();
-        const csvZipCode = (entry.ZipCode || "").toLowerCase().trim();
-
-        if (normalizedAddress.includes(csvCity)) {
-            city = entry.City;
-            barangay = csvBarangay;
-            zipCode = entry.ZipCode;
+    address = address.replace(/\bPhilippines\b/g, "").replace(/\bCity\b/g, "").replace(/\bProvince\b/g, "").trim();
+    
+    let matchedData = null;
+    
+    for (let entry of addressData) {
+        if (address.includes(entry.city)) {
+            matchedData = entry;
             break;
         }
     }
 
-    if (!city) {
-        console.warn("❌ No matching city found in CSV.");
+    if (!matchedData) {
+        for (let entry of addressData) {
+            if (address.includes(entry.zip_code)) {
+                matchedData = entry;
+                break;
+            }
+        }
+    }
+
+    if (!matchedData) {
+        console.warn("❌ No matching city or ZIP code found in CSV.");
         return { remainingAddress: address };
     }
 
-    console.log(`✅ Matched City: ${city}, Barangay: ${barangay}, Zip: ${zipCode}`);
-
-    // Remove matched parts from the address
-    let remainingAddress = normalizedAddress
-        .replace(new RegExp(city, "i"), "")
-        .replace(new RegExp(barangay, "i"), "")
-        .replace(new RegExp(zipCode, "i"), "")
-        .trim();
-
     return {
-        city,
-        barangay,
-        zipCode,
-        remainingAddress
+        city: matchedData.city || "",
+        barangay: matchedData.barangay || "",
+        zip_code: matchedData.zip_code || "",
+        remainingAddress: address.replace(matchedData.city, "").replace(matchedData.zip_code, "").trim(),
     };
 }
+
 
 function cleanRemainingAddress(address, matchedEntry) {
     let cleanedAddress = address;
     
-    // Remove city, province, and zip from the extracted address
     cleanedAddress = cleanedAddress.replace(matchedEntry.City_or_Municipality, "").trim();
     cleanedAddress = cleanedAddress.replace(matchedEntry.Province, "").trim();
     cleanedAddress = cleanedAddress.replace(matchedEntry.ZipCOde, "").trim();
