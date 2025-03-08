@@ -324,18 +324,23 @@ function normalizeOcrData(data) {
 let addressData = [];
 
 
-async function loadAddressData() {
-    try {
-        const response = await fetch('/static/csv/PHLZipCodes.csv'); 
-        if (!response.ok) throw new Error(`Failed to load CSV: ${response.statusText}`);
+function loadAddressData() {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const response = await fetch('/static/csv/PHLZipCodes.csv'); 
+            if (!response.ok) throw new Error(`Failed to load CSV: ${response.statusText}`);
 
-        const csvText = await response.text();
-        addressData = parseCSV(csvText);
-        console.log("CSV Loaded Successfully:", addressData);
-    } catch (error) {
-        console.error("Error loading CSV:", error);
-    }
+            const csvText = await response.text();
+            addressData = parseCSV(csvText);
+            console.log("✅ CSV Loaded Successfully:", addressData);
+            resolve(); 
+        } catch (error) {
+            console.error("❌ Error loading CSV:", error);
+            reject(error);
+        }
+    });
 }
+
 
 
 function parseCSV(csvText) {
@@ -349,43 +354,79 @@ function parseCSV(csvText) {
 
         const region = cols[0].trim();
         const province = cols[1].trim();
-        const city = cols[2].trim().toLowerCase();  // Normalize city name
+        const cityOrMunicipality = cols[2].trim().toLowerCase();  // Normalize city name
         const zipCode = cols[3].trim();
 
-        data[city] = { region, province, city, zipCode };
+        data[cityOrMunicipality] = { 
+            Region: region, 
+            Province: province, 
+            City_or_Municipality: cityOrMunicipality, 
+            ZipCOde: zipCode 
+        };
     }
     return data;
 }
 
 
 
-function extractAddressDetails(address) {
-    if (!address || Object.keys(addressData).length === 0) return {};
 
-    const addressLower = address.toLowerCase();
+function extractAddressDetails(address) {
+    if (!address || Object.keys(addressData).length === 0) {
+        console.warn("⚠️ Address data is empty or not loaded.");
+        return {};
+    }
+
+    console.log("📌 Checking Address Against CSV Data...");
+
+    const addressLower = address.toLowerCase().trim();
     let matchedEntry = null;
 
-    for (const city in addressData) {
-        if (addressLower.includes(city) || addressLower.includes(addressData[city].zipCode)) {
-            matchedEntry = addressData[city];
+    for (const key in addressData) {
+        const cityEntry = addressData[key].City_or_Municipality.toLowerCase().trim();
+        const provinceEntry = addressData[key].Province.toLowerCase().trim();
+        const regionEntry = addressData[key].Region.toLowerCase().trim();
+        const zipEntry = addressData[key].ZipCOde.toLowerCase().trim();
+
+        // 🔍 Check if city name appears anywhere in the address
+        if (addressLower.includes(cityEntry) || addressLower.includes(zipEntry)) {
+            matchedEntry = {
+                city: addressData[key].City_or_Municipality,
+                province: addressData[key].Province,
+                region: addressData[key].Region,
+                zipCode: addressData[key].ZipCOde,
+                remainingAddress: cleanRemainingAddress(address, addressData[key])
+            };
+            console.log(`✅ Match Found: ${matchedEntry.city} →`, matchedEntry);
             break;
         }
     }
 
-    if (matchedEntry) {
-        return {
-            city: matchedEntry.city || "",
-            province: matchedEntry.province || "",
-            region: matchedEntry.region || "",
-            zipCode: matchedEntry.zipCode || "",
-            remainingAddress: address
-                .replace(matchedEntry.city, "")
-                .replace(matchedEntry.zipCode, "")
-                .trim()
-        };
+    if (!matchedEntry) {
+        console.warn("❌ No matching city found in CSV.");
+        return { remainingAddress: address };
     }
 
-    return { remainingAddress: address };
+    return matchedEntry;
+}
+
+function cleanRemainingAddress(address, matchedEntry) {
+    let cleanedAddress = address;
+    
+    // Remove city, province, and zip from the extracted address
+    cleanedAddress = cleanedAddress.replace(matchedEntry.City_or_Municipality, "").trim();
+    cleanedAddress = cleanedAddress.replace(matchedEntry.Province, "").trim();
+    cleanedAddress = cleanedAddress.replace(matchedEntry.ZipCOde, "").trim();
+
+    return cleanedAddress;
+}
+
+async function handleUploadAndProcess(data) {
+    try {
+        await loadAddressData(); // ✅ Waits until CSV is loaded
+        populateFields(data);
+    } catch (error) {
+        console.error("❌ Failed to load CSV before populating fields:", error);
+    }
 }
 
 
@@ -395,6 +436,11 @@ async function populateFields(data) {
     const normalizedData = normalizeOcrData(data);
     console.log('Normalized OCR data:', normalizedData);
 
+    if (Object.keys(addressData).length === 0) {
+        console.warn("⚠️ CSV data not yet loaded. Retrying...");
+        setTimeout(() => populateFields(data), 500); // Retry after 500ms
+        return;
+    }
     function setValue(fieldId, value) {
         if (!value) return;
 
@@ -419,7 +465,7 @@ async function populateFields(data) {
         'lastname': 'id_last_name',
         'address': 'id_address_line_1',
         'permanentaddress': 'id_address_line_1',
-        'currentaddress': 'id_address_line_2',
+        'currentaddress': 'id_address_line_1',
         'emailaddress': 'id_email_address',
         'landlinenumbers': 'id_landline_number',
         'landlinenumber': 'id_landline_number',
@@ -490,28 +536,19 @@ async function populateFields(data) {
 
     setValue('id_urns_per_columbary', '1'); 
 
-    // Extract Address and Match it to the CSV
-    if (normalizedData.address) {
-        const addressParts = normalizedData.address.toLowerCase().split(',');
-        
-        let foundCity = null;
-        for (let part of addressParts) {
-            const cityName = part.trim();
-            if (addressData[cityName]) {
-                foundCity = addressData[cityName];
-                break;
-            }
-        }
+    const extractedAddress = normalizedData.currentaddress || "";
+    if (extractedAddress) {
+        console.log("Extracted Address:", extractedAddress);
+        const addressDetails = extractAddressDetails(extractedAddress);
 
-        if (foundCity) {
-            console.log("Matched Address Data:", foundCity);
-            setValue('id_city', foundCity.city || '');
-            setValue('id_province', foundCity.province || '');
-            setValue('id_region', foundCity.region || '');
-            setValue('id_zip_code', foundCity.zip || '');
-        } else {
-            console.warn("No matching city found in CSV.");
-        }
+        console.log("Parsed Address Details:", addressDetails);
+
+        setValue('id_city', addressDetails.city);
+        setValue('id_province', addressDetails.province);
+        setValue('id_zip_code', addressDetails.zipCode);
+        setValue('id_address_line_1', addressDetails.remainingAddress);
+    } else {
+        console.warn("No address found in OCR data.");
     }
 
     console.log('Field population complete');
