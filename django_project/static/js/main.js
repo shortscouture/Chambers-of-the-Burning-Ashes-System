@@ -77,18 +77,18 @@ jQuery(document).ready(function($) {
 });
 
 function showInfoBox(event) {
-  event.stopPropagation();
-  document.getElementById('infobox').style.display = 'block';
-  document.addEventListener('click', hideInfoBox);
+  event.preventDefault();
+  var infobox = document.getElementById('infobox');
+  infobox.style.display = 'block';
 }
 
-function hideInfoBox(event) {
-  const infobox = document.getElementById('infobox');
-  if (!infobox.contains(event.target)) {
-    infobox.style.display = 'none';
-    document.removeEventListener('click', hideInfoBox);
+document.addEventListener('click', function(event) {
+  var infobox = document.getElementById('infobox');
+  var openInfobox = document.querySelector('a[onclick="showInfoBox(event)"]');
+  if (infobox.style.display === 'block' && !infobox.contains(event.target) && event.target !== openInfobox) {
+      infobox.style.display = 'none';
   }
-}
+});
 
 function toggleChat() {
   let chatContainer = document.getElementById("chatContainer");
