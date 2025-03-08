@@ -28,6 +28,8 @@ embeddings = OpenAIEmbeddings(openai_api_key=OPEN_AI_API_KEY)
 vector_db = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
 
 
+
+
 # Create LangGraph Workflow
 workflow = Graph()
 
