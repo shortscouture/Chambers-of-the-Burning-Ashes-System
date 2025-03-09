@@ -10,7 +10,8 @@ class ChatbotAPIView(APIView):
         if not user_query:
             return Response({"error": "Query cannot be empty"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Run the chatbot workflow
         result = chatbot.invoke({"query": user_query})
 
-        return Response(result["response"], status=status.HTTP_200_OK)
+        # Extract "answer" directly instead of nesting it inside "response"
+        bot_response = result.get("response", {})
+        return Response({"response": bot_response.get("answer", "No response from bot")}, status=status.HTTP_200_OK)
