@@ -378,34 +378,36 @@ function extractAddressDetails(address) {
 
     if (!Array.isArray(addressData) || addressData.length === 0) {
         console.warn("⚠️ CSV data not yet loaded. Retrying...");
-        return { remainingAddress: address };  
+        return { remainingAddress: address };
     }
 
-    console.log("🔍 CSV Data Sample:", addressData.slice(0, 5)); // Debug CSV data
-    console.log("🔍 Extracted Address:", address);
+    // Normalize the input address
+    address = address.replace(/\bPhilippines\b/g, "")
+                     .replace(/\bCity\b/g, "")
+                     .replace(/\bProvince\b/g, "")
+                     .trim();
 
-    // Normalize input address
-    address = address.replace(/\b(Philippines|City|Province)\b/g, "").trim();
-    
     let matchedData = null;
 
-    // Try matching by city first
-    for (let entry of addressData) {
+    // Ensure CSV data is cleaned before matching
+    const cleanedAddressData = addressData.map(entry => ({
+        city: entry.city.replace(/"/g, "").trim(),
+        province: entry.province.replace(/"/g, "").trim(),
+        zip_code: entry.zip_code.replace(/"/g, "").trim()
+    }));
+
+    // First try to match by city
+    for (let entry of cleanedAddressData) {
         if (address.toLowerCase().includes(entry.city.toLowerCase())) {
             matchedData = entry;
             break;
         }
     }
 
-    // Extract ZIP code from the address
-    let zipRegex = /\b\d{4}\b/;
-    let extractedZip = address.match(zipRegex)?.[0];
-    console.log("🔍 Extracted ZIP Code:", extractedZip);
-
-    // If no city match, try by ZIP code
-    if (!matchedData && extractedZip) {
-        for (let entry of addressData) {
-            if (entry.zip_code.trim() === extractedZip.trim()) {
+    // If no match by city, try by zip code
+    if (!matchedData) {
+        for (let entry of cleanedAddressData) {
+            if (address.includes(entry.zip_code)) {
                 matchedData = entry;
                 break;
             }
@@ -417,13 +419,12 @@ function extractAddressDetails(address) {
         return { remainingAddress: address };
     }
 
-    console.log("✅ Matched Entry:", matchedData);
-
+    // Clean up the remaining address
     let remainingAddress = address
-        .replace(new RegExp(`\\b${matchedData.city}\\b`, 'i'), '')
-        .replace(new RegExp(`\\b${matchedData.zip_code}\\b`, 'i'), '')
-        .replace(/,\s*,/g, ',')
-        .replace(/\s+/g, ' ')
+        .replace(new RegExp(matchedData.city, 'i'), '')
+        .replace(matchedData.zip_code, '')
+        .replace(/,\s*,/g, ',') // Remove double commas
+        .replace(/\s+/g, ' ')   // Normalize spaces
         .trim();
 
     return {
@@ -499,6 +500,7 @@ async function populateFields(data) {
             'mobileno': 'id_mobile_number',
             'telno': 'id_landline_number',
             'beneficiaries': 'id_first_beneficiary_name',
+            'zip_code': 'id_postal_code',
         };
 
         let firstName = '';
@@ -573,8 +575,8 @@ async function populateFields(data) {
 
             // Only set these fields if we have valid data
             if (addressDetails.city) setValue('id_city', addressDetails.city);
-            if (addressDetails.province) setValue('id_province', addressDetails.province);
-            if (addressDetails.zipCode) setValue('id_zip_code', addressDetails.zipCode);
+            if (addressDetails.province) setValue('id_province_or_state', addressDetails.province);
+            if (addressDetails.zipCode) setValue('id_postal_code', addressDetails.zipCode);
             
             // Always set the address line, either the parsed one or the original
             setValue('id_address_line_1', addressDetails.remainingAddress || extractedAddress);
