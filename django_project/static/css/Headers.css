@@ -101,10 +101,12 @@ nav{
 
 .logohead{
   width: 350px;
-  margin-left: -95px;
+  margin-left: 100px;
   margin-top: -95px;
   z-index: 2;
 }
+
+
 
 /* Style for navigation icons */
 .headname li a {
