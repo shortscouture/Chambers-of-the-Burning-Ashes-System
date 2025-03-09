@@ -566,12 +566,12 @@ async function populateFields(data) {
             const foundBeneficiaries = [];
             
             for (const name of expectedBeneficiaries) {
-                // Create a simpler version of each name for fuzzy matching
+
                 const nameParts = name.split(' ');
                 const firstName = nameParts[0];
                 const lastName = nameParts[nameParts.length - 1];
                 
-                // Check if both first and last name appear in the text
+
                 if (beneficiaryText.includes(firstName) && beneficiaryText.includes(lastName)) {
                     foundBeneficiaries.push(name);
                 }
@@ -613,12 +613,12 @@ async function populateFields(data) {
 
             console.log("Parsed Address Details:", addressDetails);
 
-            // Only set these fields if we have valid data
+
             if (addressDetails.city) setValue('id_city', addressDetails.city);
             if (addressDetails.province) setValue('id_province_or_state', addressDetails.province);
             if (addressDetails.zipCode) setValue('id_postal_code', addressDetails.zipCode);
             
-            // Always set the address line, either the parsed one or the original
+
             setValue('id_address_line_1', addressDetails.remainingAddress || extractedAddress);
         } else {
             console.warn("No address found in OCR data.");
