@@ -7,17 +7,17 @@
 .chat-wrapper {
     position: fixed; /* Keep it fixed in the viewport */
     bottom: 20px;
-    right: 60px;
+    right: 20px;
     width: 300px;
     background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 5px;
     display: none; /* Initially hidden */
-    z-index: 21; /* Ensure it's on top */
+    z-index: 21;
+    border-radius: 5px; /* Ensure it's on top */
 }
 .chat-title-container {
     text-align: center; /* Center the title */
-    margin-bottom: 10px; /* Add some space below */
+    margin-bottom: 10px;
+    margin-top: 10px; /* Add some space below */
 }
 
 .chat-title-container h3 {
@@ -25,8 +25,12 @@
 }
 .chat-title {
     font-weight: bold;
-    margin-right: auto; /* Push the title to the left */
-    /* Add any other styling you want for the title */
+    margin-right: auto;
+    color:#fff;
+    bottom: 20px;
+    margin-bottom: 5px;
+    margin-top: 5px; 
+    font-family: 'Open Sans', arial, sans-serif;
 }
 
 .chat-header {
@@ -34,7 +38,12 @@
     justify-content: flex-end; /* Align close button to the right */
     padding: 5px;
     border-bottom: 1px solid #ccc;
-    z-index:21
+    z-index:21;
+    background-color: #4594EE;
+    bottom: 20px;
+    border-top-left-radius:  5px;
+    border-top-right-radius:  5px;
+
   }
   
   .close-btn {
@@ -54,6 +63,7 @@
     flex-direction: column;
     gap: 10px;
     height: 300px;
+    border-radius: 15px;
 }
 body {
     /* Extend the background (example - customize as needed) */
@@ -65,7 +75,7 @@ body {
 
 /* User message bubble (align right) */
 .chatbox .user-message {
-    background-color: #007bff;
+    background-color: #4594EE;
     color: white;
     padding: 10px;
     border-radius: 15px;
@@ -86,12 +96,22 @@ body {
     word-wrap: break-word;
     margin-bottom: 10px; /* Consistent margin */
 }
+.chatbox-header {
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+
+.chatbox-footer {
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
 
 /* Input container */
 .input-container {
     display: flex; /* Keep the input and button in a row */
     padding: 10px;
-    background-color: #f8f8f8;
+    background-color: #F1F1F1;
+    border-radius: 5px;
 }
 
 /* Input field styling */
@@ -105,7 +125,7 @@ body {
 
 /* Send button styling */
 .send-btn {
-    background-color: #007bff;
+    background-color: #4594EE;
     color: white;
     padding: 10px 15px; /* Adjust padding for button size */
     border-radius: 5px; /* Consistent border radius */
@@ -116,19 +136,27 @@ body {
 /* Bot button (fixed position) */
 .Bot {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #007bff;
+    bottom: 30px;
+    right: 30px;
+    background-color: #4594EE;
     color: white;
-    padding: 15px;
+    padding: 10px;
     border-radius: 50%;
     cursor: pointer;
     z-index: 20; /* Ensure the button is below the chatbox */
+    
 }
 
+
 .Bot svg {
-    width: 30px;
-    height: 30px;
+    width: 50px;
+    height: 50px;
+
+}
+.Bot:hover {
+    background-color: #0056b3;
+    color: white;
+    transition: ease-in 0.25s;
 }
 
 /* Optional: Style the scrollbar */
@@ -144,3 +172,4 @@ body {
     background: #888;
     border-radius: 4px;
 }
+
