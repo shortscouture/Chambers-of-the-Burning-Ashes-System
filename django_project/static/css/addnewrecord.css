@@ -1,252 +1,184 @@
+/* addnewrecord.css */
+
 /* General Styling */
 body {
-  font-family: 'Arial', sans-serif;
-  background-color: #f0f0f0;
-  color: #333;
+  background: #dbeafe;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
   padding: 0;
 }
 
-/* Container for the page */
+/* Container */
 .container {
   max-width: 800px;
   margin: 2rem auto;
   padding: 2rem;
-  background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white background */
-  border-radius: 15px;
-  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-left: 3px solid #0078d4;
+  border-bottom: 3px solid #969696;
+
 }
 
 /* Form Title */
 h2 {
-  font-size: 24px;
-  text-align: center;
-  color: #333;
-  margin-bottom: 20px;
+  font-size: 28px;
+  font-weight: 600;
+  color: #201f1e;
+  margin-bottom: 24px;
 }
 
 /* Card Styling */
 .card {
   border: none;
-  border-radius: 10px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white background */
+  border-radius: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 10px;
+  border-left: 7px solid #0078d4;
 }
 
+
 .card-header {
-  background-color: #007bff;
-  color: white;
-  border-radius: 10px 10px 0 0;
-  padding: 1rem;
+  background-color: #0078d4;
+  color: #ffffff;
+  border-radius: 8px 8px 0 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 22px; 
+  font-weight: bold;
+  padding: .1rem 2rem
+
 }
 
 .card-body {
   padding: 1.5rem;
 }
 
-/* Input fields styling */
-input[type="text"], input[type="tel"], input[type="email"], input[type="date"], select, textarea {
+/* Input Fields */
+input,
+select,
+textarea {
   width: 100%;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  background-color: #f8f9fa;
-  font-size: 16px;
-  color: #333;
-  transition: border-color 0.3s ease;
-  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 4px;
+  border: 1px solid #c8c8c8;
+  background-color: #fff;
+  font-size: 14px;
+  color: #201f1e;
+  transition: border-color 0.2s ease;
+  margin-bottom: 12px;
 }
 
-input[type="text"]:focus, input[type="tel"]:focus, input[type="email"]:focus, select:focus, textarea:focus {
-  border-color: #007bff;
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #0078d4;
   outline: none;
-}
-
-/* Placeholder text styling */
-input::placeholder, textarea::placeholder {
-  color: #aaa;
+  box-shadow: 0 0 0 1px #0078d4;
 }
 
 /* Buttons */
-.btn {
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 16px;
+.btn, .submit-button, .go-back-button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.btn-primary {
-  background-color: #007bff;
+  transition: background-color 0.2s ease;
   border: none;
+  background-color: #0078d4;
   color: white;
 }
 
-.btn-primary:hover {
-  background-color: #0056b3;
+.btn:hover, .submit-button:hover, .go-back-button:hover {
+  background-color: #005a9e;
 }
 
+/* Secondary Buttons */
 .btn-secondary {
-  background-color: #6c757d;
-  border: none;
-  color: white;
+  background-color: #f3f2f1;
+  color: #201f1e;
 }
 
 .btn-secondary:hover {
-  background-color: #5a6268;
+  background-color: #e1dfdd;
 }
 
-.btn-success {
-  background-color: #28a745;
-  border: none;
-  color: white;
-}
-
-.btn-success:hover {
-  background-color: #218838;
-}
-
-/* Label Styling */
+/* Labels */
 label {
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 5px;
-  display: inline-block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  display: block;
+  color: #201f1e;
 }
 
-/* Responsive Design */
+/* Responsive */
 @media (max-width: 768px) {
   .container {
       padding: 1rem;
-      width: 100%;
+      width: 90%;
   }
 }
 
-/* Form Styling */
+/* Form */
 form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
-/* Fieldset Styling */
+/* Fieldset */
 fieldset {
-  padding: 20px;
-  border: none;
-  background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white background */
-  border-radius: 8px;
-  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  border: 1px solid #c8c8c8;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 legend {
-  font-size: 1.2rem;
+  font-size: 16px;
   font-weight: 600;
-  color: #333;
-  margin-bottom: 10px;
+  color: #201f1e;
+  margin-bottom: 8px;
 }
 
-/* Additional Hover and Focus Effects */
-input[type="text"]:hover, input[type="email"]:hover, textarea:hover {
-  background-color: #fafafa;
+/* Placeholder Text */
+input::placeholder, textarea::placeholder {
+  color: #6a6a6a;
 }
 
-input[type="date"] {
-  padding: 12px 16px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
-  width: 100%;
-  background-color: #f8f8f8;
-}
-
-input[type="date"]:focus {
-  border-color: #007bff;
-  outline: none;
-}
-
-.ocr-section {
-  margin-bottom: 2em;
-  padding: 1em;
-  background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white background */
-  border-radius: 5px;
-}
-
-.capture-options {
+/* Button Container */
+.button-container {
   display: flex;
-  gap: 1em;
-  margin-bottom: 1em;
-}
-
-.capture-option {
-  padding: 0.5em 1em;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.capture-option.active {
-  background-color: #0056b3;
-}
-
-#webcam-container {
-  display: none;
-  margin: 1em 0;
-}
-
-#webcam-view {
-  width: 100%;
-  max-width: 640px;
-  margin-bottom: 1em;
-}
-
-#capture-controls {
-  display: flex;
-  gap: 1em;
-  margin-bottom: 1em;
-}
-
-.camera-button {
-  padding: 0.5em 1em;
-  background-color: #28a745;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.camera-button:hover {
-  background-color: #218838;
-}
-
-#captured-image {
-  display: none;
-  max-width: 640px;
-  margin: 1em 0;
-}
-
-.file-upload {
-  display: none;
-  margin: 1em 0;
-}
-
-.processing-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: none;
-  justify-content: center;
+  gap: 10px;
+  justify-content: flex-start;
+  margin-top: 15px;
   align-items: center;
-  z-index: 1000;
 }
 
-.processing-message {
-  background: white;
-  padding: 2em;
-  border-radius: 8px;
-  text-align: center;
+.go-back-button {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+
+.row .col-md-4, .row .col-md-6 {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Improve form responsiveness */
+@media (max-width: 768px) {
+  .row .col-md-4, .row .col-md-6 {
+      flex: 0 0 100%;
+  }
+}
+
+/* Adjust spacing */
+.row {
+  margin-bottom: 10px;
 }

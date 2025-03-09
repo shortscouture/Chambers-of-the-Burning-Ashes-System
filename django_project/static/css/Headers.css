@@ -1,6 +1,6 @@
 /* Header style for staff headers */
   
-.container {  
+.staffcontainer {  
   padding: 10px 10%;
   margin: -10px;
   margin-top: auto;
@@ -16,7 +16,7 @@
 }
 
 /* Semi-transparent overlay */
-.container::before {
+.staffcontainer::before {
   content: "";
   position: absolute;
   top: 0;
@@ -36,20 +36,20 @@ nav{
   flex-wrap: absolute;
 }
 
-.logo{
+.stafflogo{
   width: 90px;
   margin-left: -400px;
   margin-top: -400px;
 }
 
-.menu{
+.staffmenu{
   width: 90px;
   position: fixed;
   margin-left: 1250px;
 }
 
   
-.menu-box{
+.staffmenu-box{
   width: 10%;
   height: 30%;
   background: rgb(8, 61, 3);
@@ -61,7 +61,7 @@ nav{
   display: none;
 }
 
-.links a{
+.stafflinks a{
   text-decoration: none;
   color:white;
   display: block;
@@ -70,7 +70,7 @@ nav{
   font-size: 28;
 }
 
-.links a::after{
+.stafflinks a::after{
   content: '';
   width: 30px;
   height: 5px;
@@ -79,19 +79,19 @@ nav{
   margin-left: 10px;
   margin-bottom: 5px;
 }
-.links a:hover{
+.stafflinks a:hover{
   font-weight: 700;
 }
-.links a:hover::after{
+.stafflinks a:hover::after{
   display: inline-block;
 }
 
-.close{
+.staffclose{
   width: 40px;
   cursor: pointer;
 }
 
-.right-L{
+.staffright-L{
   position: absolute;
   top: 30px;
   right: 30px;
