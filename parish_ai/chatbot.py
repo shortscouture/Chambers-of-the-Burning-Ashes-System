@@ -197,7 +197,6 @@ def generate_response(state: dict):
         response_prompt = f"""
         Given the following context, which is a question and answer pair: '{context}'
         Extract and return only the answer from the context. 
-        Make it clear that the information comes from the church records and not from the database I am feeding you.
         """
         human_response = llm.invoke([HumanMessage(content=response_prompt)]).content
         return {"response": {"answer": human_response, "source": "FAISS"}}
