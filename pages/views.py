@@ -219,8 +219,8 @@ class DashboardView(TemplateView):
             .order_by("holder_of_privilege__issuance_date")
         )
 
-        class DashboardView(TemplateView):
-            template_name = "dashboard.html"
+class DashboardView(TemplateView):
+    template_name = "dashboard.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -258,6 +258,16 @@ class DashboardView(TemplateView):
         # Separate vacant and occupied columbaries
         vacant_columbaries = filtered_columbaries.filter(status="Vacant")
         occupied_columbaries = filtered_columbaries.filter(status="Occupied")
+        
+        context["occupied_columbaries"] = [
+            {
+                "vault_id": record.vault_id,
+                "customer_name": record.customer.full_name() if record.customer else "No Customer",
+                "inurnment_date": record.inurnment_date,
+                "expiration_date": record.expiration_date,  # Add calculated expiration date
+            }
+            for record in occupied_columbaries
+        ]
 
         # Count filtered columbaries
         vacant_columbaries_count = vacant_columbaries.count()
@@ -267,10 +277,6 @@ class DashboardView(TemplateView):
         payments = Payment.objects.all()
         if start_date and end_date:
             payments = payments.filter(created_at__date__range=[start_date, end_date])
-
-        # Count Payments
-        full_payment_count = payments.filter(mode_of_payment="Full Payment").count()
-        installment_count = payments.filter(mode_of_payment="6-Month Installment").count()
 
         # Earnings per month based on filtered payments
         earnings_by_month = (
@@ -282,24 +288,32 @@ class DashboardView(TemplateView):
         
         # Fetch Payment Records
         full_payment_records = Payment.objects.filter(mode_of_payment="Full Payment")
-        installment_payment_records = Payment.objects.filter(mode_of_payment="6-Month Installment").annotate(
+        # Retrieve installment payments and calculate total paid
+        installment_payments = Payment.objects.filter(mode_of_payment="6-Month Installment").annotate(
             total_installment_paid=Coalesce(
-                Sum(F("six_month_amount_1"), output_field=DecimalField()) + 
-                Sum(F("six_month_amount_2"), output_field=DecimalField()) + 
-                Sum(F("six_month_amount_3"), output_field=DecimalField()) + 
-                Sum(F("six_month_amount_4"), output_field=DecimalField()) + 
-                Sum(F("six_month_amount_5"), output_field=DecimalField()) + 
+                Sum(F("six_month_amount_1"), output_field=DecimalField()) +
+                Sum(F("six_month_amount_2"), output_field=DecimalField()) +
+                Sum(F("six_month_amount_3"), output_field=DecimalField()) +
+                Sum(F("six_month_amount_4"), output_field=DecimalField()) +
+                Sum(F("six_month_amount_5"), output_field=DecimalField()) +
                 Sum(F("six_month_amount_6"), output_field=DecimalField()), 
-                Value(0, output_field=DecimalField())
+                Value(0, output_field=DecimalField())  # Default to 0 if no payments
             )
         )
+
+        # Count Payments
+        full_payment_count = payments.filter(mode_of_payment="Full Payment").count()
+
+        # Define completed and unpaid installment counts
+        completed_installment_count = installment_payments.filter(total_installment_paid=F("total_amount")).count()
+        unpaid_installment_count = installment_payments.exclude(total_installment_paid=F("total_amount")).count()
 
         # Convert data for Chart.js
         earnings_labels = [entry["month"].strftime("%b %Y") if entry["month"] else "Unknown" for entry in earnings_by_month]
         earnings_data = [float(entry["total_earnings"]) if entry["total_earnings"] else 0 for entry in earnings_by_month]
 
-        payment_labels = ["Full Payment", "Installment"]
-        payment_data = [full_payment_count, installment_count]
+        payment_labels = ["Full Payment", "Completed Installment", "Unpaid Installment"]
+        payment_data = [full_payment_count, completed_installment_count, unpaid_installment_count]
 
         # Update context with ALL columbaries (ensures they are always passed)
         context.update({
@@ -311,14 +325,15 @@ class DashboardView(TemplateView):
             "pending_counts": pending_customers.count(),
             "unissued_columbary_records": unissued_columbaries,
             "pending_customers": pending_customers,
-            "payment_labels": mark_safe(json.dumps(payment_labels)),
-            "payment_data": mark_safe(json.dumps(payment_data)),
             "earnings_labels": mark_safe(json.dumps(earnings_labels)),
             "earnings_data": mark_safe(json.dumps(earnings_data)),
             "start_date": start_date.strftime("%Y-%m-%d") if start_date else "",
             "end_date": end_date.strftime("%Y-%m-%d") if end_date else "",
             "full_payment_records": full_payment_records,
-            "installment_payment_records": installment_payment_records,
+            "payment_labels": mark_safe(json.dumps(payment_labels)),
+            "payment_data": mark_safe(json.dumps(payment_data)),
+            "completed_installment_records": installment_payments.filter(total_installment_paid=F("total_amount")),
+            "unpaid_installment_records": installment_payments.exclude(total_installment_paid=F("total_amount")),
         })
 
         return context

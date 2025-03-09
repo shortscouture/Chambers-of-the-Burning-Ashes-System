@@ -90,9 +90,9 @@ h1 {
 
 .info-box h2 {
     display: flex;
-    align-items: justify;
+    align-items: center;
     width: 100%;
-    font-size: 17px;
+    font-size: 15px;
     font-weight: normal;
     font-family: sans-serif;
     color: #000000;
@@ -103,7 +103,7 @@ h1 {
 .info-icon {
     font-size: 30px; /* Adjust icon size */
     color: #0565cc; /* Adjust icon color */
-    margin-left: 20%; /* Add spacing between text and icon */
+    margin-left: 15%; /* Add spacing between text and icon */
     margin-right: 15px; /* Add spacing between text and icon */
 }
 

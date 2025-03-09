@@ -13,6 +13,8 @@
     display: none; /* Initially hidden */
     z-index: 21;
     border-radius: 5px; /* Ensure it's on top */
+    box-shadow: 4px 4px 6px rgba(0, 0, 0, 0.433);
+
 }
 .chat-title-container {
     text-align: center; /* Center the title */
@@ -133,6 +135,10 @@ body {
     border: none;
 }
 
+.send-btn:hover{
+    background-color: #0056b3;
+}
+
 /* Bot button (fixed position) */
 .Bot {
     position: fixed;
@@ -144,7 +150,7 @@ body {
     border-radius: 50%;
     cursor: pointer;
     z-index: 20; /* Ensure the button is below the chatbox */
-    
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.433);
 }
 
 
