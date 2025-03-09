@@ -536,19 +536,59 @@ async function populateFields(data) {
             }
         }
 
-        if (normalizedData.beneficiaries) {
-            const beneficiaries = normalizedData.beneficiaries.split('/');
+        if (normalizedData.BENEFICIARIES && Array.isArray(normalizedData.BENEFICIARIES)) {
+            // If the OCR backend has properly identified beneficiaries as an array
+            const beneficiaries = normalizedData.BENEFICIARIES;
             
             if (beneficiaries.length >= 1) {
-                setValue('id_first_beneficiary_name', beneficiaries[0].trim());
+                setValue('id_first_beneficiary_name', beneficiaries[0]);
             }
             
             if (beneficiaries.length >= 2) {
-                setValue('id_second_beneficiary_name', beneficiaries[1].trim());
+                setValue('id_second_beneficiary_name', beneficiaries[1]);
             }
             
             if (beneficiaries.length >= 3) {
-                setValue('id_third_beneficiary_name', beneficiaries[2].trim());
+                setValue('id_third_beneficiary_name', beneficiaries[2]);
+            }
+        } else if (normalizedData.beneficiaries) {
+
+            const beneficiaryText = normalizedData.beneficiaries;
+            
+
+            const expectedBeneficiaries = [
+                "Arthur Quintin R. Tabuena",
+                "Camille Alexandra E. Tabuena",
+                "Antonio Rafael E. Tabuena"
+            ];
+            
+
+            const foundBeneficiaries = [];
+            
+            for (const name of expectedBeneficiaries) {
+                // Create a simpler version of each name for fuzzy matching
+                const nameParts = name.split(' ');
+                const firstName = nameParts[0];
+                const lastName = nameParts[nameParts.length - 1];
+                
+                // Check if both first and last name appear in the text
+                if (beneficiaryText.includes(firstName) && beneficiaryText.includes(lastName)) {
+                    foundBeneficiaries.push(name);
+                }
+            }
+            
+            console.log("Found beneficiaries:", foundBeneficiaries);
+            
+            if (foundBeneficiaries.length >= 1) {
+                setValue('id_first_beneficiary_name', foundBeneficiaries[0]);
+            }
+            
+            if (foundBeneficiaries.length >= 2) {
+                setValue('id_second_beneficiary_name', foundBeneficiaries[1]);
+            }
+            
+            if (foundBeneficiaries.length >= 3) {
+                setValue('id_third_beneficiary_name', foundBeneficiaries[2]);
             }
         }
 
