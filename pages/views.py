@@ -69,11 +69,11 @@ class HomePageView(TemplateView):
     template_name = "pages/home.html"
 
 
+
 class AboutPageView(TemplateView):
     template_name = "pages/about.html"
 
-class MapView(TemplateView):
-    template_name= "Columbary_Map.html"
+
     
 class MainDashView(TemplateView):
     template_name = "pages/maindash.html"
