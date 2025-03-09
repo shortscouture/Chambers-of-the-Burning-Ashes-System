@@ -3,7 +3,7 @@
 .staffcontainer {  
   padding: 10px 10%;
   margin: -10px;
-  margin-top: auto;
+  margin-top: top;
   height: 130px;
   border-bottom: 0.1cm solid white; /* Add a solid white border to the bottom */
   background: url("/static/images/front.jpg") no-repeat center center;
@@ -11,7 +11,7 @@
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Add a dark shadow */
   border-radius: 1px; /* Optional: Add rounded corners for a smoother look */
   position: relative; /* Add a relative position */
-  width: 85%; 
+  width: 81%; 
   z-index: 2;
 }
 
