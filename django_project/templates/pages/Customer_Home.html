@@ -491,44 +491,46 @@ function toggleChat() {
 function sendMessage() {
     const userInput = document.getElementById('userInput').value;
     const chatbox = document.getElementById('chatbox');
-    
-    setTimeout(() => { // Small delay to ensure the element is rendered
-        chatbox.scrollTop = chatbox.scrollHeight;
-    }, 0); 
 
-    // Check if there's input and display user's message
     if (userInput.trim() !== '') {
+        // Display user message
         chatbox.innerHTML += `<div class="user-message">${userInput}</div>`;
-
-        // Clear the input field
         document.getElementById('userInput').value = '';
 
-        // Make a POST request to the chatbot API
-        fetch('/api/chatbot/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken,
-            },
-            body: JSON.stringify({ query: userInput })
-        })
-        .then(response => response.json())
-.then(data => {
-    console.log("Bot response:", data);  // Debugging step
+        // Show "Bot is typing..." message
+        const typingIndicator = document.createElement("div");
+        typingIndicator.classList.add("bot-message", "typing-indicator");
+        typingIndicator.innerHTML = "Bot is typing...";
+        chatbox.appendChild(typingIndicator);
+        chatbox.scrollTop = chatbox.scrollHeight;
 
-    const chatbox = document.getElementById('chatbox');
+        // Simulate slight delay before sending request (optional for UX)
+        setTimeout(() => {
+            fetch('/api/chatbot/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+                body: JSON.stringify({ query: userInput })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Remove "Bot is typing..." indicator only after getting response
+                typingIndicator.remove();
 
-    if (data.error) {
-        chatbox.innerHTML += `<div class="bot-message error">${data.error}</div>`;
-    } else {
-        // Ensure data.response is accessed properly
-        const botMessage = data.response || "No response from bot"; 
-        chatbox.innerHTML += `<div class="bot-message">${botMessage}</div>`;
-    }
-
-    // Scroll to the bottom of the chatbox
-    chatbox.scrollTop = chatbox.scrollHeight;
-})
+                // Display bot's response
+                const botMessage = data.response || "No response from bot";
+                chatbox.innerHTML += `<div class="bot-message">${botMessage}</div>`;
+                chatbox.scrollTop = chatbox.scrollHeight;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                typingIndicator.remove();
+                chatbox.innerHTML += `<div class="bot-message error">There was an error connecting to the bot.</div>`;
+                chatbox.scrollTop = chatbox.scrollHeight;
+            });
+        }, 500); // Small delay to make typing indicator visible
     }
 }
 document.addEventListener('DOMContentLoaded', function() {
