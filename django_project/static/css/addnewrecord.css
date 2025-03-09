@@ -182,3 +182,37 @@ input::placeholder, textarea::placeholder {
 .row {
   margin-bottom: 10px;
 }
+
+
+
+/* Make form rows flexible */
+.dynamic-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 25px; /* Increased spacing between elements */
+  justify-content: space-between; /* Distributes elements evenly */
+}
+
+/* Each input field should grow and shrink based on available space */
+.dynamic-row .form-group {
+  flex: 1 1 250px; /* Allows fields to expand but not too long */
+  min-width: 200px; /* Ensures fields don’t shrink too much */
+  max-width: 300px; /* Limits maximum field width */
+}
+
+/* Ensure inputs take full width inside their container */
+.dynamic-row .form-group input {
+  width: 70%;
+}
+
+/* Responsive: Stack fields on smaller screens */
+@media (max-width: 768px) {
+  .dynamic-row {
+      flex-direction: column; /* Stack fields vertically */
+  }
+}
+
+#id_suffix {
+  width: 100px; /* Set a fixed width */
+  max-width: 40px; /* Ensures it doesn’t expand too much */
+}
