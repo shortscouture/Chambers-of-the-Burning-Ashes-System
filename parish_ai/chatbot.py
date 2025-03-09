@@ -78,13 +78,6 @@ def retrieve_context(state):
         return {"query": query, "context": "FAISS Index Not Loaded"}
 
 
-
-def classify_intent(query):
-    intent_prompt = f"Classify the intent of the following query: '{query}'. Respond with only the intent label (e.g., 'farewell', 'information', 'greeting')."
-    intent = llm.invoke([HumanMessage(content=intent_prompt)]).content.strip().lower()
-    print(f"DEBUG: Intent for '{query}' is '{intent}'")
-    return intent
-
 def retrieve_context(state):
     query = state.get("query")
     if not query:
@@ -95,12 +88,10 @@ def retrieve_context(state):
         if retrieved_docs_with_scores:
             document, score = retrieved_docs_with_scores[0]
             print(f"DEBUG: FAISS score for '{query}' is {score}")
-            if score > 0.7:
-                context = document.page_content
-                print(f"DEBUG: FAISS context: {context}")
-                return {"query": query, "context": context}
-            else:
-                return {"query": query, "context": ""}
+            print(f"DEBUG: FAISS document: {document.page_content}") #added print statement
+            context = document.page_content
+            print(f"DEBUG: FAISS context: {context}")
+            return {"query": query, "context": context}
         else:
             return {"query": query, "context": ""}
     else:
@@ -108,11 +99,6 @@ def retrieve_context(state):
 
 def check_relevance(state: dict):
     query = state.get("query")
-    intent = classify_intent(query)
-    if intent in ("farewell", "greeting"):
-        print("Debug: intent was a greeting or farewell")
-        return {"relevant": False, "query": query, "context": ""}
-
     context = state.get("context", "")
     if not context:
         print("Debug: context was empty")
@@ -123,6 +109,8 @@ def check_relevance(state: dict):
     Determine if the user's query relates to parish information.
     Reply strictly in JSON format: {{"relevant": true}} or {{"relevant": false}}
     User query: {query}
+    Make sure you only get the answer from the parish_knowledge table when replying.
+    Don't take the user questions literally. Instead, focus on the intent behind the question. Find the most relevant question if possible.
     """
     try:
         response = llm.invoke([HumanMessage(content=relevance_prompt)]).content.strip()
@@ -136,24 +124,33 @@ def check_relevance(state: dict):
 
 def convert_to_sql(state: dict):
     user_query = state["query"]
-    sql_prompt = f"""
-    Given the user question: '{user_query}', generate a SQL query to retrieve the 'answer' from the 'parish_knowledge' table.
-    The table has columns 'question' and 'answer'.
-    Find the 'answer' that best corresponds to the meaning of the user's question, even if the exact wording is different.
-    Perform some level of fuzzy matching or semantic similarity to find the most relevant question in the database.
-    Do not take the user questions literally. Instead, focus on the intent behind the question. Find the most relevant question if possible.
-    
-    Examples:
-    User Question: 'Mass schedule?'
-    SQL Query: SELECT answer FROM parish_knowledge WHERE question LIKE '%mass times%';
+    context = state.get("context", "")
 
-    User Question: 'Tell me about the columbary.'
-    SQL Query: SELECT answer FROM parish_knowledge WHERE question LIKE '%columbary%';
+    if context:
+        sql_prompt = f"""
+        Given the following question and answer pair: '{context}', generate a SQL query to retrieve the 'answer' from the 'parish_knowledge' table.
+        The table has columns 'question' and 'answer'.
+        Generate a sql query that would return the answer from the context.
+        """
+    else:
+        sql_prompt = f"""
+        Given the user question: '{user_query}', generate a SQL query to retrieve the 'answer' from the 'parish_knowledge' table.
+        The table has columns 'question' and 'answer'.
+        Find the 'answer' that best corresponds to the meaning of the user's question, even if the exact wording is different.
+        Perform some level of fuzzy matching or semantic similarity to find the most relevant question in the database.
+        Do not take the user questions literally. Instead, focus on the intent behind the question. Find the most relevant question if possible.
+        
+        Examples:
+        User Question: 'Mass schedule?'
+        SQL Query: SELECT answer FROM parish_knowledge WHERE question LIKE '%mass times%';
 
-    User Question: '{user_query}'
-    SQL Query:
-    If you cannot find a similar match, check the database and give them the parish contact information which is also located inside the parish_knowledge table.
-    """
+        User Question: 'Tell me about the columbary.'
+        SQL Query: SELECT answer FROM parish_knowledge WHERE question LIKE '%columbary%';
+
+        User Question: '{user_query}'
+        SQL Query:
+        If you cannot find a similar match, check the database and give them the parish contact information which is also located inside the parish_knowledge table.
+        """
     sql_query = llm.invoke([HumanMessage(content=sql_prompt)]).content
     print("DEBUG: Generated SQL query ->", sql_query)
     return {"sql_query": sql_query, "attempts": 1, "query": state["query"]}
@@ -169,6 +166,7 @@ def execute_sql(state):
 
     try:
         result = db.execute(text(query)).fetchall()
+        print(f"DEBUG: SQL query result: {result}") #added print statement
         return {"sql_result": result, "query": state.get("query")}
     except Exception as e:
         return {"sql_result": None, "error": f"SQL Execution Error: {str(e)}", "query": state.get("query")}
@@ -188,27 +186,22 @@ def handle_sql_retries(state: dict):
             "query": state.get("query")}
 
 def generate_response(state: dict):
-    query = state.get("query")
-    intent = classify_intent(query)
-
-    if intent == "farewell":
-        return {"response": {"answer": "Goodbye!", "source": "Intent Classifier"}}
-
     sql_result = state.get("sql_result")
     context = state.get("context", "")
 
     if sql_result:
-        response_prompt = f"Format this database result in a polite and informative response: {sql_result}. Use this context to add more information: {context}"
+        response_prompt = f"Format this database result in a polite and informative response: {sql_result}. Use this context to add more information: {context}. Do not include any salutations or closing remarks."
         human_response = llm.invoke([HumanMessage(content=response_prompt)]).content
         return {"response": {"answer": human_response, "source": "parish_knowledge database and FAISS"}}
     elif context:
-        response_prompt = f"Based on the following context, provide a response: {context}"
+        response_prompt = f"""
+        Given the following context, which is a question and answer pair: '{context}'
+        Extract and return only the answer from the context.
+        """
         human_response = llm.invoke([HumanMessage(content=response_prompt)]).content
         return {"response": {"answer": human_response, "source": "FAISS"}}
     else:
         return {"response": {"answer": "I'm unable to find relevant information. Please contact the parish for more details.", "source": "None"}}
-
-# Define Nodes
 workflow.add_node("retrieve_context", retrieve_context)
 workflow.add_node("check_relevance", check_relevance)
 workflow.add_node("convert_to_sql", convert_to_sql)
