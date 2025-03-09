@@ -3,18 +3,25 @@
         
     }
 
+    .logo{
+        z-index: 1001;
+        cursor: pointer;
+    }
+    
     .hover-effect:hover {
         fill: blue;
     }
     #svg-container {
-        width: 1200px; /* Set the desired visible area */
-        height: 600px;
+        width: 500px; /* Set the desired visible area */
+        margin-bottom: 15.5px;
+        height: 539px;
         overflow: hidden;
         border: 1px solid #000;
         position: relative;
-        border-radius: 10px;
-        background-color: #ffffff86;
+        background-color: #dbeafe;;
         cursor: grab;
+        margin-left:640px ;
+        z-index: 999;
     }
     
     #svg-container:active{
@@ -22,7 +29,7 @@
     }
 
     body{
-        background-image: url(../images/Front.jpg);
+        background-image: url(../images/slide_03.jpg);
         background-size: cover;
         background-position: center; /* Centers the image */
         background-repeat: no-repeat; /* Prevents the image from repeating */
@@ -34,6 +41,44 @@
         overflow: hidden;
     }
 
+    #loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7); /* Dark transparent background */
+        display: flex;
+        backdrop-filter: blur(10px); /* Adds blur effect */
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        color: white;
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .legend img{
+        width: 80px;
+        height: 80px;
+        margin-left: 43%;
+        margin-top: 170px;
+        position: absolute;
+        z-index: 1000;
+    }
+
+    #loading-screen img {
+        width: 100px; /* Adjust size as needed */
+        height: auto;
+        margin-bottom: -20px;
+    }
+
+    #loading-text {
+        text-align: center;
+        max-width: 300px;
+    }
+
     #grab{
         cursor: grab; /* Default cursor */
     }
@@ -42,31 +87,34 @@
     }
 
 .popup {
-    display: none;
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.91);
+    background-color: #012b57;
     padding: 20px;
     width: 500px;
     height: 500px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 5);
-
+    margin-left:-200px; ;
 }
 .popup svg {
     width: 300px;
     height: auto;
     z-index: 1;
 }
-.overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+
+.logo{
+    position: absolute;
+    z-index: 1001;
+    margin-right: 78%;
+    margin-bottom: 43%;
+}
+
+#note{
+    font-family: sans-serif;
+    font-size: 15px;
+    text-align: left;
 }
 
 .container {
@@ -77,7 +125,7 @@
     margin: auto;
     padding: 20px;
     position: absolute;
-    margin-top: -290px;
+    margin-top: -350px;
     z-index: 1;
 }   
 .container svg{
@@ -94,14 +142,14 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: -250px;
+    margin-top: -300px;
     color: white;
-    font-family: 'lucida console';
+    font-family: 'Open Sans',sans-serif;
     z-index: 2;
 }
 
 .selected{
-    font-family: 'lucida console';
+    font-family: 'Open Sans',sans-serif;
     color: white;
     font-size: 30px;
 }
@@ -188,4 +236,8 @@ input:focus, select:focus {
 form {
     display: flex;
     flex-direction: column;
+}
+
+#zoomable-svg{
+    margin-bottom:10%;
 }
