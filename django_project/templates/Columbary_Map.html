@@ -2,12 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" href="../static/images/logo.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../../static/css/Map.css">
+    <link rel="stylesheet" href="../static/css/Map.css">
 </head>
 <body>
+<div class ="logo">
+  <img src ="../../static/images/St.Alphonsus.png" onclick="window.location.href='{% url 'Customer_Home' %}'" />
+</div>
+<div id="loading-screen">
+  <img src="../../static/images/loading.gif" alt="Loading..." />
+  <p id="loading-text">Loading...</p>
+</div>
+<div class = "legend">
+  <img src = "../../static/images/Legend.png" alt ="legend"/>
+</div>
 <div id="svg-container">
-<svg id="zoomable-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1200" height="600" zoomAndPan="magnify" viewBox="0 0 1440 809.999993" height="1080" preserveAspectRatio="xMidYMid meet" version="1.0">
+<svg id="zoomable-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="800" zoomAndPan="magnify" viewBox="250 0 1440 1300" height="1080" preserveAspectRatio="xMidYMid meet" version="1.0">
   <defs>
     <g>
     <clipPath id="4c4f4309db">
@@ -43141,6 +43152,7 @@
         {% include 'A-E_Vault.html' %}
     </svg>
   </div>
+
 
 
     
