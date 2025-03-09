@@ -8,6 +8,7 @@ from .views import (
     CustomerHomeView, MemorialView, send_letter_of_intent, verify_otp,
     memorials_verification, accept_letter_of_intent, decline_letter_of_intent,
     RecordsDetailsView, CustomerEditView, SuccesView, ChatbotAPIView, DashboardView, get_crypt_status, MapView, CustomerDeleteView,
+    get_vault_data,contact,
     get_vault_data, upload_and_process
 )
 
@@ -33,6 +34,7 @@ urlpatterns = [
     path('addnewrecord/', views.addnewrecord, name='addnewrecord'),
     path('delete_customer/<int:customer_id>/', CustomerDeleteView.as_view(), name='delete_customer'),
     path('get_vault_data/<str:section_id>/', get_vault_data, name='get_vault_data'),
+    path('contact/', contact, name='contact'),
     path('upload_and_process/', views.upload_and_process, name='upload_and_process'),  
     path('addnewcustomer/', views.addnewcustomer, name='addnewcustomer'),
 
