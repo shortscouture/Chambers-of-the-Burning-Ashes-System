@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "crispy_bootstrap5",
     "debug_toolbar",
     "cv2",
+    "rest_framework",
     # Local
     "accounts",
     "pages",
