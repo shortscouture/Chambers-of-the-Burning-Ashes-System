@@ -25,29 +25,19 @@ function sendMessage() {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': csrfToken,
             },
-            body: JSON.stringify({ query: userInput })
+            body: JSON.stringify({ message: userInput })
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log("Response Status:", response.status);
+            return response.json();
+        })
         .then(data => {
-            console.log("Bot response:", data);  // Debugging step
-        
-            const chatbox = document.getElementById('chatbox');
-        
-            if (data.error) {
-                chatbox.innerHTML += `<div class="bot-message error">${data.error}</div>`;
-            } else {
-                // Read "answer" instead of "response"
-                const botMessage = data.answer || "No response from bot"; 
-                chatbox.innerHTML += `<div class="bot-message">${botMessage}</div>`;
-            }
-        
-            chatbox.scrollTop = chatbox.scrollHeight;
+            console.log("Chatbot Response:", data);
         })
         .catch(error => {
             console.error('Fetch Error:', error);
-            chatbox.innerHTML += `<div class="bot-message error">There was an error connecting to the bot.</div>`;
-            chatbox.scrollTop = chatbox.scrollHeight;
         });
+    
     }
 }
 document.addEventListener('DOMContentLoaded', function() {

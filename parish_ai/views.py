@@ -12,6 +12,8 @@ class ChatbotAPIView(APIView):
 
         result = chatbot.invoke({"query": user_query})
 
-        # Extract "answer" directly instead of nesting it inside "response"
-        bot_response = result.get("response", {})
-        return Response({"response": bot_response.get("answer", "No response from bot")}, status=status.HTTP_200_OK)
+        # Extract "answer" directly and clean up quotes
+        bot_response = result.get("response", {}).get("answer", "No response from bot")
+        clean_response = bot_response.strip("'\"")  # Remove unnecessary quotes
+
+        return Response({"response": clean_response}, status=status.HTTP_200_OK)

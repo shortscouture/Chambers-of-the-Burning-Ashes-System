@@ -529,11 +529,6 @@ function sendMessage() {
     // Scroll to the bottom of the chatbox
     chatbox.scrollTop = chatbox.scrollHeight;
 })
-.catch(error => {
-    console.error('Fetch Error:', error);
-    chatbox.innerHTML += `<div class="bot-message error">There was an error connecting to the bot.</div>`;
-    chatbox.scrollTop = chatbox.scrollHeight;
-});
     }
 }
 document.addEventListener('DOMContentLoaded', function() {
