@@ -30,12 +30,14 @@ llm = ChatOpenAI(model="gpt-4", temperature=0.5, openai_api_key=OPEN_AI_API_KEY)
 embeddings = OpenAIEmbeddings(openai_api_key=OPEN_AI_API_KEY)
 
 
-index_path = "faiss_index"
+index_path = os.path.join(os.path.dirname(__file__), "faiss_index")
 if not os.path.exists(index_path):
     from .generate_faiss import generate_faiss_index
     generate_faiss_index()
-vector_db = FAISS.load_local(index_path, embeddings, allow_dangerous_deserialization=True)
-
+    vector_db = FAISS.load_local(index_path, embeddings, allow_dangerous_deserialization=True)
+else:
+    print("FAISS index not found. Make sure to run generate_faiss.py first.")
+    vector_db = None
 # Create LangGraph Workflow
 workflow = Graph()
 
@@ -61,33 +63,50 @@ def convert_to_sql(state: dict):
     sql_prompt = f"Convert this user question into a valid MySQL query that searches the parish_knowledge table: {user_query}"
     
     sql_query = llm.invoke([HumanMessage(content=sql_prompt)]).content
+    
+    print("DEBUG: Generated SQL query ->", sql_query)
     return {"sql_query": sql_query, "attempts": 1}
 
 def execute_sql(state: dict):
     session = SessionLocal()
-    sql_query = state["sql_query"]
-    
+    sql_query = state.get("sql_query")
+
+    print("DEBUG: Executing SQL ->", sql_query)  # Debugging output
+
     try:
         result = session.execute(sql_query).fetchone()
         session.close()
+
+        print("DEBUG: SQL Execution Result ->", result)  # Debugging output
+
         if result:
             return {"sql_result": result[0]}
         return {"sql_result": None}
-    except:
+
+    except Exception as e:
+        print("SQL Execution Error:", str(e))  # Print error for debugging
         return {"sql_result": None}
 
 def handle_sql_retries(state: dict):
     if state["attempts"] >= 5:
-        return {"response": {"answer": "I'm unable to find relevant information. Please contact the parish for more details.", "source": "None"}}
-    
+        return {"sql_result": None,  # Ensure key exists
+                "response": {"answer": "I'm unable to find relevant information. Please contact the parish for more details.",
+                             "source": "None"}}
+
     new_sql = convert_to_sql({"query": state["query"]})
-    return {"sql_query": new_sql["sql_query"], "attempts": state["attempts"] + 1}
+    
+    return {"sql_query": new_sql["sql_query"], 
+            "attempts": state["attempts"] + 1,
+            "sql_result": None}  # Ensure key is always present
 
 def generate_response(state: dict):
-    if state["sql_result"]:
-        response_prompt = f"Format this database result in a polite and informative response: {state['sql_result']}"
+    sql_result = state.get("sql_result")  # Use .get() to avoid KeyError
+
+    if sql_result:  # Only process if sql_result is valid
+        response_prompt = f"Format this database result in a polite and informative response: {sql_result}"
         human_response = llm.invoke([HumanMessage(content=response_prompt)]).content
         return {"response": {"answer": human_response, "source": "parish_knowledge database"}}
+
     return {"response": {"answer": "I'm unable to find relevant information. Please contact the parish for more details.", "source": "None"}}
 
 # Define Nodes

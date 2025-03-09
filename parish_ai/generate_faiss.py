@@ -19,6 +19,7 @@ env = environ.Env(
 # Load environment variables
 OPEN_AI_API_KEY = env("OPEN_AI_API_KEY")
 
+index_path = index_path = os.path.join(os.path.dirname(__file__), "faiss_index")
 # Initialize embeddings
 embeddings = OpenAIEmbeddings(openai_api_key=settings.OPEN_AI_API_KEY)
 
@@ -32,9 +33,8 @@ def generate_faiss_index():
         return
 
     documents = [f"Q: {row[0]}\nA: {row[1]}" for row in rows]
-    vector_db = FAISS.from_texts(documents, embeddings, allow_dangerous_deserialization=True)
+    vector_db = FAISS.from_texts(documents, embeddings)
     
-    index_path = "faiss_index"
     if not os.path.exists(index_path):
         os.makedirs(index_path)
     
