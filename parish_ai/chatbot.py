@@ -16,18 +16,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent # always need lagyan tatlong p
 
 # Initialize env variablesparent
 env = environ.Env(
-    DEBUG=(bool, False) #default value for DEBUG = False
+    DEBUG=(bool, False) 
 )
 
 # Load environment variables
 OPEN_AI_API_KEY = env("OPEN_AI_API_KEY")
 
 
-# Initialize LLM
+
 llm = ChatOpenAI(model="gpt-4", temperature=0.5, openai_api_key=OPEN_AI_API_KEY)
 embeddings = OpenAIEmbeddings(openai_api_key=OPEN_AI_API_KEY)
 
-# Initialize FAISS vector store for RAG, create if not exists
+
 index_path = "faiss_index"
 if not os.path.exists(index_path):
     from .generate_faiss import generate_faiss_index
