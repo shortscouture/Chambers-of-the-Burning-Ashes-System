@@ -19,7 +19,7 @@ env = environ.Env(
 
 # Read env file
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-
+OPEN_AI_API_KEY = env("OPEN_AI_API_KEY")
 DATABASE_URL = f"mysql+pymysql://{env('DB_USER')}:{env('DB_PASSWORD')}@{env('DB_HOST')}:{env('DB_PORT')}/{env('DB_NAME')}"
 # use env for sensitive settings
 # Quick-start development settings - unsuitable for production
