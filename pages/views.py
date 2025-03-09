@@ -436,7 +436,7 @@ def decline_letter_of_intent(request, intent_id):
         fail_silently=False,
     )
 
-    return redirect('some_rejection_page')
+    return redirect('success.html')
 
 
 from django.shortcuts import render, get_object_or_404, redirect
@@ -694,7 +694,7 @@ def verify_otp(request):
             messages.error(request, "Something went wrong. Please try again.")
             return redirect('Memorials')
 
-    return render(request, 'pages/verify_otp.html')
+    return render(request, 'pages/Memorials.html')
 
 
 def success(request):

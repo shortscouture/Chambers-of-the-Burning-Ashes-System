@@ -3,8 +3,9 @@
         
     }
 
-    .header{
+    .logo{
         z-index: 1001;
+        cursor: pointer;
     }
     
     .hover-effect:hover {
@@ -12,7 +13,7 @@
     }
     #svg-container {
         width: 500px; /* Set the desired visible area */
-        margin-top: 15.5px;
+        margin-bottom: 15.5px;
         height: 539px;
         overflow: hidden;
         border: 1px solid #000;

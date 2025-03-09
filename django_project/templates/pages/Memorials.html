@@ -2,35 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" href="../../static/images/logo.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Main Page</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="../../static/css/Memorials.css">
 </head>
 <body>
-<button onclick = location.href="{% url 'Customer_Home' %}" class="custom-button" type= 'button' >
-    <div class="button-overlay">
-      <svg
-        width="25px"
-        height="25px"
-        viewBox="0 0 1024 1024"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          fill="#000000"
-          d="M224 480h640a32 32 0 1 1 0 64H224a32 32 0 0 1 0-64z"
-        ></path>
-        <path
-          fill="#000000"
-          d="m237.248 512 265.408 265.344a32 32 0 0 1-45.312 45.312l-288-288a32 32 0 0 1 0-45.312l288-288a32 32 0 1 1 45.312 45.312L237.248 512z"
-        ></path>
-      </svg>
-    </div>
-    <p class="button-text">Go Back</p>
-  </button>
+<div class ="logo">
+    <img src ="../../static/images/St.Alphonsus.png" onclick="window.location.href='{% url 'Customer_Home' %}'" />
+</div>
 
   <div class="form-container">
-    <h1>Please Insert your Correct email address to retrieve your information</h1>
+    <h1>Please insert your correct email address to retrieve your vault information</h1>
     {% if messages %}
     <div>
         {% for message in messages %}
