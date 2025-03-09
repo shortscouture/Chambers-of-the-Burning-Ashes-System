@@ -177,6 +177,14 @@ class ColumbaryRecord(models.Model):
     section = models.CharField(null= False, max_length=7)
     level = models.CharField(null= False, max_length=1)
     inurnment_date = models.DateField(blank=True, null=True)
+
+    @property
+    def expiration_date(self):
+        """Returns the expiration date, 50 years after inurnment."""
+        if self.inurnment_date:
+            return self.inurnment_date + timedelta(days=50 * 365)
+        return None  # Return None if no inurnment date is set
+    
     urns_per_columbary = models.CharField(max_length=1, null=True, choices=[('1', '1'), ('2', '2'), ('3', '3'), ('4', '4')])
 
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)

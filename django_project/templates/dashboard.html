@@ -53,7 +53,7 @@
             </div>
 
             <div class="info-box" onclick="toggleTableVisibility('unissuedTableContainer')">
-                <h2><i class="fas fa-file-alt info-icon"></i> UNISSUED VAULTS</h2>
+                <h2><i class="fas fa-file-alt info-icon"></i>VAULTS WITHOUT HOLDER OF PRIVILAGE</h2>
                 <p>{{ unissued_columbaries }}</p>
             </div>
 
@@ -123,25 +123,25 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Columbary Name</th>
-                        <th>Location</th>
-                        <th>Capacity</th>
-                        <th>Occupied By</th>
-                        <th>Status</th>
+                        <th>Vault ID</th>
+                        <th>Customer Name</th>
+                        <th>Inurnment Date</th>
+                        <th>Expiration Date</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for columbary in occupied_columbaries %}
+                    {% for record in occupied_columbaries %}
                     <tr>
-                        <td>{{ columbary.vault_id }}</td>
-                        <td>{{ columbary.section }}</td>
-                        <td>{{ columbary.urns_per_columbary }}</td>
-                        <td>{{ columbary.customer.full_name|default:"Unassigned" }}</td>
-                        <td>{{ columbary.status }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="5">No occupied columbaries found.</td>
+                        <td>{{ record.vault_id }}</td>
+                        <td>{{ record.customer_name }}</td>
+                        <td>{{ record.inurnment_date|date:"Y-m-d" }}</td>
+                        <td>
+                            {% if record.expiration_date %}
+                            {{ record.expiration_date|date:"Y-m-d" }}
+                            {% else %}
+                            Not Set
+                            {% endif %}
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -230,6 +230,61 @@
             </table>
         </div>
 
+        <!-- Completed Installment Table -->
+        <div id="completedInstallmentTableContainer" class="table-container hidden">
+            <h3>Completed Installment Payments</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer Name</th>
+                        <th>Total Amount Paid</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in completed_installment_records %}
+                    <tr>
+                        <td>{{ payment.customer.full_name }}</td>
+                        <td>₱{{ payment.total_installment_paid }}</td>
+                        <td>{{ payment.created_at|date:"Y-m-d" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">No completed installment records found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Unpaid Installment Table -->
+        <div id="unpaidInstallmentTableContainer" class="table-container hidden">
+            <h3>Unpaid Installment Payments</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer Name</th>
+                        <th>Total Amount Due</th>
+                        <th>Due Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in unpaid_installment_records %}
+                    <tr>
+                        <td>{{ payment.customer.full_name }}</td>
+                        <td>₱{{ payment.total_due }}</td>
+                        <td>{{ payment.due_date|date:"Y-m-d" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">No unpaid installment records found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+
         <div class="dashboard-grid">
             <div class="chart-container">
                 <h2>PAYMENT DISTRIBUTION</h2>
@@ -251,8 +306,8 @@
 
                 var ctx = document.getElementById("paymentChart").getContext("2d");
 
-                var paymentLabels = JSON.parse('{{ payment_labels|safe }}'); // ✅ Ensure valid JSON
-                var paymentData = JSON.parse('{{ payment_data|safe }}'); // ✅ Ensure valid JSON
+                var paymentLabels = JSON.parse('{{ payment_labels|safe }}');
+                var paymentData = JSON.parse('{{ payment_data|safe }}');
 
                 var paymentChart = new Chart(ctx, {
                     type: "doughnut",
@@ -260,7 +315,7 @@
                         labels: paymentLabels,
                         datasets: [{
                             data: paymentData,
-                            backgroundColor: ["#36A2EB", "#FFCE56"]
+                            backgroundColor: ["#36A2EB", "#4CAF50", "#f78c00"] // Full Payment, Completed Installment, Unpaid Installment
                         }]
                     },
                     options: {
@@ -302,7 +357,8 @@
                 function toggleTableVisibility(label) {
                     var tableMap = {
                         "Full Payment": "fullPaymentTableContainer",
-                        "Installment": "installmentTableContainer"
+                        "Completed Installment": "completedInstallmentTableContainer",
+                        "Unpaid Installment": "unpaidInstallmentTableContainer"
                     };
 
                     var tableId = tableMap[label];
