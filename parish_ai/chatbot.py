@@ -32,7 +32,7 @@ index_path = "faiss_index"
 if not os.path.exists(index_path):
     from .generate_faiss import generate_faiss_index
     generate_faiss_index()
-vector_db = FAISS.load_local(index_path, embeddings)
+vector_db = FAISS.load_local(index_path, embeddings, allow_dangerous_deserialization=True)
 
 # Create LangGraph Workflow
 workflow = Graph()
