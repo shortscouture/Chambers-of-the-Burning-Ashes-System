@@ -1,5 +1,5 @@
 from django.views.generic import TemplateView, DeleteView
-from django.shortcuts import render, redirect, get_object_or_404,  HttpResponseRedirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
@@ -8,26 +8,14 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.db.models import Count, Sum, Q
 from datetime import datetime, timedelta
-from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm, PaymentForm, HolderOfPrivilegeForm, DocumentUploadForm
-from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, ChatQuery, ParishAdministrator, HolderOfPrivilege
-from django.forms import modelformset_factory
+from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm, PaymentForm, HolderOfPrivilegeForm
+from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, HolderOfPrivilege
 from django.urls import reverse_lazy, reverse
-from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
-from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse, HttpResponse
 from django.views.generic.base import TemplateView
-from django.db import transaction, connection
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from PIL import Image
-import numpy as np
-import openai
-from openai import OpenAI
-from django.db import transaction, connection
 import json
 import environ
 from django.db.models.functions import TruncMonth
-from django.contrib.auth.mixins import LoginRequiredMixin
 import logging
 from django.views.generic import TemplateView
 from django.core.paginator import Paginator
@@ -36,10 +24,6 @@ from .models import ColumbaryRecord
 from django.utils.safestring import mark_safe
 from django.db.models import Count, Sum
 from django.db.models.functions import TruncMonth
-import json
-import io
-import base64
-from django.core.files.uploadedfile import InMemoryUploadedFile
 import boto3
 from django.db.models import Sum, F, Value, DecimalField
 from django.db.models.functions import Coalesce
