@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
-from langchain.chat_models import ChatOpenAI
+from langgraph.graph import END, MessageGraph
+from langchain_openai import OpenAIEmbeddings
 from langchain.schema import HumanMessage
 from langgraph.graph import Graph
 from langchain.vectorstores import FAISS
@@ -109,7 +110,7 @@ workflow.add_conditional_edges(
     lambda state: "generate_response" if state["sql_result"] else "handle_sql_retries"
 )
 workflow.add_edge("handle_sql_retries", "execute_sql")
-workflow.add_edge("generate_response", "end")
+workflow.add_edge("generate_response", END)
 
 # Compile Workflow
 chatbot = workflow.compile()
