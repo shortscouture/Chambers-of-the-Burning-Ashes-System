@@ -10,9 +10,9 @@ body {
 /* Container for the page */
 .container {
   max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #fff;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white background */
   border-radius: 15px;
   box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
 }
@@ -25,21 +25,23 @@ h2 {
   margin-bottom: 20px;
 }
 
-/* Fieldset styling */
-fieldset {
-  border: 1px solid #ddd;
+/* Card Styling */
+.card {
+  border: none;
   border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 20px;
-  background-color: #f9f9f9;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white background */
 }
 
-/* Legend styling */
-legend {
-  font-size: 20px;
-  font-weight: bold;
-  color: #007BFF;
-  padding: 0 10px;
+.card-header {
+  background-color: #007bff;
+  color: white;
+  border-radius: 10px 10px 0 0;
+  padding: 1rem;
+}
+
+.card-body {
+  padding: 1.5rem;
 }
 
 /* Input fields styling */
@@ -48,7 +50,7 @@ input[type="text"], input[type="tel"], input[type="email"], input[type="date"], 
   padding: 12px;
   border-radius: 8px;
   border: 1px solid #ddd;
-  background-color: #f0f0f0;
+  background-color: #f8f9fa;
   font-size: 16px;
   color: #333;
   transition: border-color 0.3s ease;
@@ -56,7 +58,7 @@ input[type="text"], input[type="tel"], input[type="email"], input[type="date"], 
 }
 
 input[type="text"]:focus, input[type="tel"]:focus, input[type="email"]:focus, select:focus, textarea:focus {
-  border-color: #007BFF;
+  border-color: #007bff;
   outline: none;
 }
 
@@ -66,20 +68,42 @@ input::placeholder, textarea::placeholder {
 }
 
 /* Buttons */
-button.submit-btn {
-  width: 100%;
-  padding: 12px;
+.btn {
+  padding: 10px 20px;
   border-radius: 8px;
-  border: none;
-  background-color: #007BFF;
-  color: white;
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
-button.submit-btn:hover {
+.btn-primary {
+  background-color: #007bff;
+  border: none;
+  color: white;
+}
+
+.btn-primary:hover {
   background-color: #0056b3;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  border: none;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+.btn-success {
+  background-color: #28a745;
+  border: none;
+  color: white;
+}
+
+.btn-success:hover {
+  background-color: #218838;
 }
 
 /* Label Styling */
@@ -90,22 +114,10 @@ label {
   display: inline-block;
 }
 
-/* Optional Section Styling */
-fieldset > div {
-  margin-bottom: 15px;
-}
-
-/* Form structure to handle labels and fields */
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
 /* Responsive Design */
 @media (max-width: 768px) {
   .container {
-      padding: 15px;
+      padding: 1rem;
       width: 100%;
   }
 }
@@ -114,16 +126,16 @@ form {
 form {
   display: flex;
   flex-direction: column;
-  gap: 20px; /* Adds space between form elements */
+  gap: 20px;
 }
 
 /* Fieldset Styling */
 fieldset {
   padding: 20px;
-  border: none; /* Remove border for cleaner look */
-  background-color: #ffffff;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white background */
   border-radius: 8px;
-  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for fieldset */
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 legend {
@@ -131,38 +143,6 @@ legend {
   font-weight: 600;
   color: #333;
   margin-bottom: 10px;
-}
-
-/* Input and Textarea Styling */
-input[type="text"], input[type="email"], textarea {
-  padding: 12px 16px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
-  width: 100%;
-  box-sizing: border-box;
-  background-color: #f8f8f8;
-}
-
-input[type="text"]:focus, input[type="email"]:focus, textarea:focus {
-  border-color: #007bff;
-  outline: none;
-}
-
-/* Submit Button Styling */
-.submit-btn {
-  padding: 12px 20px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s ease;
-}
-
-.submit-btn:hover {
-  background-color: #0056b3;
 }
 
 /* Additional Hover and Focus Effects */
@@ -187,7 +167,7 @@ input[type="date"]:focus {
 .ocr-section {
   margin-bottom: 2em;
   padding: 1em;
-  background-color: #f8f9fa;
+  background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white background */
   border-radius: 5px;
 }
 

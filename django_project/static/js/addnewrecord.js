@@ -16,10 +16,8 @@ function togglePaymentFields() {
     }
 }
 
-
 document.addEventListener('DOMContentLoaded', function () {
     console.log('DOM fully loaded and parsed');
-
 
     togglePaymentFields();
     const paymentModeSelect = document.getElementById('id_mode_of_payment');
@@ -28,7 +26,6 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
         console.error('Payment mode select element not found!');
     }
-
 
     setupOcrUI();
 });
@@ -324,8 +321,128 @@ function normalizeOcrData(data) {
     return normalizedData;
 }
 
-function populateFields(data) {
+let addressData = [];
+
+
+function loadAddressData() {
+    return new Promise(async (resolve, reject) => {
+        if (addressData.length > 0) {
+            console.log("📌 CSV already loaded.");
+            resolve(); // If already loaded, return immediately
+            return;
+        }
+
+        try {
+            console.log("🔄 Loading CSV...");
+            const response = await fetch('/static/csv/PHLZipCodes.csv'); 
+            if (!response.ok) throw new Error(`Failed to load CSV: ${response.statusText}`);
+
+            const csvText = await response.text();
+            addressData = parseCSV(csvText);
+            console.log("✅ CSV Loaded Successfully:", addressData);
+            resolve(); // ✅ Resolves when loading is complete
+        } catch (error) {
+            console.error("❌ Error loading CSV:", error);
+            reject(error);
+        }
+    });
+}
+
+
+
+
+function parseCSV(csvText) {
+    const rows = csvText.split("\n").map(row => row.trim()).filter(row => row);
+    const data = {};
+
+    for (let i = 1; i < rows.length; i++) {  
+        const cols = rows[i].split(",");
+
+        if (cols.length < 4) continue;  
+
+        const region = cols[0].trim();
+        const province = cols[1].trim();
+        const cityOrMunicipality = cols[2].trim().toLowerCase();  
+        const zipCode = cols[3].trim();
+
+        data[cityOrMunicipality] = { 
+            Region: region, 
+            Province: province, 
+            City_or_Municipality: cityOrMunicipality, 
+            ZipCOde: zipCode 
+        };
+    }
+    return data;
+}
+
+
+
+function extractAddressDetails(address) {
+    console.log("📌 Checking Address Against CSV Data...");
+
+    if (!Array.isArray(addressData) || addressData.length === 0) {
+        console.warn("⚠️ CSV data not yet loaded. Retrying...");
+        return { remainingAddress: address };  
+    }
+
+    address = address.replace(/\bPhilippines\b/g, "").replace(/\bCity\b/g, "").replace(/\bProvince\b/g, "").trim();
+    
+    let matchedData = null;
+    
+    for (let entry of addressData) {
+        if (address.includes(entry.city)) {
+            matchedData = entry;
+            break;
+        }
+    }
+
+    if (!matchedData) {
+        for (let entry of addressData) {
+            if (address.includes(entry.zip_code)) {
+                matchedData = entry;
+                break;
+            }
+        }
+    }
+
+    if (!matchedData) {
+        console.warn("❌ No matching city or ZIP code found in CSV.");
+        return { remainingAddress: address };
+    }
+
+    return {
+        city: matchedData.city || "",
+        barangay: matchedData.barangay || "",
+        zip_code: matchedData.zip_code || "",
+        remainingAddress: address.replace(matchedData.city, "").replace(matchedData.zip_code, "").trim(),
+    };
+}
+
+
+function cleanRemainingAddress(address, matchedEntry) {
+    let cleanedAddress = address;
+    
+    cleanedAddress = cleanedAddress.replace(matchedEntry.City_or_Municipality, "").trim();
+    cleanedAddress = cleanedAddress.replace(matchedEntry.Province, "").trim();
+    cleanedAddress = cleanedAddress.replace(matchedEntry.ZipCOde, "").trim();
+
+    return cleanedAddress;
+}
+
+async function handleUploadAndProcess(data) {
+    try {
+        await loadAddressData(); // ✅ Waits until CSV is loaded
+        populateFields(data);
+    } catch (error) {
+        console.error("❌ Failed to load CSV before populating fields:", error);
+    }
+}
+
+
+async function populateFields(data) {
     console.log('Populating fields with data:', data);
+
+    await loadAddressData();  // ✅ Ensures CSV is fully loaded before proceeding
 
     const normalizedData = normalizeOcrData(data);
     console.log('Normalized OCR data:', normalizedData);
@@ -347,7 +464,6 @@ function populateFields(data) {
         }
     }
 
-    // Map for field names (normalized key -> form field id)
     const fieldMap = {
         'fullname': 'id_first_name',
         'firstname': 'id_first_name',
@@ -355,7 +471,7 @@ function populateFields(data) {
         'lastname': 'id_last_name',
         'address': 'id_address_line_1',
         'permanentaddress': 'id_address_line_1',
-        'currentaddress': 'id_address_line_2',
+        'currentaddress': 'id_address_line_1',
         'emailaddress': 'id_email_address',
         'landlinenumbers': 'id_landline_number',
         'landlinenumber': 'id_landline_number',
@@ -387,12 +503,10 @@ function populateFields(data) {
         }
     }
 
- 
     setValue('id_first_name', firstName);
     setValue('id_middle_name', middleName);
     setValue('id_last_name', lastName);
     setValue('id_suffix', ''); 
-
     setValue('id_country', 'Philippines'); 
 
     for (const key in normalizedData) {
@@ -417,7 +531,6 @@ function populateFields(data) {
         }
     }
 
-    // Extract mobile number if available in combined format
     if (normalizedData.landlinemobilenumbers) {
         const mobilePattern = /(\d{4}[-\s]?\d{3}[-\s]?\d{4})/;
         const mobileMatch = normalizedData.landlinemobilenumbers.match(mobilePattern);
@@ -427,11 +540,26 @@ function populateFields(data) {
         }
     }
 
-
     setValue('id_urns_per_columbary', '1'); 
-    
+
+    const extractedAddress = normalizedData.currentaddress || "";
+    if (extractedAddress) {
+        console.log("Extracted Address:", extractedAddress);
+        const addressDetails = extractAddressDetails(extractedAddress);
+
+        console.log("Parsed Address Details:", addressDetails);
+
+        setValue('id_city', addressDetails.city);
+        setValue('id_province', addressDetails.province);
+        setValue('id_zip_code', addressDetails.zipCode);
+        setValue('id_address_line_1', addressDetails.remainingAddress);
+    } else {
+        console.warn("No address found in OCR data.");
+    }
+
     console.log('Field population complete');
 }
+
 
 function getCookie(name) {
     let cookieValue = null;
