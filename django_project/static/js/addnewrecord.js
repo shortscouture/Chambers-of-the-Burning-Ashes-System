@@ -324,28 +324,24 @@ function normalizeOcrData(data) {
 let addressData = [];
 
 
-function loadAddressData() {
-    return new Promise(async (resolve, reject) => {
-        if (addressData.length > 0) {
-            console.log("📌 CSV already loaded.");
-            resolve(); // If already loaded, return immediately
-            return;
-        }
+async function loadAddressData() {
+    if (addressData.length > 0) {
+        console.log("📌 CSV already loaded.");
+        return; // Already loaded
+    }
 
-        try {
-            console.log("🔄 Loading CSV...");
-            const response = await fetch('/static/csv/PHLZipCodes.csv'); 
-            if (!response.ok) throw new Error(`Failed to load CSV: ${response.statusText}`);
+    try {
+        console.log("🔄 Loading CSV...");
+        const response = await fetch('/static/csv/PHLZipCodes.csv'); 
+        if (!response.ok) throw new Error(`Failed to load CSV: ${response.statusText}`);
 
-            const csvText = await response.text();
-            addressData = parseCSV(csvText);
-            console.log("✅ CSV Loaded Successfully:", addressData);
-            resolve(); // ✅ Resolves when loading is complete
-        } catch (error) {
-            console.error("❌ Error loading CSV:", error);
-            reject(error);
-        }
-    });
+        const csvText = await response.text();
+        addressData = parseCSV(csvText);
+        console.log("✅ CSV Loaded Successfully:", addressData);
+    } catch (error) {
+        console.error("❌ Error loading CSV:", error);
+        throw error; // Re-throw to allow handling upstream
+    }
 }
 
 
@@ -353,7 +349,7 @@ function loadAddressData() {
 
 function parseCSV(csvText) {
     const rows = csvText.split("\n").map(row => row.trim()).filter(row => row);
-    const data = {};
+    const data = [];  // Change to array for easier iteration
 
     for (let i = 1; i < rows.length; i++) {  
         const cols = rows[i].split(",");
@@ -363,14 +359,14 @@ function parseCSV(csvText) {
         const region = cols[0].trim();
         const province = cols[1].trim();
         const cityOrMunicipality = cols[2].trim().toLowerCase();  
-        const zipCode = cols[3].trim();
+        const zipCOde = cols[3].trim();
 
-        data[cityOrMunicipality] = { 
-            Region: region, 
-            Province: province, 
-            City_or_Municipality: cityOrMunicipality, 
-            ZipCOde: zipCode 
-        };
+        data.push({ 
+            region: region, 
+            province: province, 
+            city: cityOrMunicipality,  // Standardize property names
+            zip_code: zipCOde 
+        });
     }
     return data;
 }
@@ -385,20 +381,31 @@ function extractAddressDetails(address) {
         return { remainingAddress: address };  
     }
 
-    address = address.replace(/\bPhilippines\b/g, "").replace(/\bCity\b/g, "").replace(/\bProvince\b/g, "").trim();
+    console.log("🔍 CSV Data Sample:", addressData.slice(0, 5)); // Debug CSV data
+    console.log("🔍 Extracted Address:", address);
+
+    // Normalize input address
+    address = address.replace(/\b(Philippines|City|Province)\b/g, "").trim();
     
     let matchedData = null;
-    
+
+    // Try matching by city first
     for (let entry of addressData) {
-        if (address.includes(entry.city)) {
+        if (address.toLowerCase().includes(entry.city.toLowerCase())) {
             matchedData = entry;
             break;
         }
     }
 
-    if (!matchedData) {
+    // Extract ZIP code from the address
+    let zipRegex = /\b\d{4}\b/;
+    let extractedZip = address.match(zipRegex)?.[0];
+    console.log("🔍 Extracted ZIP Code:", extractedZip);
+
+    // If no city match, try by ZIP code
+    if (!matchedData && extractedZip) {
         for (let entry of addressData) {
-            if (address.includes(entry.zip_code)) {
+            if (entry.zip_code.trim() === extractedZip.trim()) {
                 matchedData = entry;
                 break;
             }
@@ -410,13 +417,23 @@ function extractAddressDetails(address) {
         return { remainingAddress: address };
     }
 
+    console.log("✅ Matched Entry:", matchedData);
+
+    let remainingAddress = address
+        .replace(new RegExp(`\\b${matchedData.city}\\b`, 'i'), '')
+        .replace(new RegExp(`\\b${matchedData.zip_code}\\b`, 'i'), '')
+        .replace(/,\s*,/g, ',')
+        .replace(/\s+/g, ' ')
+        .trim();
+
     return {
         city: matchedData.city || "",
-        barangay: matchedData.barangay || "",
-        zip_code: matchedData.zip_code || "",
-        remainingAddress: address.replace(matchedData.city, "").replace(matchedData.zip_code, "").trim(),
+        province: matchedData.province || "",
+        zipCode: matchedData.zip_code || "",
+        remainingAddress: remainingAddress,
     };
 }
+
 
 
 function cleanRemainingAddress(address, matchedEntry) {
@@ -442,122 +459,133 @@ async function handleUploadAndProcess(data) {
 async function populateFields(data) {
     console.log('Populating fields with data:', data);
 
-    await loadAddressData();  // ✅ Ensures CSV is fully loaded before proceeding
+    try {
+        await loadAddressData();  // Ensure CSV is fully loaded
+        console.log('CSV data loaded and ready for processing');
+        
+        const normalizedData = normalizeOcrData(data);
+        console.log('Normalized OCR data:', normalizedData);
 
-    const normalizedData = normalizeOcrData(data);
-    console.log('Normalized OCR data:', normalizedData);
+        function setValue(fieldId, value) {
+            if (!value) return;
 
-    function setValue(fieldId, value) {
-        if (!value) return;
+            const element = document.getElementById(fieldId) ||
+                document.getElementsByName(fieldId)[0];
 
-        const element = document.getElementById(fieldId) ||
-            document.getElementsByName(fieldId)[0];
+            if (element) {
+                console.log(`Setting ${fieldId} to "${value}"`);
+                element.value = value;
 
-        if (element) {
-            console.log(`Setting ${fieldId} to "${value}"`);
-            element.value = value;
+                const event = new Event('change', { bubbles: true });
+                element.dispatchEvent(event);
+            } else {
+                console.warn(`Field not found: ${fieldId}`);
+            }
+        }
 
-            const event = new Event('change', { bubbles: true });
-            element.dispatchEvent(event);
+        const fieldMap = {
+            'fullname': 'id_first_name',
+            'firstname': 'id_first_name',
+            'middlename': 'id_middle_name',
+            'lastname': 'id_last_name',
+            'address': 'id_address_line_1',
+            'permanentaddress': 'id_address_line_1',
+            'currentaddress': 'id_address_line_1',
+            'emailaddress': 'id_email_address',
+            'landlinenumbers': 'id_landline_number',
+            'landlinenumber': 'id_landline_number',
+            'landlinemobilenumbers': 'id_mobile_number',
+            'mobilenumber': 'id_mobile_number',
+            'mobileno': 'id_mobile_number',
+            'telno': 'id_landline_number',
+            'beneficiaries': 'id_first_beneficiary_name',
+        };
+
+        let firstName = '';
+        let middleName = '';
+        let lastName = '';
+
+        const fullName = normalizedData.fullname || normalizedData.name || '';
+        
+        if (fullName) {
+            const nameParts = fullName.split(' ');
+            
+            if (nameParts.length >= 1) {
+                firstName = nameParts[0] || '';
+            }
+            
+            if (nameParts.length >= 3) {
+                lastName = nameParts[nameParts.length - 1] || '';
+                middleName = nameParts.slice(1, -1).join(' ') || '';
+            } else if (nameParts.length === 2) {
+                lastName = nameParts[1] || '';
+            }
+        }
+
+        setValue('id_first_name', firstName);
+        setValue('id_middle_name', middleName);
+        setValue('id_last_name', lastName);
+        setValue('id_suffix', ''); 
+        setValue('id_country', 'Philippines'); 
+
+        for (const key in normalizedData) {
+            if (fieldMap[key]) {
+                setValue(fieldMap[key], normalizedData[key]);
+            }
+        }
+
+        if (normalizedData.beneficiaries) {
+            const beneficiaries = normalizedData.beneficiaries.split('/');
+            
+            if (beneficiaries.length >= 1) {
+                setValue('id_first_beneficiary_name', beneficiaries[0].trim());
+            }
+            
+            if (beneficiaries.length >= 2) {
+                setValue('id_second_beneficiary_name', beneficiaries[1].trim());
+            }
+            
+            if (beneficiaries.length >= 3) {
+                setValue('id_third_beneficiary_name', beneficiaries[2].trim());
+            }
+        }
+
+        if (normalizedData.landlinemobilenumbers) {
+            const mobilePattern = /(\d{4}[-\s]?\d{3}[-\s]?\d{4})/;
+            const mobileMatch = normalizedData.landlinemobilenumbers.match(mobilePattern);
+            
+            if (mobileMatch) {
+                setValue('id_mobile_number', mobileMatch[0]);
+            }
+        }
+
+        setValue('id_urns_per_columbary', '1'); 
+
+        const extractedAddress = normalizedData.currentaddress || 
+                             normalizedData.permanentaddress || 
+                             normalizedData.address || "";
+                                
+        if (extractedAddress) {
+            console.log("Extracted Address:", extractedAddress);
+            const addressDetails = extractAddressDetails(extractedAddress);
+
+            console.log("Parsed Address Details:", addressDetails);
+
+            // Only set these fields if we have valid data
+            if (addressDetails.city) setValue('id_city', addressDetails.city);
+            if (addressDetails.province) setValue('id_province', addressDetails.province);
+            if (addressDetails.zipCode) setValue('id_zip_code', addressDetails.zipCode);
+            
+            // Always set the address line, either the parsed one or the original
+            setValue('id_address_line_1', addressDetails.remainingAddress || extractedAddress);
         } else {
-            console.warn(`Field not found: ${fieldId}`);
+            console.warn("No address found in OCR data.");
         }
+
+        console.log('Field population complete');
+    } catch (error) {
+        console.error("Error during field population:", error);
     }
-
-    const fieldMap = {
-        'fullname': 'id_first_name',
-        'firstname': 'id_first_name',
-        'middlename': 'id_middle_name',
-        'lastname': 'id_last_name',
-        'address': 'id_address_line_1',
-        'permanentaddress': 'id_address_line_1',
-        'currentaddress': 'id_address_line_1',
-        'emailaddress': 'id_email_address',
-        'landlinenumbers': 'id_landline_number',
-        'landlinenumber': 'id_landline_number',
-        'landlinemobilenumbers': 'id_mobile_number',
-        'mobilenumber': 'id_mobile_number',
-        'mobileno': 'id_mobile_number',
-        'telno': 'id_landline_number',
-        'beneficiaries': 'id_first_beneficiary_name',
-    };
-
-    let firstName = '';
-    let middleName = '';
-    let lastName = '';
-
-    const fullName = normalizedData.fullname || normalizedData.name || '';
-    
-    if (fullName) {
-        const nameParts = fullName.split(' ');
-        
-        if (nameParts.length >= 1) {
-            firstName = nameParts[0] || '';
-        }
-        
-        if (nameParts.length >= 3) {
-            lastName = nameParts[nameParts.length - 1] || '';
-            middleName = nameParts.slice(1, -1).join(' ') || '';
-        } else if (nameParts.length === 2) {
-            lastName = nameParts[1] || '';
-        }
-    }
-
-    setValue('id_first_name', firstName);
-    setValue('id_middle_name', middleName);
-    setValue('id_last_name', lastName);
-    setValue('id_suffix', ''); 
-    setValue('id_country', 'Philippines'); 
-
-    for (const key in normalizedData) {
-        if (fieldMap[key]) {
-            setValue(fieldMap[key], normalizedData[key]);
-        }
-    }
-
-    if (normalizedData.beneficiaries) {
-        const beneficiaries = normalizedData.beneficiaries.split('/');
-        
-        if (beneficiaries.length >= 1) {
-            setValue('id_first_beneficiary_name', beneficiaries[0].trim());
-        }
-        
-        if (beneficiaries.length >= 2) {
-            setValue('id_second_beneficiary_name', beneficiaries[1].trim());
-        }
-        
-        if (beneficiaries.length >= 3) {
-            setValue('id_third_beneficiary_name', beneficiaries[2].trim());
-        }
-    }
-
-    if (normalizedData.landlinemobilenumbers) {
-        const mobilePattern = /(\d{4}[-\s]?\d{3}[-\s]?\d{4})/;
-        const mobileMatch = normalizedData.landlinemobilenumbers.match(mobilePattern);
-        
-        if (mobileMatch) {
-            setValue('id_mobile_number', mobileMatch[0]);
-        }
-    }
-
-    setValue('id_urns_per_columbary', '1'); 
-
-    const extractedAddress = normalizedData.currentaddress || "";
-    if (extractedAddress) {
-        console.log("Extracted Address:", extractedAddress);
-        const addressDetails = extractAddressDetails(extractedAddress);
-
-        console.log("Parsed Address Details:", addressDetails);
-
-        setValue('id_city', addressDetails.city);
-        setValue('id_province', addressDetails.province);
-        setValue('id_zip_code', addressDetails.zipCode);
-        setValue('id_address_line_1', addressDetails.remainingAddress);
-    } else {
-        console.warn("No address found in OCR data.");
-    }
-
-    console.log('Field population complete');
 }
 
 
