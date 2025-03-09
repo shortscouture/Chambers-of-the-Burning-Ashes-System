@@ -1,4 +1,5 @@
-from pathlib import Path
+import os
+from dotenv import load_dotenv
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import HumanMessage
 from langgraph.graph import Graph
@@ -8,6 +9,7 @@ from sqlalchemy.orm import Session
 from django.conf import settings
 from .database import SessionLocal
 import environ
+from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent # always need lagyan tatlong parent kasi nasa base.py tayo
 
@@ -20,15 +22,17 @@ env = environ.Env(
 # Load environment variables
 OPEN_AI_API_KEY = env("OPEN_AI_API_KEY")
 
+
 # Initialize LLM
 llm = ChatOpenAI(model="gpt-4", temperature=0.5, openai_api_key=OPEN_AI_API_KEY)
 embeddings = OpenAIEmbeddings(openai_api_key=OPEN_AI_API_KEY)
 
-# Initialize FAISS vector store for RAG
-vector_db = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
-
-
-
+# Initialize FAISS vector store for RAG, create if not exists
+index_path = "faiss_index"
+if not os.path.exists(index_path):
+    from .generate_faiss import generate_faiss_index
+    generate_faiss_index()
+vector_db = FAISS.load_local(index_path, embeddings)
 
 # Create LangGraph Workflow
 workflow = Graph()
@@ -109,3 +113,5 @@ workflow.add_edge("generate_response", "end")
 
 # Compile Workflow
 chatbot = workflow.compile()
+
+
