@@ -93,7 +93,7 @@
                 </div>
             
                 <div class="form-group">
-                    <label for="id_suffix">Suffix:</label>
+                    <label for="id_suffix">Suffix (Optional):</label>
                     <input type="text" name="suffix" id="id_suffix" placeholder="Suffix" class="form-control">
                 </div>
             </div>
@@ -111,25 +111,8 @@
                 </div>
             
                 <div class="form-group">
-                    <label for="id_address_line_2">Address Line 2:</label>
-                    <input type="text" name="address_line_2" id="id_address_line_2" placeholder="Address Line 2" class="form-control">
-                </div>
-            </div>
-            
-            <div class="dynamic-row">
-                <div class="form-group">
-                    <label for="id_city">City:</label>
-                    <input type="text" name="city" id="id_city" placeholder="City" class="form-control">
-                </div>
-            
-                <div class="form-group">
-                    <label for="id_province_or_state">Province/State:</label>
-                    <input type="text" name="province_or_state" id="id_province_or_state" placeholder="Province/State" class="form-control">
-                </div>
-            
-                <div class="form-group">
-                    <label for="id_postal_code">Postal Code:</label>
-                    <input type="text" name="postal_code" id="id_postal_code" placeholder="Postal Code" class="form-control">
+                    <label for="id_address_line_2">Address Line 2 (Optional):</label>
+                    <input type="text" name="address_line_2" id="id_address_line_2" placeholder="Address Line 2 (Optional)" class="form-control">
                 </div>
             </div>
             
@@ -171,6 +154,24 @@
                         <option value="3">3</option>
                         <option value="4">4</option>
                     </select>
+                </div>
+            </div>
+
+            <h3>Holder of Privilege</h3>
+            <div class="dynamic-row">
+                <div class="form-group">
+                    <label for="id_issuance_date">Issuance Date:</label>
+                    <input type="date" name="issuance_date" id="id_issuance_date" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="id_expiration_date">Expiration Date:</label>
+                    <input type="date" name="expiration_date" id="id_expiration_date" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="id_issuing_parish_priest">Issuing Parish Priest:</label>
+                    <input type="text" name="issuing_parish_priest" id="id_issuing_parish_priest" placeholder="Issuing Parish Priest" class="form-control">
                 </div>
             </div>
             
