@@ -106,11 +106,48 @@ nav{
   z-index: 2;
 }
 
-.headname{
-  margin-left: -80px;
-  margin-top: 40px;
-  z-index: 2; 
+/* Style for navigation icons */
+.headname li a {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Space between icon and text */
+  font-size: 19px;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  position: relative;
+  transition: transform 0.3s ease-in-out;
 }
+
+/* Add smooth hover animation */
+.headname li a:hover {
+  transform: scale(1.1); /* Slightly enlarge on hover */
+}
+
+/* Style icons inside the navigation */
+.headname li a i {
+  font-size: 22px; /* Adjust icon size */
+  transition: transform 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+/* Rotate icons slightly on hover */
+.headname li a:hover i {
+  transform: rotate(15deg);
+  color: #00d1ff; /* Change color on hover */
+}
+
+/* Animation for clicking effect */
+.headname li a:active {
+  animation: clickEffect 0.2s ease-in-out;
+}
+
+/* Keyframes for the click effect */
+@keyframes clickEffect {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+
 
 nav ul li{
   display: inline-block;
@@ -132,7 +169,7 @@ nav ul li a::after{
   content:'';
   width:0%; 
   height: 4px;
-  background: rgb(0, 153, 255);
+  background: linear-gradient(120deg, rgba(55, 198, 255, 0.247), rgb(118, 205, 255), rgba(70, 181, 255, 0.281));
   position: absolute;
   left: 0;
   bottom: -15px;
@@ -164,24 +201,33 @@ nav ul li a:hover::after{
 
 #logoutBtn {
   background-color: rgba(63, 63, 63, 0.7); 
-  border-style: solid; 
-  border-width: 3px; /* Adjusted for clarity */
-  border-color: rgba(0, 132, 255, 0.7); 
-  color: #f0ffff; 
-  border-radius: 30px; 
-  padding: 12px 15px; /* Use padding instead of fixed width/height */
-  margin-top: -150px; 
-  margin-right: -120px; 
-  box-shadow: 5px 5px 7px rgba(1, 1, 1, 0.5); 
-  font-size: 16px; /* Ensure font size fits */
-  text-align: center; /* Center-align text */
-  text-decoration: none; /* Remove underline */
+  border-radius: 30px;
+  padding: 12px 15px;
+  box-shadow: 5px 5px 7px rgba(1, 1, 1, 0.5);
+  font-size: 16px;
+  text-align: center;
+  text-decoration: none;
   font-weight: bold;
+  transition: transform 0.3s ease-in-out;
 }
 
-#logoutBtn:hover{
-  background-color: rgba(199, 5, 5, 0.5);
-}  
+/* Add hover effect */
+#logoutBtn:hover {
+  transform: scale(1.1);
+  background-color: rgba(180, 0, 0, 0.699); /* Change color on hover */
+}
+
+/* Click animation effect */
+#logoutBtn:active {
+  animation: pulse 0.3s ease-in-out;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
 
 .modal {
 display: none;

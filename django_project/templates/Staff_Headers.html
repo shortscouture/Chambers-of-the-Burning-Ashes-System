@@ -7,6 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
     <link rel="stylesheet" href="{% static 'css/Headers.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 
 <body>
@@ -16,11 +17,12 @@
         <nav>
           <img src="{% static 'images/sa_logo.gif' %}" alt="logoheader" class="logohead">
           <ul class="headname">
-            <li><a href="{% url 'dashboard' %}">HOME</a></li>
-            <li><a href="{% url 'columbaryrecords' %}">RECORDS</a></li>
-            <li><a id="logoutBtn" href="{% url 'account_logout' %}" class="custom-signup-btn mb-2">LOG OUT</a></li>
-          </ul>
-          
+            <li><a href="{% url 'dashboard' %}"><i class="fas fa-home"></i> HOME</a></li>
+            <li><a href="{% url 'columbaryrecords' %}"><i class="fas fa-folder-open"></i> RECORDS</a></li>
+            <li><a id="logoutBtn" href="{% url 'account_logout' %}" class="custom-signup-btn mb-2">
+                <i class="fas fa-sign-out-alt"></i> LOG OUT
+            </a></li>
+        </ul>               
         </nav>
     </div>
 </body>

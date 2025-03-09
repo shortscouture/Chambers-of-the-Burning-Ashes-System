@@ -12,6 +12,9 @@
     <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
 
     </style>
@@ -40,25 +43,26 @@
     <div class="dashboard-container">
         <div class="dashboard-grid">
             <div class="info-box" onclick="toggleTableVisibility('availableTableContainer')">
-                <h2>AVAILABLE COLUMBARIES</h2>
+                <h2><i class="fas fa-box-open info-icon"></i> AVAILABLE VAULTS</h2>
                 <p>{{ vacant_columbaries_count }}</p>
             </div>
 
             <div class="info-box" onclick="toggleTableVisibility('occupiedTableContainer')">
-                <h2>OCCUPIED COLUMBARIES</h2>
+                <h2><i class="fas fa-users info-icon"></i> OCCUPIED VAULTS</h2>
                 <p>{{ occupied_columbaries_count }}</p>
             </div>
 
             <div class="info-box" onclick="toggleTableVisibility('unissuedTableContainer')">
-                <h2>UNISSUED COLUMBARIES</h2>
+                <h2><i class="fas fa-file-alt info-icon"></i> UNISSUED VAULTS</h2>
                 <p>{{ unissued_columbaries }}</p>
             </div>
 
             <div class="info-box" onclick="toggleTableVisibility('pendingTableContainer')">
-                <h2>PENDING LETTERS OF INTENT</h2>
+                <h2><i class="fas fa-hourglass-half info-icon"></i> PENDING LETTERS OF INTENT</h2>
                 <p>{{ pending_counts }}</p>
             </div>
         </div>
+
 
         <!-- Pending Letter of Intent Table (Initially Hidden) -->
         <div id="pendingTableContainer" class="table-container hidden">
@@ -85,7 +89,7 @@
 
         <!-- Available Columbaries Table -->
         <div id="availableTableContainer" class="table-container hidden">
-            <h3>AVAILABLE COLUMBARIES</h3>
+            <h3>AVAILABLE VAULTS</h3>
             <table>
                 <thead>
                     <tr>
@@ -115,7 +119,7 @@
 
         <!-- Occupied Columbaries Table -->
         <div id="occupiedTableContainer" class="table-container hidden">
-            <h3>OCCUPIED COLUMBARIES</h3>
+            <h3>OCCUPIED VAULTS</h3>
             <table>
                 <thead>
                     <tr>
@@ -147,7 +151,7 @@
 
         <!-- Unissued Columbaries Table (Initially Hidden) -->
         <div id="unissuedTableContainer" class="table-container hidden">
-            <h3>UNISSUED COLUMBARIES</h3>
+            <h3>UNISSUED VAULTS</h3>
             <table id="availableTable">
                 <thead>
                     <tr>
@@ -172,6 +176,60 @@
             </table>
         </div>
 
+        <!-- Full Payment Breakdown Table -->
+        <div id="fullPaymentTableContainer" class="table-container hidden">
+            <h3>Full Payment Breakdown</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer Name</th>
+                        <th>Amount Paid</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in full_payment_records %}
+                    <tr>
+                        <td>{{ payment.customer.full_name }}</td>
+                        <td>₱{{ payment.Full_payment_amount_1 }}</td>
+                        <td>{{ payment.created_at|date:"Y-m-d" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">No full payment records found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Installment Breakdown Table -->
+        <div id="installmentTableContainer" class="table-container hidden">
+            <h3>Installment Breakdown</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer Name</th>
+                        <th>Total Amount Paid</th>
+                        <th>Payment Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in installment_payment_records %}
+                    <tr>
+                        <td>{{ payment.customer.full_name }}</td>
+                        <td>₱{{ payment.total_installment_paid }}</td>
+                        <td>{{ payment.payment_status }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">No installment records found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
         <div class="dashboard-grid">
             <div class="chart-container">
                 <h2>PAYMENT DISTRIBUTION</h2>
@@ -183,53 +241,92 @@
             </div>
         </div>
 
-
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-
         <!-- Hidden elements to store filtered earnings data -->
         <span id="earnings_labels" style="display: none;">{{ earnings_labels|safe }}</span>
         <span id="earnings_data" style="display: none;">{{ earnings_data|safe }}</span>
 
         <script>
             document.addEventListener("DOMContentLoaded", function () {
+                Chart.register(ChartDataLabels); // ✅ Register DataLabels plugin
+
                 var ctx = document.getElementById("paymentChart").getContext("2d");
+
+                var paymentLabels = JSON.parse('{{ payment_labels|safe }}'); // ✅ Ensure valid JSON
+                var paymentData = JSON.parse('{{ payment_data|safe }}'); // ✅ Ensure valid JSON
 
                 var paymentChart = new Chart(ctx, {
                     type: "doughnut",
                     data: {
-                        labels: {{ payment_labels| safe }},
-                datasets: [{
-                    data: {{ payment_data| safe }},
-                backgroundColor: ["#36A2EB", "#FFCE56"],
-            }]
-        },
-                options: {
-                responsive: true,
-                maintainAspectRatio: true, // Keep aspect ratio
-                aspectRatio: 1, // Ensure it's square
-                plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: {
-                            color: "#ffffff",
-                            font: { size: 16 }
-                        }
+                        labels: paymentLabels,
+                        datasets: [{
+                            data: paymentData,
+                            backgroundColor: ["#36A2EB", "#FFCE56"]
+                        }]
                     },
-                    datalabels: {  // Enable the plugin for showing percentages
-                        formatter: (value, ctx) => {
-                            let sum = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                            let percentage = ((value / sum) * 100).toFixed(2) + "%";
-                            return percentage;
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    color: "#ffffff",
+                                    font: { size: 16 }
+                                }
+                            },
+                            datalabels: {
+                                formatter: (value, ctx) => {
+                                    let sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                    let percentage = ((value / sum) * 100).toFixed(2) + "%";
+                                    return percentage;
+                                },
+                                color: "#525252",
+                                font: {
+                                    size: 25,
+                                    weight: "bold"
+                                }
+                            }
                         },
-                        color: "#ffffff", // Percentage text color
-                        font: { size: 30, weight: 'normal', family: 'Impact' }
+                        onClick: (event, elements) => {
+                            if (elements.length > 0) {
+                                var index = elements[0].index;
+                                var label = paymentChart.data.labels[index];
+
+                                console.log("Clicked segment:", label); // Debugging log
+                                toggleTableVisibility(label);
+                            }
+                        }
+                    }
+                });
+
+                function toggleTableVisibility(label) {
+                    var tableMap = {
+                        "Full Payment": "fullPaymentTableContainer",
+                        "Installment": "installmentTableContainer"
+                    };
+
+                    var tableId = tableMap[label];
+
+                    if (tableId) {
+                        var tableContainer = document.getElementById(tableId);
+
+                        if (tableContainer) {
+                            if (tableContainer.classList.contains("hidden")) {
+                                document.querySelectorAll('.table-container').forEach(container => {
+                                    container.classList.add("hidden");
+                                });
+
+                                tableContainer.classList.remove("hidden");
+                            } else {
+                                tableContainer.classList.add("hidden");
+                            }
+                        }
+                    } else {
+                        console.warn("No table found for label:", label);
                     }
                 }
-            },
-                plugins: [ChartDataLabels] // Activate the plugin
-    });
-});
+
+            });
 
             var earningsChart = null;  // 🔥 Ensure it's globally defined
 
@@ -428,7 +525,6 @@
                         tableContainer.classList.remove("hidden");
                     }
                 }
-
 
 
                 // Add event listeners AFTER the page loads
