@@ -5,14 +5,7 @@
 <head>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-image: url("{% static 'images/cloud.png' %}");
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            background-position: center;
-            margin: 0;
-            padding: 0;
+        background: #dbeafe;
         }
     </style>
     <meta charset="UTF-8">
@@ -70,7 +63,6 @@
                             <span class="label">Urns Per Columbary:</span>
                             <span class="value">{{ record.urns_per_columbary }}</span>
                         </div>
-                        <hr class="separator">
                     </div>
                 {% endfor %}
             {% else %}
@@ -127,7 +119,6 @@
                 {% endif %}
             {% endif %}
             
-            <hr class="separator">
         </div>
     {% endfor %}
 {% else %}
@@ -153,7 +144,6 @@
                             <span class="label">Expiration Date:</span>
                             <span class="value">{{ holder.expiration_date }}</span>
                         </div>
-                        <hr class="separator">
                     </div>
                 {% endfor %}
             {% else %}
@@ -177,7 +167,6 @@
                             <span class="label">Third Beneficiary Name:</span>
                             <span class="value">{{ beneficiary.third_beneficiary_name }}</span>
                         </div>
-                        <hr class="separator">
                     </div>
                 {% endfor %}
             {% else %}
