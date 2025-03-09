@@ -1,16 +1,17 @@
 import os
 from dotenv import load_dotenv
 from langgraph.graph import END, MessageGraph
-from langchain_openai import OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain.schema import HumanMessage
 from langgraph.graph import Graph
 from langchain.vectorstores import FAISS
-from langchain.embeddings.openai import OpenAIEmbeddings
 from sqlalchemy.orm import Session
 from django.conf import settings
 from .database import SessionLocal
 import environ
 from pathlib import Path
+
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent # always need lagyan tatlong parent kasi nasa base.py tayo
 
