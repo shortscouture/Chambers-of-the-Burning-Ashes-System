@@ -725,18 +725,18 @@ def upload_and_process(request):
         s3_client = boto3.client("s3")
         bucket_name = env("AWS_S3_BUCKET_NAME")
         file_key = f"uploads/{uploaded_file.name}"
-
         
         s3_client.upload_fileobj(uploaded_file, bucket_name, file_key)
-
         
         textract_client = boto3.client("textract")
         response = textract_client.analyze_document(
             Document={"S3Object": {"Bucket": bucket_name, "Name": file_key}},
-            FeatureTypes=["FORMS"]
+            FeatureTypes=["FORMS", "TABLES"]  # Add TABLES feature type
         )
 
         extracted_data = {}
+        
+        # Process key-value pairs (forms)
         for block in response.get("Blocks", []):
             if block["BlockType"] == "KEY_VALUE_SET" and "KEY" in block.get("EntityTypes", []):
                 key_text = ""
@@ -752,11 +752,82 @@ def upload_and_process(request):
                                         value_text = " ".join([w["Text"] for w in response["Blocks"] if w["Id"] in value_rel["Ids"]])
                 if key_text and value_text:
                     extracted_data[key_text] = value_text
+        
 
+        beneficiaries = extract_beneficiaries_from_tables(response.get("Blocks", []))
+        if beneficiaries:
+            extracted_data["BENEFICIARIES"] = beneficiaries
         
         return JsonResponse({"success": True, "data": extracted_data})
 
     return JsonResponse({"success": False, "error": "Invalid request"})
+
+def extract_beneficiaries_from_tables(blocks):
+    """Extract beneficiaries from tables in the document."""
+
+    tables = [block for block in blocks if block["BlockType"] == "TABLE"]
+    
+
+    beneficiaries_table = None
+    for table in tables:
+
+        table_bbox = table["Geometry"]["BoundingBox"]
+        nearby_texts = [
+            block for block in blocks 
+            if block["BlockType"] == "LINE" 
+            and is_nearby(block["Geometry"]["BoundingBox"], table_bbox)
+            and "BENEFICIARIES" in block.get("Text", "").upper()
+        ]
+        
+        if nearby_texts:
+            beneficiaries_table = table
+            break
+    
+    if not beneficiaries_table:
+        return None
+    
+
+    table_cells = {}
+    for block in blocks:
+        if (block["BlockType"] == "CELL" and 
+            "Relationships" in block and
+            any(rel["Type"] == "CHILD_OF" and beneficiaries_table["Id"] in rel["Ids"] 
+                for rel in block.get("Relationships", []))):
+            
+            row_index = block.get("RowIndex", 0)
+            col_index = block.get("ColumnIndex", 0)
+            
+            if row_index not in table_cells:
+                table_cells[row_index] = {}
+            
+
+            cell_text = ""
+            for rel in block.get("Relationships", []):
+                if rel["Type"] == "CHILD":
+                    words = [b for b in blocks if b["Id"] in rel["Ids"] and b["BlockType"] == "WORD"]
+                    cell_text = " ".join(word["Text"] for word in words)
+            
+            table_cells[row_index][col_index] = cell_text
+    
+
+    beneficiary_names = []
+    for row_index in sorted(table_cells.keys()):
+        if row_index > 1 and 1 in table_cells[row_index]: 
+            beneficiary_names.append(table_cells[row_index][1])
+    
+    return beneficiary_names
+
+def is_nearby(bbox1, bbox2):
+    """Check if two bounding boxes are near each other."""
+
+    vertical_distance = min(
+        abs(bbox1["Top"] - bbox2["Top"]),
+        abs(bbox1["Top"] + bbox1["Height"] - bbox2["Top"]),
+        abs(bbox1["Top"] - bbox2["Top"] - bbox2["Height"])
+    )
+    
+
+    return vertical_distance < 0.1
 
 def parse_text_to_dict(text):
     """

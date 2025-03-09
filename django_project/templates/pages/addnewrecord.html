@@ -13,15 +13,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add New Columbary Record</title>
-    <!-- Link to your CSS file -->
+    <title>Add New Vault Record</title>
+    
     <link rel="stylesheet" href="{% static 'css/addnewrecord.css' %}">
-    <!-- Add favicon -->
+   
     <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
 </head>
 <body>
     <div class="container">
-        <h2>Add New Columbary Record</h2>
+        <h2>Add New Vault Record</h2>
 <!-- OCR Capture Section -->
 <div class="card mb-4">
     <div class="card-header">
@@ -61,7 +61,7 @@
 </div>
 
         
-        <!-- Display Form Errors -->
+        
         {% if customer_form.errors or payment_form.errors or columbary_form.errors or holder_form.errors or beneficiary_form.errors %}
         <div class="alert alert-danger">
             <strong>There were errors in your submission. Please check the fields and try again.</strong>
@@ -125,7 +125,7 @@
                 <input type="text" name="third_beneficiary_name" id="id_third_beneficiary_name" placeholder="Third Beneficiary Name" class="form-control">
             </div>
 
-            <h3>Columbary Record</h3>
+            <h3>Vault Record</h3>
             <div class="form-group">
                 <label for="id_vault_id">Vault ID:</label>
                 <input type="text" name="vault_id" id="id_vault_id" placeholder="Vault ID" class="form-control">
@@ -133,7 +133,7 @@
                 <label for="id_inurnment_date">Inurnment Date:</label>
                 <input type="date" name="inurnment_date" id="id_inurnment_date" placeholder="Inurnment Date" class="form-control">
                 
-                <label for="id_urns_per_columbary">Urns Per Columbary:</label>
+                <label for="id_urns_per_columbary">Urns Per Vault:</label>
                 <select name="urns_per_columbary" id="id_urns_per_columbary" class="form-control">
                     <option value="1">1</option>
                     <option value="2">2</option>
@@ -181,7 +181,7 @@
 
             <button type="submit" class="btn btn-primary">Submit Record</button>
 
-            <!-- Go Back Button -->
+            
             <a href="{% url 'columbaryrecords' %}" class="btn btn-secondary" style="margin-left: 10px;">Go Back</a>
         </form>
     </div>
