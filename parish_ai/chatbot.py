@@ -11,7 +11,7 @@ from .database import SessionLocal
 import environ
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent.parent # always need lagyan tatlong parent kasi nasa base.py tayo
+BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent # always need lagyan tatlong parent kasi nasa base.py tayo
 
 
 # Initialize env variablesparent
