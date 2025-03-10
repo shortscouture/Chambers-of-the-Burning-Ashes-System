@@ -2,10 +2,12 @@
 .content {
   padding: 20px;
   margin: 0 auto;
-  max-width: 95%;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
 }
 
 /* Top Navigation */
@@ -13,12 +15,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background: #f3f3f3;
+  padding: 16px;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 1200px;
 }
 
 /* Filters & Search Bar Container */
@@ -26,17 +27,17 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center; /* Centering elements */
   width: 100%;
-  max-width: 1000px;
-  gap: 10px;
+  gap: 12px;
 }
 
 /* Checklist Filters */
 .checklist-filters {
   display: flex;
-  gap: 15px;
+  gap: 12px;
   flex-wrap: wrap;
+  justify-content: center; /* Center filters */
 }
 
 .checklist-filters label {
@@ -52,6 +53,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  justify-content: center; /* Centering search bar */
 }
 
 .search-form {
@@ -61,42 +63,50 @@
 }
 
 .search-bar input {
-  padding: 10px;
+  padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  width: 250px;
+  width: 280px;
+  font-size: 14px;
+}
+
+/* Centering the Add New Button */
+.bluebutt {
+  display: flex;
+  justify-content: center;
 }
 
 .bluebutt button {
-  padding: 10px 15px;
-  background: #007bff;
+  padding: 8px 12px;
+  background: #0078d4;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   transition: background 0.3s ease;
+  font-size: 14px;
 }
 
-.bluehov button:hover {
-  background: #0056b3;
+.bluebutt button:hover {
+  background: #005a9e;
 }
 
 /* Table Section */
 .table-container {
-  margin-top: 20px;
-  background: rgba(255, 255, 255, 0.95);
+  margin-top: 16px;
+  background: #ffffff;
   padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 1200px;
 }
 
 /* Table */
 table {
   width: 100%;
   border-collapse: collapse;
-  text-align: center;
+  text-align: left;
+  font-size: 14px;
 }
 
 table th, table td {
@@ -104,8 +114,12 @@ table th, table td {
   border-bottom: 1px solid #ddd;
 }
 
-table th {
-  background: #f4f4f4;
+/* Centering Beneficiary, Payment, Holder of Privilege Columns */
+.table-container td:nth-child(3), /* Beneficiary */
+.table-container td:nth-child(4), /* Payment */
+.table-container td:nth-child(5)  /* Holder of Privilege */
+{
+    text-align: center;
 }
 
 /* Sortable Headers */
@@ -115,39 +129,39 @@ th.sortable {
 }
 
 th.sortable:hover {
-  background-color: #ddd;
+  background-color: #e1e1e1;
 }
 
 /* Buttons */
 .details-button {
-  background: #28a745;
+  background: #107c10;
   color: white;
   border: none;
   border-radius: 4px;
-  padding: 5px 10px;
+  padding: 5px 12px;
   cursor: pointer;
 }
 
 .details-button:hover {
-  background: #218838;
+  background: #0b5a0b;
 }
 
 /* No Records Message */
 .no-records {
   text-align: center;
-  color: red;
-  font-size: 1.2em;
+  color: #a80000;
+  font-size: 1.1em;
   padding: 20px;
 }
 
 /* Status Colors */
 .status-completed {
-  color: rgb(46, 200, 74);
+  color: #107c10;
   font-weight: bold;
 }
 
 .status-incomplete {
-  color: red;
+  color: #a80000;
   font-weight: bold;
 }
 
@@ -159,39 +173,35 @@ th.sortable:hover {
 
 .pagination a {
   display: inline-block;
-  padding: 8px 16px;
+  padding: 6px 12px;
   margin: 2px;
   text-decoration: none;
   color: white;
-  background-color: #007bff;
-  border-radius: 5px;
+  background-color: #0078d4;
+  border-radius: 4px;
   transition: 0.3s;
 }
 
 .pagination a:hover {
-  background-color: #0056b3;
+  background-color: #005a9e;
 }
 
 .pagination span {
   font-weight: bold;
-  padding: 8px 16px;
+  padding: 6px 12px;
 }
 
-/* Background */
-body {
-  background: url("{% static 'images/garden3.jpg' %}") no-repeat center center fixed;
-  background-size: cover;
-}
-
+/* Add Button */
 .add-button {
-  background: #e70a0a;
+  background: #d13438;
   color: white;
   border: none;
   border-radius: 4px;
-  padding: 5px 10px;
+  padding: 6px 12px;
   cursor: pointer;
+  font-size: 14px;
 }
 
 .add-button:hover {
-  background: #a40808;
+  background: #a4262c;
 }

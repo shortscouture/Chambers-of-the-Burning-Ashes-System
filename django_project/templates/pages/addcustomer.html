@@ -1,150 +1,177 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add New Customer</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{% static 'css/addcustomer.css' %}">
-    <script src="{% static 'js/addnewrecord.js' %}" defer></script>
-</head>
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Assign New Customer</title>
+    
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" integrity="sha384-Towp4sCOhYlqO7M6XcmAvZOk5pH1PDDjtuY2wC2ILTB5MA+U5UnkqojF1f6NcIXB" crossorigin="anonymous">
+    
+        <link rel="stylesheet" href="{% static 'css/addcustomer.css' %}">
+        <script src="{% static 'js/addnewrecord.js' %}" defer></script>
+        <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    </head>
 <style>
     body {
-        background: url("{% static 'images/inside.jpg' %}") no-repeat center center fixed;
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
+    background: #dbeafe;
     }
 </style>
 <body>
-
+    {% include 'Staff_Headers.html' %}
 <div class="container">
-    <h2 class="text-center mt-4">Add New Customer</h2>
-    <form method="post" class="card p-4 mt-3">
+    <h2 class="text-center mt-4">Assign New Customer</h2>
+    <form method="post">
         {% csrf_token %}
 
-        <h4>Customer Details</h4>
         {% if vault_id %}
             <p>Assigning to Vault ID: <strong>{{ vault_id }}</strong></p>
             <input type="hidden" name="vault_id" value="{{ vault_id }}">
         {% endif %}
-        <h4>OCR Options</h4>
-        <div>
-            <!-- Webcam option -->
-            <label>
-                <input type="radio" id="webcamOption" name="ocrOption" value="webcam" checked> Capture from Webcam
-            </label>
-            <br>
-            <!-- File upload option -->
-            <label>
-                <input type="radio" id="uploadOption" name="ocrOption" value="upload"> Upload Document
-            </label>
+
+
+        <!-- OCR Capture Section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0" >Document OCR</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Scan a document to automatically fill out customer information.</p>
+                
+                <!-- OCR Options -->
+                <div class="btn-group mb-3" role="group">
+                    <button id="uploadOption" type="button" class="btn btn-outline-primary active">Upload Image</button>
+                    <button id="webcamOption" type="button" class="btn btn-outline-primary">Use Camera</button>
+                </div>
+                
+                <div id="fileUploadContainer" class="mb-3">
+                    <div class="input-group">
+                        <input type="file" class="form-control" id="ocrInput" accept="image/*">
+                        <div><button class="btn btn-outline-primary active" type="button" id="processOCR">Process Document</button></div>
+                    </div>
+                    <div class="form-text">Upload a clear image of your document</div>
+                </div>
+                
+                <!-- Webcam Option -->
+                <div id="webcam-container" style="display: none;">
+                    <div class="mb-3">
+                        <video id="webcam-view" autoplay playsinline style="width: 100%; max-width: 500px;"></video>
+                        <canvas id="captured-image" style="display: none; width: 100%; max-width: 500px;"></canvas>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <button id="captureButton" class="btn btn-primary me-2">Take Photo</button>
+                        <button id="retakeButton" class="btn btn-secondary me-2" style="display: none;">Retake</button>
+                        <button id="processWebcamButton" class="btn btn-success" style="display: none;">Process Photo</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div id="webcam-container" style="display: none;">
-            <h5>Capture Image from Webcam</h5>
-            <video id="webcam-view" width="640" height="480" autoplay></video>
-            <canvas id="captured-image" style="display: none;"></canvas>
-            <button type="button" id="captureButton" onclick="captureWebcamImage()">Capture Image</button>
-            <button type="button" id="retakeButton" style="display: none;" onclick="retakeWebcamImage()">Retake Image</button>
-            <button type="button" id="processWebcamButton" style="display: none;" onclick="processWebcamImage()">Process Image</button>
-        </div>
-
-        <div id="fileUploadContainer" style="display: none;">
-            <h5>Upload Document</h5>
-            <input type="file" id="ocrInput" accept="image/*">
-            <button type="button" id="processOCR">Process OCR</button>
-        </div>
         
-        <div class="row">
-            <div class="col-md-4">{{ customer_form.first_name.label_tag }} {{ customer_form.first_name }}</div>
-            <div class="col-md-4">{{ customer_form.middle_name.label_tag }} {{ customer_form.middle_name }}</div>
-            <div class="col-md-4">{{ customer_form.last_name.label_tag }} {{ customer_form.last_name }}</div>
-            <div class="col-md-4">{{ customer_form.suffix.label_tag }} {{ customer_form.suffix }}</div>
+        
+        {% if customer_form.errors or payment_form.errors or columbary_form.errors or holder_form.errors or beneficiary_form.errors %}
+        <div class="alert alert-danger">
+            <strong>There were errors in your submission. Please check the fields and try again.</strong>
+        </div>
+        {% endif %}
+        
+        <h3>Customer Name</h3>
+        <div class="dynamic-row">
+            <div class="form-group">{{ customer_form.first_name.label_tag }} {{ customer_form.first_name }}</div>
+            <div class="form-group">{{ customer_form.middle_name.label_tag }} {{ customer_form.middle_name }}</div>
+            <div class="form-group">{{ customer_form.last_name.label_tag }} {{ customer_form.last_name }}</div>
+            <div class="form-group">{{ customer_form.suffix.label_tag }} {{ customer_form.suffix }}</div>
+        </div>
+        <h3>Address</h3>
+        <div class="dynamic-row">
+            <div class="form-group">{{ customer_form.address_line_1.label_tag }} {{ customer_form.address_line_1 }}</div>
+            <div class="form-group">{{ customer_form.address_line_2.label_tag }} {{ customer_form.address_line_2 }}</div>
+        </div>
+        <div class="dynamic-row">
+            <div class="form-group">{{ customer_form.city.label_tag }} {{ customer_form.city }}</div>
+            <div class="form-group">{{ customer_form.province_or_state.label_tag }} {{ customer_form.province_or_state }}</div>
+        </div>
+        <div class="dynamic-row">
+            <div class="form-group">{{ customer_form.postal_code.label_tag }} {{ customer_form.postal_code }}</div>
+            <div class="form-group">{{ customer_form.country.label_tag }} {{ customer_form.country }}</div>
+        </div>
+        <h4>Contact Number</h4>
+        <div class="dynamic-row">
+            <div class="form-group">{{ customer_form.landline_number.label_tag }} {{ customer_form.landline_number }}</div>
+            <div class="form-group">{{ customer_form.mobile_number.label_tag }} {{ customer_form.mobile_number }}</div>
         </div>
 
-        <h4>Address</h4>
-        <div class="row">
-            <div class="col-md-6">{{ customer_form.address_line_1.label_tag }} {{ customer_form.address_line_1 }}</div>
-            <div class="col-md-6">{{ customer_form.address_line_2.label_tag }} {{ customer_form.address_line_2 }}</div>
-        </div>
-        <div class="row">
-            <div class="col-md-6">{{ customer_form.city.label_tag }} {{ customer_form.city }}</div>
-            <div class="col-md-6">{{ customer_form.province_or_state.label_tag }} {{ customer_form.province_or_state }}</div>
-        </div>
-        <div class="row">
-            <div class="col-md-6">{{ customer_form.postal_code.label_tag }} {{ customer_form.postal_code }}</div>
-            <div class="col-md-6">{{ customer_form.country.label_tag }} {{ customer_form.country }}</div>
+        <h4>Holder of Privilege</h4>
+        <div class="dynamic-row">
+            <div class="form-group">{{ holder_form.issuance_date.label_tag }} {{ holder_form.issuance_date }}</div>
+            <div class="form-group">{{ holder_form.expiration_date.label_tag }} {{ holder_form.expiration_date }}</div>
+            <div class="form-group">{{ holder_form.issuing_parish_priest.label_tag }} {{ holder_form.issuing_parish_priest }}</div>
+
         </div>
 
-        <div class="row">
-            <div class="col-md-6">{{ customer_form.landline_number.label_tag }} {{ customer_form.landline_number }}</div>
-            <div class="col-md-6">{{ customer_form.mobile_number.label_tag }} {{ customer_form.mobile_number }}</div>
+        <h4>Columbary Record</h4>
+        <div class="dynamic-row">
+            <div class="form-group">{{ columbary_form.inurnment_date.label_tag }} {{ columbary_form.inurnment_date }}</div>
         </div>
+        <div class="dynamic-row">
+            <div class="form-group">{{ columbary_form.urns_per_columbary.label_tag }} {{ columbary_form.urns_per_columbary }}</div>
+        </div>    
 
         <h4>Beneficiaries</h4>
-        <div class="row">
-            <div class="col-md-4">{{ beneficiary_form.first_beneficiary_name.label_tag }} {{ beneficiary_form.first_beneficiary_name }}</div>
-            <div class="col-md-4">{{ beneficiary_form.second_beneficiary_name.label_tag }} {{ beneficiary_form.second_beneficiary_name }}</div>
-            <div class="col-md-4">{{ beneficiary_form.third_beneficiary_name.label_tag }} {{ beneficiary_form.third_beneficiary_name }}</div>
+        <div class="dynamic-row">
+            <div class="form-group">{{ beneficiary_form.first_beneficiary_name.label_tag }} {{ beneficiary_form.first_beneficiary_name }}</div>
+            <div class="form-group">{{ beneficiary_form.second_beneficiary_name.label_tag }} {{ beneficiary_form.second_beneficiary_name }}</div>
+            <div class="form-group">{{ beneficiary_form.third_beneficiary_name.label_tag }} {{ beneficiary_form.third_beneficiary_name }}</div>
         </div>
 
         <h4>Payment Details</h4>
-        <div class="row">
-            <div class="col-md-6">{{ payment_form.mode_of_payment.label_tag }} {{ payment_form.mode_of_payment }}</div>
+        <div class="dynamic-row">
+            <div class="form-group">{{ payment_form.mode_of_payment.label_tag }} {{ payment_form.mode_of_payment }}</div>
         </div>
 
         <div id="full_payment_fields" style="display: none;">
             <h5>Full Payment</h5>
-            <label>Receipt #1:</label> {{ payment_form.Full_payment_receipt_1 }}
-            <label>Amount #1:</label> {{ payment_form.Full_payment_amount_1 }}
+            <div class="dynamic-row">
+            <div class="form-group">Receipt #1:{{ payment_form.Full_payment_receipt_1 }}</div>
+            <div class="form-group">Amount #1:{{ payment_form.Full_payment_amount_1 }}</div>
+            </div>
         </div>
 
         <div id="installment_payment_fields" style="display: none;">
             <h5>6-Month Installment</h5>
-            <div class="row">
-                <div class="col-md-6"><label>Receipt #1:</label> {{ payment_form.six_month_receipt_1 }}</div>
-                <div class="col-md-6"><label>Amount #1:</label> {{ payment_form.six_month_amount_1 }}</div>
+            <div class="dynamic-row">
+                <div class="form-group">Receipt #1:{{ payment_form.six_month_receipt_1 }}</div>
+                <div class="form-group">Amount #1:{{ payment_form.six_month_amount_1 }}</div>
             </div>
-            <div class="row">
-                <div class="col-md-6"><label>Receipt #2:</label> {{ payment_form.six_month_receipt_2 }}</div>
-                <div class="col-md-6"><label>Amount #2:</label> {{ payment_form.six_month_amount_2 }}</div>
+            <div class="dynamic-row">
+                <div class="form-group">Receipt #2:{{ payment_form.six_month_receipt_2 }}</div>
+                <div class="form-group">Amount #2:{{ payment_form.six_month_amount_2 }}</div>
             </div>
-            <div class="row">
-                <div class="col-md-6"><label>Receipt #3:</label> {{ payment_form.six_month_receipt_3 }}</div>
-                <div class="col-md-6"><label>Amount #3:</label> {{ payment_form.six_month_amount_3 }}</div>
+            <div class="dynamic-row">
+                <div class="form-group">Receipt #3:{{ payment_form.six_month_receipt_3 }}</div>
+                <div class="form-group">Amount #3:{{ payment_form.six_month_amount_3 }}</div>
             </div>
-            <div class="row">
-                <div class="col-md-6"><label>Receipt #4:</label> {{ payment_form.six_month_receipt_4 }}</div>
-                <div class="col-md-6"><label>Amount #4:</label> {{ payment_form.six_month_amount_4 }}</div>
+            <div class="dynamic-row">
+                <div class="form-group">Receipt #4:{{ payment_form.six_month_receipt_4 }}</div>
+                <div class="form-group">Amount #4:{{ payment_form.six_month_amount_4 }}</div>
             </div>
-            <div class="row">
-                <div class="col-md-6"><label>Receipt #5:</label> {{ payment_form.six_month_receipt_5 }}</div>
-                <div class="col-md-6"><label>Amount #5:</label> {{ payment_form.six_month_amount_5 }}</div>
+            <div class="dynamic-row">
+                <div class="form-group">Receipt #5:{{ payment_form.six_month_receipt_5 }}</div>
+                <div class="form-group">Amount #5:{{ payment_form.six_month_amount_5 }}</div>
             </div>
-            <div class="row">
-                <div class="col-md-6"><label>Receipt #6:</label> {{ payment_form.six_month_receipt_6 }}</div>
-                <div class="col-md-6"><label>Amount #6:</label> {{ payment_form.six_month_amount_6 }}</div>
+            <div class="dynamic-row">
+                <div class="form-group">Receipt #6:{{ payment_form.six_month_receipt_6 }}</div>
+                <div class="form-group">Amount #6:{{ payment_form.six_month_amount_6 }}</div>
             </div>
-        </div>
-
-        <h4>Holder of Privilege</h4>
-        <div class="row">
-            <div class="col-md-6">{{ holder_form.issuance_date.label_tag }} {{ holder_form.issuance_date }}</div>
-            <div class="col-md-6">{{ holder_form.expiration_date.label_tag }} {{ holder_form.expiration_date }}</div>
-        </div>
-
-        <h4>Columbary Record</h4>
-        <div class="row">
-            <div class="col-md-6">{{ columbary_form.inurnment_date.label_tag }} {{ columbary_form.inurnment_date }}</div>
-        </div>
-        <div class="row">
-            <div class="col-md-6">{{ columbary_form.urns_per_columbary.label_tag }} {{ columbary_form.urns_per_columbary }}</div>
-        </div>        
+        </div>    
 
         <div class="text-center mt-4">
             <button type="submit" class="btn btn-primary btn-lg">Add Customer</button>
+            <a href="{% url 'columbaryrecords' %}" class="btn go-back-button">Go Back</a>
         </div>
     </form>
 </div>

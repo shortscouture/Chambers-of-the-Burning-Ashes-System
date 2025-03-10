@@ -1,47 +1,195 @@
-/* General Page Styling */
+/* General Styling */
 body {
-  background-color: #f8f9fa;
-  font-family: Arial, sans-serif;
+  background: #dbeafe;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
+/* Container */
 .container {
   max-width: 800px;
-  margin: auto;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-left: 3px solid #0078d4;
+  border-bottom: 3px solid #0078d4;
 }
 
+/* Form Title */
 h2 {
-  color: #333;
-}
-
-.section-title {
-  margin-top: 20px;
-  font-weight: bold;
-  color: #0056b3;
-  border-bottom: 2px solid #0056b3;
-  padding-bottom: 5px;
+  font-size: 28px;
+  font-weight: 600;
+  color: #201f1e;
+  margin-bottom: 24px;
 }
 
 /* Card Styling */
 .card {
-  background: #ffffff;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 10px;
+  border-left: 7px solid #0078d4;
+}
+
+.card-header {
+  background-color: #0078d4;
+  color: #ffffff;
+  border-radius: 8px 8px 0 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 22px; 
+  font-weight: bold;
+  padding: .1rem 2rem;
+}
+
+.card-body {
+  padding: 1.5rem;
 }
 
 /* Input Fields */
-.form-control {
-  margin-bottom: 10px;
-  border-radius: 5px;
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 4px;
+  border: 1px solid #c8c8c8;
+  background-color: #fff;
+  font-size: 14px;
+  color: #201f1e;
+  transition: border-color 0.2s ease;
+  margin-bottom: 12px;
 }
 
-/* Submit Button */
-.btn-primary {
-  background-color: #007bff;
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #0078d4;
+  outline: none;
+  box-shadow: 0 0 0 1px #0078d4;
+}
+
+/* Buttons */
+.btn, .submit-button, .go-back-button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
   border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
+  background-color: #0078d4;
+  color: white;
 }
 
-.btn-primary:hover {
-  background-color: #0056b3;
+.btn:hover, .submit-button:hover, .go-back-button:hover {
+  background-color: #005a9e;
+}
+
+/* Secondary Buttons */
+.btn-secondary {
+  background-color: #f3f2f1;
+  color: #201f1e;
+}
+
+.btn-secondary:hover {
+  background-color: #e1dfdd;
+}
+
+/* Labels */
+label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  display: block;
+  color: #201f1e;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+      padding: 1rem;
+      width: 90%;
+  }
+}
+
+/* Form */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Fieldset */
+fieldset {
+  padding: 16px;
+  border: 1px solid #c8c8c8;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+legend {
+  font-size: 16px;
+  font-weight: 600;
+  color: #201f1e;
+  margin-bottom: 8px;
+}
+
+/* Placeholder Text */
+input::placeholder, textarea::placeholder {
+  color: #6a6a6a;
+}
+
+/* Button Container */
+.button-container {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
+  margin-top: 15px;
+  align-items: center;
+}
+
+.go-back-button {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+
+
+/* Make form rows flexible */
+.dynamic-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 25px; /* Increased spacing between elements */
+  justify-content: space-between; /* Distributes elements evenly */
+}
+
+/* Each input field should grow and shrink based on available space */
+.dynamic-row .form-group {
+  flex: 1 1 250px; /* Allows fields to expand but not too long */
+  min-width: 200px; /* Ensures fields don’t shrink too much */
+  max-width: 300px; /* Limits maximum field width */
+}
+
+/* Ensure inputs take full width inside their container */
+.dynamic-row .form-group input {
+  width: 70%;
+}
+
+/* Responsive: Stack fields on smaller screens */
+@media (max-width: 768px) {
+  .dynamic-row {
+      flex-direction: column; /* Stack fields vertically */
+  }
+}
+
+#id_suffix {
+  width: 100px; /* Set a fixed width */
+  max-width: 40px; /* Ensures it doesn’t expand too much */
 }
