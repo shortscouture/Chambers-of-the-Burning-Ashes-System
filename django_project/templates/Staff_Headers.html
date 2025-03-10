@@ -13,13 +13,13 @@
 <body>
   <header>
     <div id="header">
-      <div class="container">
+      <div class="staffcontainer">
         <nav>
-          <img src="{% static 'images/sa_logo.gif' %}" alt="logoheader" class="logohead">
-          <ul class="headname">
+          <img src="{% static 'images/sa_logo.gif' %}" alt="stafflogoheader" class="logohead">
+          <ul class="staffheadname">
             <li><a href="{% url 'dashboard' %}"><i class="fas fa-home"></i> HOME</a></li>
             <li><a href="{% url 'columbaryrecords' %}"><i class="fas fa-folder-open"></i> RECORDS</a></li>
-            <li><a id="logoutBtn" href="{% url 'account_logout' %}" class="custom-signup-btn mb-2">
+            <li><a id="stafflogoutBtn" href="{% url 'account_logout' %}" class="custom-signup-btn mb-2">
                 <i class="fas fa-sign-out-alt"></i> LOG OUT
             </a></li>
         </ul>               

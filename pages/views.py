@@ -1,5 +1,5 @@
 from django.views.generic import TemplateView, DeleteView
-from django.shortcuts import render, redirect, get_object_or_404,  HttpResponseRedirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
@@ -8,26 +8,14 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.db.models import Count, Sum, Q
 from datetime import datetime, timedelta
-from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm, PaymentForm, HolderOfPrivilegeForm, DocumentUploadForm
-from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, ChatQuery, ParishAdministrator, HolderOfPrivilege
-from django.forms import modelformset_factory
+from .forms import CustomerForm, ColumbaryRecordForm, BeneficiaryForm, EmailVerificationForm, PaymentForm, HolderOfPrivilegeForm
+from .models import Customer, ColumbaryRecord, Beneficiary, TwoFactorAuth,Customer, Payment, HolderOfPrivilege
 from django.urls import reverse_lazy, reverse
-from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
-from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse, HttpResponse
 from django.views.generic.base import TemplateView
-from django.db import transaction, connection
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from PIL import Image
-import numpy as np
-import openai
-from openai import OpenAI
-from django.db import transaction
 import json
 import environ
 from django.db.models.functions import TruncMonth
-from django.contrib.auth.mixins import LoginRequiredMixin
 import logging
 from django.views.generic import TemplateView
 from django.core.paginator import Paginator
@@ -36,10 +24,6 @@ from .models import ColumbaryRecord
 from django.utils.safestring import mark_safe
 from django.db.models import Count, Sum
 from django.db.models.functions import TruncMonth
-import json
-import io
-import base64
-from django.core.files.uploadedfile import InMemoryUploadedFile
 import boto3
 from django.db.models import Sum, F, Value, DecimalField
 from django.db.models.functions import Coalesce
@@ -71,11 +55,11 @@ class HomePageView(TemplateView):
     template_name = "pages/home.html"
 
 
+
 class AboutPageView(TemplateView):
     template_name = "pages/about.html"
 
-class MapView(TemplateView):
-    template_name= "Columbary_Map.html"
+
     
 class MainDashView(TemplateView):
     template_name = "pages/maindash.html"
@@ -235,8 +219,8 @@ class DashboardView(TemplateView):
             .order_by("holder_of_privilege__issuance_date")
         )
 
-        class DashboardView(TemplateView):
-            template_name = "dashboard.html"
+class DashboardView(TemplateView):
+    template_name = "dashboard.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -274,6 +258,16 @@ class DashboardView(TemplateView):
         # Separate vacant and occupied columbaries
         vacant_columbaries = filtered_columbaries.filter(status="Vacant")
         occupied_columbaries = filtered_columbaries.filter(status="Occupied")
+        
+        context["occupied_columbaries"] = [
+            {
+                "vault_id": record.vault_id,
+                "customer_name": record.customer.full_name() if record.customer else "No Customer",
+                "inurnment_date": record.inurnment_date,
+                "expiration_date": record.expiration_date,  # Add calculated expiration date
+            }
+            for record in occupied_columbaries
+        ]
 
         # Count filtered columbaries
         vacant_columbaries_count = vacant_columbaries.count()
@@ -283,10 +277,6 @@ class DashboardView(TemplateView):
         payments = Payment.objects.all()
         if start_date and end_date:
             payments = payments.filter(created_at__date__range=[start_date, end_date])
-
-        # Count Payments
-        full_payment_count = payments.filter(mode_of_payment="Full Payment").count()
-        installment_count = payments.filter(mode_of_payment="6-Month Installment").count()
 
         # Earnings per month based on filtered payments
         earnings_by_month = (
@@ -298,24 +288,32 @@ class DashboardView(TemplateView):
         
         # Fetch Payment Records
         full_payment_records = Payment.objects.filter(mode_of_payment="Full Payment")
-        installment_payment_records = Payment.objects.filter(mode_of_payment="6-Month Installment").annotate(
+        # Retrieve installment payments and calculate total paid
+        installment_payments = Payment.objects.filter(mode_of_payment="6-Month Installment").annotate(
             total_installment_paid=Coalesce(
-                Sum(F("six_month_amount_1"), output_field=DecimalField()) + 
-                Sum(F("six_month_amount_2"), output_field=DecimalField()) + 
-                Sum(F("six_month_amount_3"), output_field=DecimalField()) + 
-                Sum(F("six_month_amount_4"), output_field=DecimalField()) + 
-                Sum(F("six_month_amount_5"), output_field=DecimalField()) + 
+                Sum(F("six_month_amount_1"), output_field=DecimalField()) +
+                Sum(F("six_month_amount_2"), output_field=DecimalField()) +
+                Sum(F("six_month_amount_3"), output_field=DecimalField()) +
+                Sum(F("six_month_amount_4"), output_field=DecimalField()) +
+                Sum(F("six_month_amount_5"), output_field=DecimalField()) +
                 Sum(F("six_month_amount_6"), output_field=DecimalField()), 
-                Value(0, output_field=DecimalField())
+                Value(0, output_field=DecimalField())  # Default to 0 if no payments
             )
         )
+
+        # Count Payments
+        full_payment_count = payments.filter(mode_of_payment="Full Payment").count()
+
+        # Define completed and unpaid installment counts
+        completed_installment_count = installment_payments.filter(total_installment_paid=F("total_amount")).count()
+        unpaid_installment_count = installment_payments.exclude(total_installment_paid=F("total_amount")).count()
 
         # Convert data for Chart.js
         earnings_labels = [entry["month"].strftime("%b %Y") if entry["month"] else "Unknown" for entry in earnings_by_month]
         earnings_data = [float(entry["total_earnings"]) if entry["total_earnings"] else 0 for entry in earnings_by_month]
 
-        payment_labels = ["Full Payment", "Installment"]
-        payment_data = [full_payment_count, installment_count]
+        payment_labels = ["Full Payment", "Completed Installment", "Unpaid Installment"]
+        payment_data = [full_payment_count, completed_installment_count, unpaid_installment_count]
 
         # Update context with ALL columbaries (ensures they are always passed)
         context.update({
@@ -327,14 +325,15 @@ class DashboardView(TemplateView):
             "pending_counts": pending_customers.count(),
             "unissued_columbary_records": unissued_columbaries,
             "pending_customers": pending_customers,
-            "payment_labels": mark_safe(json.dumps(payment_labels)),
-            "payment_data": mark_safe(json.dumps(payment_data)),
             "earnings_labels": mark_safe(json.dumps(earnings_labels)),
             "earnings_data": mark_safe(json.dumps(earnings_data)),
             "start_date": start_date.strftime("%Y-%m-%d") if start_date else "",
             "end_date": end_date.strftime("%Y-%m-%d") if end_date else "",
             "full_payment_records": full_payment_records,
-            "installment_payment_records": installment_payment_records,
+            "payment_labels": mark_safe(json.dumps(payment_labels)),
+            "payment_data": mark_safe(json.dumps(payment_data)),
+            "completed_installment_records": installment_payments.filter(total_installment_paid=F("total_amount")),
+            "unpaid_installment_records": installment_payments.exclude(total_installment_paid=F("total_amount")),
         })
 
         return context
@@ -454,7 +453,7 @@ def decline_letter_of_intent(request, intent_id):
         fail_silently=False,
     )
 
-    return redirect('some_rejection_page')
+    return redirect('success.html')
 
 
 from django.shortcuts import render, get_object_or_404, redirect
@@ -712,8 +711,7 @@ def verify_otp(request):
             messages.error(request, "Something went wrong. Please try again.")
             return redirect('Memorials')
 
-    return render(request, 'pages/verify_otp.html')
-
+    return render(request, 'pages/Memorials.html')
 
 def success(request):
     return render(request, 'pages/success.html')
@@ -924,132 +922,6 @@ def parse_text_to_dict(text):
         data["inurnment_date"] = date_match.group(1).strip()
     
     return data
-
-
-#chatbot env
-env = environ.Env(
-    DEBUG=(bool, False) #default value for DEBUG = False
-)
-        
-openai.api_key = env("OPEN_AI_API_KEY")
-logger = logging.getLogger(__name__)
-class ChatbotAPIView(APIView):
-    def get(self, request, *args, **kwargs):
-        return Response({"message": "Chatbot API is running! Use POST to send messages."}, status=200)
-
-    
-    def post(self, request, *args, **kwargs):
-        user_query = request.data.get("message", "").strip()
-        if not user_query:
-            return JsonResponse({"error": "No query provided"}, status=400)
-
-        db_answer = self.get_answer_from_parish_knowledge(user_query)
-
-        ai_response = self.query_openai(user_query, db_answer)
-        
-        # Save the chat history into pages_chatquery
-        self.save_chat_history(user_query, ai_response)
-
-
-        return JsonResponse({
-            "query": user_query,
-            "response": ai_response,
-        })
-
-
-    def get_answer_from_parish_knowledge(self, query):
-        """Uses FULLTEXT search to find the best matching answer in parish_knowledge."""
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                SELECT answer, MATCH(question) AGAINST (%s IN NATURAL LANGUAGE MODE) AS relevance 
-                FROM parish_knowledge 
-                WHERE MATCH(question) AGAINST (%s IN NATURAL LANGUAGE MODE) 
-                ORDER BY relevance DESC LIMIT 1;
-                """, [query, query])
-            result = cursor.fetchone()
-            return result[0] if result else None
-
-
-    def get_all_knowledge(self):
-        """Retrieves all questions and answers from parish_knowledge for AI context."""
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT question, answer FROM parish_knowledge;")
-            rows = cursor.fetchall()
-        return [{"question": q, "answer": a} for q, a in rows]
-
-
-
-    def query_openai(self, user_query, db_answer=None, past_conversations=None):
-        """Uses OpenAI while incorporating database knowledge."""
-        try:
-            # Construct the AI prompt to guide behavior
-            system_prompt = (
-                "You are a helpful chatbot for church visitors. "
-                "If there is relevant information from the church database, use it, "
-                "Only answer questions about the columbarium, and if they answer things such as baptism or wedding, or funeral services, direct them to the contact information, it's found in the parish_questions database"
-                "but if the user gives you specific instructions on how to respond, follow them."
-                "direct them to the church's contact information."
-            )
-
-            # Prepare messages with context  
-            messages = [{"role": "system", "content": system_prompt}]
-
-            if past_conversations:
-                for convo in past_conversations:
-                    messages.append({"role": "user", "content": convo["query"]})
-                    messages.append({"role": "assistant", "content": convo["response"]})
-
-            if db_answer:
-                messages.append({"role": "assistant", "content": f"Database says: {db_answer}"})
-
-                messages.append({"role": "user", "content": user_query})
-
-                response = openai.chat.completions.create(
-                    model="gpt-3.5-turbo",
-                    messages=messages,
-                    temperature=0.7
-                )
-
-                if response and response.choices:
-                    return response.choices[0].message.content.strip()
-            
-        except Exception as e:
-            print(f"OpenAI API error: {e}")
-
-        return "I'm not sure how to answer that. Please contact the St. Alphonsus Mary de Liguori Parish for further assistance."
-
-
-    def save_unanswered_query(self, query):
-        """Logs unanswered queries to pages_chatquery."""
-        with connection.cursor() as cursor:
-            cursor.execute("INSERT INTO pages_chatquery (query, created_at) VALUES (%s, NOW());", [query])
-
-    
-    def get_related_parish_knowledge(self, query):
-        """Finds questions in parish_knowledge that contain keywords from the user's query."""
-        search_query = f"%{query}%"
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT question, answer FROM parish_knowledge WHERE question LIKE %s LIMIT 5;", [search_query])
-            return cursor.fetchall()  # Returns a list of (question, answer) tuples
-
-    def get_past_conversations(self, limit=5):
-        """Retrieve the last few conversations from pages_chatquery for context"""
-        with connection.cursor() as cursor:
-            cursor.execute(
-                "SELECT user_message, bot_response FROM pages_chatquery ORDER BY created_at DESC LIMIT %s;",
-                [limit]
-            )
-            past_chats = cursor.fetchall()
-
-        return [{"query": chat[0], "response": chat[1]} for chat in past_chats]
-    
-    def save_chat_history(self, user_query, bot_response):
-        """Logs chat messages to pages_chatquery."""
-        with connection.cursor() as cursor:
-            cursor.execute(
-                "INSERT INTO pages_chatquery (user_message, bot_response, created_at) VALUES (%s, %s, NOW(6));",
-                [user_query, bot_response]
-            )
 
 
 
