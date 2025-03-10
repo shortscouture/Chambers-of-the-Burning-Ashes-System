@@ -262,7 +262,6 @@ class DashboardView(TemplateView):
         context["occupied_columbaries"] = [
             {
                 "vault_id": record.vault_id,
-                "customer_name": record.customer.full_name() if record.customer else "No Customer",
                 "inurnment_date": record.inurnment_date,
                 "expiration_date": record.expiration_date,  # Add calculated expiration date
             }
