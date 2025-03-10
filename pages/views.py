@@ -184,6 +184,8 @@ class DashboardView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        
+        request = self.request
 
         # Fetch necessary data
         customer_status_counts = Customer.objects.values('status').annotate(count=Count('status'))
@@ -192,6 +194,10 @@ class DashboardView(TemplateView):
         occupied_columbaries_count = ColumbaryRecord.objects.filter(status="Occupied").count()
         full_payment_count = Payment.objects.filter(mode_of_payment="Full Payment").count()
         installment_count = Payment.objects.filter(mode_of_payment="6-Month Installment").count()
+        
+        customer = None
+        if request.user.is_authenticated:
+            customer = Customer.objects.filter(email_address=request.user.email).first()
 
         # Ensure correct referencing of issuance date in HolderOfPrivilege
         unissued_columbaries = ColumbaryRecord.objects.filter(
@@ -218,12 +224,6 @@ class DashboardView(TemplateView):
                     Sum("payment__six_month_amount_6"))
             .order_by("holder_of_privilege__issuance_date")
         )
-
-class DashboardView(TemplateView):
-    template_name = "dashboard.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
 
         # Get filter parameters from the request
         request = self.request
@@ -333,6 +333,7 @@ class DashboardView(TemplateView):
             "payment_data": mark_safe(json.dumps(payment_data)),
             "completed_installment_records": installment_payments.filter(total_installment_paid=F("total_amount")),
             "unpaid_installment_records": installment_payments.exclude(total_installment_paid=F("total_amount")),
+            "customer": customer if customer else "No associated customer",
         })
 
         return context
