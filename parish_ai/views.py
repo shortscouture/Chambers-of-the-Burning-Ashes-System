@@ -10,7 +10,10 @@ class ChatbotAPIView(APIView):
         if not user_query:
             return Response({"error": "Query cannot be empty"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Run the chatbot workflow
         result = chatbot.invoke({"query": user_query})
 
-        return Response(result["response"], status=status.HTTP_200_OK)
+        # Extract "answer" directly and clean up quotes
+        bot_response = result.get("response", {}).get("answer", "No response from bot")
+        clean_response = bot_response.strip("'\"")  # Remove unnecessary quotes
+
+        return Response({"response": clean_response}, status=status.HTTP_200_OK)

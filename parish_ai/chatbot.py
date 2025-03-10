@@ -196,7 +196,7 @@ def generate_response(state: dict):
     elif context:
         response_prompt = f"""
         Given the following context, which is a question and answer pair: '{context}'
-        Extract and return only the answer from the context.
+        Extract and return only the answer from the context. 
         """
         human_response = llm.invoke([HumanMessage(content=response_prompt)]).content
         return {"response": {"answer": human_response, "source": "FAISS"}}
