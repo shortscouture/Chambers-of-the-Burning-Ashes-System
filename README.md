@@ -14,3 +14,7 @@ Ramon Surara Jr. (rdsurara@student.apc.edu.ph)
 
 The project aims to automate the management of columbarium records, ensuring accurate tracking of vaults, improving customer data security, and streamlining the retrieval of information. By migrating from physical and Excel-based records to a secure, centralized database with integrated backup and encryption features, the parish can significantly reduce human errors and enhance service delivery for St. Alphonsus Mary de Liguori Parish. 
 
+*Forked over by original authors of the project. 
+
+
+
